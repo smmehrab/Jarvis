@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="50dp"
+    tools:context=".SignInActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@drawable/logo" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:background="@drawable/left_rounded_rec"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/email_txt"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/sign_in_email_edit_txt"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/right_rounded_outline_rec"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:background="@drawable/left_rounded_rec"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/pass_txt"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/sign_in_pass_edit_txt"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/right_rounded_outline_rec"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:textSize="11sp" />
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/sign_in_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rounded_solid_rec"
+        android:text="@string/sign_in_btn_txt"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/sign_in_with_google_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_outline_rec"
+        android:drawableLeft="@drawable/google_icon"
+        android:padding="5dp"
+        android:text="@string/sign_in_with_google_btn_txt"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/forgot_pass_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorWhite"
+        android:clickable="true"
+        android:focusable="true"
+        android:shadowColor="@color/colorWhite"
+        android:stateListAnimator="@null"
+        android:text="@string/forgot_pass_btn_txt"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textSize="11sp" />
+
+</LinearLayout>

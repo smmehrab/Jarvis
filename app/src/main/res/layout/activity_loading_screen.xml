@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    tools:context=".LoadingScreenActivity">
+
+    <LinearLayout
+        android:id="@+id/bar1"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="140dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"
+        android:layout_marginEnd="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/bar2"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"
+        android:layout_marginEnd="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/bar3"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"
+        android:layout_marginEnd="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/bar4"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/bar5"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"
+        android:layout_marginEnd="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/bar6"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="140dp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_solid_rec"/>
+
+</LinearLayout>
