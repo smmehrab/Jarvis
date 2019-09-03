@@ -1,0 +1,13 @@
+# GENERATED
+*build
+buildsystem
+.gradle
+.DS_Store
+
+# LOCAL
+local.properties
+gradle.properties
+
+# IDEA
+*.idea
+*.iml
