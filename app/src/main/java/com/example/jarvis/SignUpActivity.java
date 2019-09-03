@@ -47,7 +47,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             finish();
         }
         else if(view == signUpWithGoogleBtn){
-
+            // Here you go
         }
     }
 

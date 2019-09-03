@@ -51,8 +51,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         else if(view == signInWithGoogleBtn){
-
-
+            // Here you go
         }
 
         else if(view == forgotPassBtn){
