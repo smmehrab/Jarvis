@@ -18,4 +18,22 @@
     <string name="pass_txt">Password</string>
     <string name="confirm_pass_txt">Confirm Password</string>
 
+    <string name="voice_command_txt">Voice Command</string>
+    <string name="home_txt">Home</string>
+
+    <string name="todo_txt">Todo</string>
+    <string name="journal_txt">Journal</string>
+    <string name="wallet_txt">Wallet</string>
+    <string name="reminder_txt">Reminder</string>
+
+
+    <string name="settings_txt">Settings</string>
+    <string name="history_txt">History</string>
+    <string name="sign_out_txt">Sign Out</string>
+
+    <string name="profile_name_txt">Jarvis Bot</string>
+    <string name="profile_email_txt">jarvis@gmail.com</string>
+
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>
