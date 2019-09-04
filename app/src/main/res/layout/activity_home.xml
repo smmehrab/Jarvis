@@ -1,31 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/drawer_layout"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".HomeActivity">
+
+<LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    android:orientation="vertical"
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <include layout="@layout/home_action_bar"
+        android:id="@+id/action_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"/>
 
-        <include layout="@layout/action_bar"
-            android:id="@+id/action_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/todo_activity_btn"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:text="@string/todo_txt" />
 
-    </LinearLayout>
+    <Button
+        android:id="@+id/journal_activity_btn"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:text="@string/journal_txt" />
 
-    <com.google.android.material.navigation.NavigationView
-        app:headerLayout="@layout/left_drawer_header"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        app:menu="@menu/left_drawer_menu"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true">
+    <Button
+        android:id="@+id/wallet_activity_btn"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:text="@string/wallet_txt" />
 
-    </com.google.android.material.navigation.NavigationView>
+    <Button
+        android:id="@+id/reminder_activity_btn"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:text="@string/reminder_txt" />
+
+
+</LinearLayout>
+
+
+
+<com.google.android.material.navigation.NavigationView
+    android:id="@+id/left_navigation_view"
+    app:headerLayout="@layout/left_drawer_header"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    app:menu="@menu/left_drawer_menu"
+    android:layout_gravity="start"
+    android:fitsSystemWindows="true">
+
+</com.google.android.material.navigation.NavigationView>
+
+<com.google.android.material.navigation.NavigationView
+    android:id="@+id/right_navigation_view"
+    app:headerLayout="@layout/home_drawer_header"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    app:menu="@menu/right_drawer_menu"
+    android:layout_gravity="end"
+    android:fitsSystemWindows="true">
+
+</com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -23,45 +23,62 @@ import com.google.android.material.navigation.NavigationView;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
-    private boolean doubleBackToExitPressedOnce = false;
-    private Button leftNavOn;
-    private Button rightNavOn;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
 
-    private DrawerLayout leftDrawer;
-    private boolean leftDrawerState=false;
-
-    private DrawerLayout rightDrawer;
-    private boolean rightDrawerState=false;
+    private NavigationView leftNavigationView;
+    private NavigationView rightNavigationView;
 
     private Toolbar actionBar;
+
+    private Button leftDrawerBtn;
+    private Button rightDrawerBtn;
+
+    private Button todoActivityBtn;
+    private Button journalActivityBtn;
+    private Button walletActivityBtn;
+    private Button reminderActivityBtn;
+
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        loadXmlElements();
-        setListeners();
+        settingUpXmlElements();
     }
 
 
-    void loadXmlElements(){
-        leftNavOn = (Button) findViewById(R.id.left_nav_on_btn);
-        rightNavOn = (Button) findViewById(R.id.right_nav_on_btn);
+    void settingUpXmlElements(){
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        leftNavigationView = (NavigationView) findViewById(R.id.left_navigation_view);
+        rightNavigationView = (NavigationView) findViewById(R.id.right_navigation_view);
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        leftDrawerBtn = (Button) findViewById(R.id.left_nav_on_btn);
+        rightDrawerBtn = (Button) findViewById(R.id.right_nav_on_btn);
 
-        leftDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        todoActivityBtn = (Button) findViewById(R.id.todo_activity_btn);
+        journalActivityBtn = (Button) findViewById(R.id.journal_activity_btn);
+        walletActivityBtn = (Button) findViewById(R.id.wallet_activity_btn);
+        reminderActivityBtn = (Button) findViewById(R.id.reminder_activity_btn);
+
+        leftDrawerBtn.setOnClickListener(this);
+        rightDrawerBtn.setOnClickListener(this);
+
+        todoActivityBtn.setOnClickListener(this);
+        journalActivityBtn.setOnClickListener(this);
+        walletActivityBtn.setOnClickListener(this);
+        reminderActivityBtn.setOnClickListener(this);
     }
 
-    void setListeners(){
-        leftNavOn.setOnClickListener(this);
-        rightNavOn.setOnClickListener(this);
-    }
 
     public void showToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -92,55 +109,94 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if(view == leftNavOn){
+        if(view == leftDrawerBtn){
             new CountDownTimer(100, 20){
                 int i;
                 @Override
                 public void onTick(long l) {
                     if(i%2==0) {
-                        leftNavOn.setVisibility(View.INVISIBLE);
+                        leftDrawerBtn.setVisibility(View.INVISIBLE);
                     }
                     else{
-                        leftNavOn.setVisibility(View.VISIBLE);
+                        leftDrawerBtn.setVisibility(View.VISIBLE);
                     }
                     i++;
                 }
 
                 @Override
                 public void onFinish() {
-                    leftNavOn.setVisibility(View.VISIBLE);
-                    leftDrawer.openDrawer(GravityCompat.START);
-                    if(!leftDrawerState)
-                        leftDrawerState = true;
-                    else leftDrawerState = false;
+                    leftDrawerBtn.setVisibility(View.VISIBLE);
+                    if(drawerLayout.isDrawerOpen(leftNavigationView)){
+                        drawerLayout.closeDrawer(leftNavigationView);
+                    }
+
+                    else if(!drawerLayout.isDrawerOpen(leftNavigationView)){
+                        drawerLayout.openDrawer(leftNavigationView);
+                    }
+
+                    else if(drawerLayout.isDrawerOpen(rightNavigationView)){
+                        drawerLayout.closeDrawer(rightNavigationView);
+                    }
                 }
             }.start();
         }
 
-        /*else if(view == rightNavOn){
+        else if(view == rightDrawerBtn){
             new CountDownTimer(100, 20){
                 int i;
                 @Override
                 public void onTick(long l) {
                     if(i%2==0) {
-                        rightNavOn.setVisibility(View.INVISIBLE);
+                        rightDrawerBtn.setVisibility(View.INVISIBLE);
                     }
                     else{
-                        rightNavOn.setVisibility(View.VISIBLE);
+                        rightDrawerBtn.setVisibility(View.VISIBLE);
                     }
                     i++;
                 }
 
                 @Override
                 public void onFinish() {
-                    rightNavOn.setVisibility(View.VISIBLE);
-                    rightDrawer.openDrawer(GravityCompat.END);
-                    if(!rightDrawerState)
-                        rightDrawerState = true;
-                    else rightDrawerState = false;
+                    rightDrawerBtn.setVisibility(View.VISIBLE);
+
+                    if(drawerLayout.isDrawerOpen(rightNavigationView)){
+                        drawerLayout.closeDrawer(rightNavigationView);
+                    }
+
+                    else if(!drawerLayout.isDrawerOpen(rightNavigationView)){
+                        drawerLayout.openDrawer(rightNavigationView);
+                    }
+
+                    else if(drawerLayout.isDrawerOpen(leftNavigationView)){
+                        drawerLayout.closeDrawer(leftNavigationView);
+                    }
                 }
             }.start();
-        }*/
+        }
+
+        else if(view == todoActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, TodoActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        else if(view == journalActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, JournalActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        else if(view == walletActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, WalletActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        else if(view == reminderActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, ReminderActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override
