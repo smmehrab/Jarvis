@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/reminder_action_bar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="@color/colorWhite"
-    android:orientation="horizontal"
-    android:paddingRight="20dp">
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:paddingVertical="7dp"
+        android:orientation="horizontal"
+        android:paddingVertical="5dp"
+        android:paddingRight="20dp"
         android:weightSum="9">
 
         <Button
-            android:id="@+id/left_nav_on_btn"
+            android:id="@+id/user_drawer_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -24,23 +24,22 @@
             android:stateListAnimator="@null" />
 
         <TextView
-            android:id="@+id/wallet_action_bar_title"
+            android:id="@+id/activity_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="7"
             android:background="@color/colorWhite"
             android:gravity="center"
-            android:text="@string/reminder_txt"
+            android:text="@string/app_name"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/reminder_nav_on_btn"
+            android:id="@+id/activity_drawer_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorWhite"
-            android:foreground="@drawable/reminder_icon"
+            android:background="@color/colorPrimary"
             android:stateListAnimator="@null" />
 
     </LinearLayout>

@@ -13,7 +13,7 @@
         android:layout_width="20dp"
         android:layout_height="140dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:background="@drawable/shape_rounded_rectangle"
         android:layout_marginEnd="10dp"/>
 
     <LinearLayout
@@ -22,7 +22,7 @@
         android:layout_width="20dp"
         android:layout_height="100dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:background="@drawable/shape_rounded_rectangle"
         android:layout_marginEnd="10dp"/>
 
     <LinearLayout
@@ -31,7 +31,7 @@
         android:layout_width="20dp"
         android:layout_height="60dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:background="@drawable/shape_rounded_rectangle"
         android:layout_marginEnd="10dp"/>
 
     <LinearLayout
@@ -40,7 +40,7 @@
         android:layout_width="20dp"
         android:layout_height="60dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:background="@drawable/shape_rounded_rectangle"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"/>
 
@@ -50,7 +50,7 @@
         android:layout_width="20dp"
         android:layout_height="100dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"
+        android:background="@drawable/shape_rounded_rectangle"
         android:layout_marginEnd="10dp"/>
 
     <LinearLayout
@@ -59,6 +59,6 @@
         android:layout_width="20dp"
         android:layout_height="140dp"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_solid_rectangle_shape"/>
+        android:background="@drawable/shape_rounded_rectangle"/>
 
 </LinearLayout>

@@ -26,18 +26,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private NavigationView leftNavigationView;
-    private NavigationView rightNavigationView;
+    private NavigationView userNavigationView;
+    private NavigationView activityNavigationView;
 
-    private Toolbar actionBar;
+    private Toolbar toolbar;
 
-    private Button leftDrawerBtn;
-    private Button rightDrawerBtn;
+    private Button userDrawerBtn;
+    private Button activityDrawerBtn;
 
     private Button todoActivityBtn;
     private Button journalActivityBtn;
     private Button walletActivityBtn;
     private Button reminderActivityBtn;
+
 
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -51,27 +52,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     void settingUpXmlElements(){
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        leftNavigationView = (NavigationView) findViewById(R.id.left_navigation_view);
-        rightNavigationView = (NavigationView) findViewById(R.id.right_navigation_view);
-
-        actionBar = (Toolbar) findViewById(R.id.action_bar);
-        setSupportActionBar(actionBar);
+        toolbar = (Toolbar) findViewById(R.id.home_toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        leftDrawerBtn = (Button) findViewById(R.id.left_nav_on_btn);
-        rightDrawerBtn = (Button) findViewById(R.id.right_nav_on_btn);
+        userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
+        activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
+
+        userDrawerBtn.setOnClickListener(this);
+        activityDrawerBtn.setOnClickListener(this);
+
+        activityDrawerBtn.setBackgroundResource(R.drawable.icon_home);
+
+        userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
+        activityNavigationView = (NavigationView) findViewById(R.id.home_navigation_view);
 
         todoActivityBtn = (Button) findViewById(R.id.todo_activity_btn);
         journalActivityBtn = (Button) findViewById(R.id.journal_activity_btn);
         walletActivityBtn = (Button) findViewById(R.id.wallet_activity_btn);
         reminderActivityBtn = (Button) findViewById(R.id.reminder_activity_btn);
-
-        leftDrawerBtn.setOnClickListener(this);
-        rightDrawerBtn.setOnClickListener(this);
 
         todoActivityBtn.setOnClickListener(this);
         journalActivityBtn.setOnClickListener(this);
@@ -109,66 +112,66 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if(view == leftDrawerBtn){
+        if(view == userDrawerBtn){
             new CountDownTimer(100, 20){
                 int i;
                 @Override
                 public void onTick(long l) {
                     if(i%2==0) {
-                        leftDrawerBtn.setVisibility(View.INVISIBLE);
+                        userDrawerBtn.setVisibility(View.INVISIBLE);
                     }
                     else{
-                        leftDrawerBtn.setVisibility(View.VISIBLE);
+                        userDrawerBtn.setVisibility(View.VISIBLE);
                     }
                     i++;
                 }
 
                 @Override
                 public void onFinish() {
-                    leftDrawerBtn.setVisibility(View.VISIBLE);
-                    if(drawerLayout.isDrawerOpen(leftNavigationView)){
-                        drawerLayout.closeDrawer(leftNavigationView);
+                    userDrawerBtn.setVisibility(View.VISIBLE);
+                    if(drawerLayout.isDrawerOpen(userNavigationView)){
+                        drawerLayout.closeDrawer(userNavigationView);
                     }
 
-                    else if(!drawerLayout.isDrawerOpen(leftNavigationView)){
-                        drawerLayout.openDrawer(leftNavigationView);
+                    else if(!drawerLayout.isDrawerOpen(userNavigationView)){
+                        drawerLayout.openDrawer(userNavigationView);
                     }
 
-                    else if(drawerLayout.isDrawerOpen(rightNavigationView)){
-                        drawerLayout.closeDrawer(rightNavigationView);
+                    else if(drawerLayout.isDrawerOpen(activityNavigationView)){
+                        drawerLayout.closeDrawer(activityNavigationView);
                     }
                 }
             }.start();
         }
 
-        else if(view == rightDrawerBtn){
+        else if(view == activityDrawerBtn){
             new CountDownTimer(100, 20){
                 int i;
                 @Override
                 public void onTick(long l) {
                     if(i%2==0) {
-                        rightDrawerBtn.setVisibility(View.INVISIBLE);
+                        activityDrawerBtn.setVisibility(View.INVISIBLE);
                     }
                     else{
-                        rightDrawerBtn.setVisibility(View.VISIBLE);
+                        activityDrawerBtn.setVisibility(View.VISIBLE);
                     }
                     i++;
                 }
 
                 @Override
                 public void onFinish() {
-                    rightDrawerBtn.setVisibility(View.VISIBLE);
+                    activityDrawerBtn.setVisibility(View.VISIBLE);
 
-                    if(drawerLayout.isDrawerOpen(rightNavigationView)){
-                        drawerLayout.closeDrawer(rightNavigationView);
+                    if(drawerLayout.isDrawerOpen(activityNavigationView)){
+                        drawerLayout.closeDrawer(activityNavigationView);
                     }
 
-                    else if(!drawerLayout.isDrawerOpen(rightNavigationView)){
-                        drawerLayout.openDrawer(rightNavigationView);
+                    else if(!drawerLayout.isDrawerOpen(activityNavigationView)){
+                        drawerLayout.openDrawer(activityNavigationView);
                     }
 
-                    else if(drawerLayout.isDrawerOpen(leftNavigationView)){
-                        drawerLayout.closeDrawer(leftNavigationView);
+                    else if(drawerLayout.isDrawerOpen(userNavigationView)){
+                        drawerLayout.closeDrawer(userNavigationView);
                     }
                 }
             }.start();
@@ -203,26 +206,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
 
-        if (id == R.id.home_option) {
+        if (id == R.id.user_voice_command_option) {
             // Handle the camera action
-        } else if (id == R.id.voice_command_option) {
+        } else if (id == R.id.user_home_option) {
 
-        } else if (id == R.id.home_option) {
+        } else if (id == R.id.user_todo_option) {
 
-        } else if (id == R.id.todo_option) {
+        } else if (id == R.id.user_journal_option) {
 
-        } else if (id == R.id.journal_option) {
+        } else if (id == R.id.user_wallet_option) {
 
-        } else if (id == R.id.wallet_option) {
+        } else if (id == R.id.user_reminder_option) {
 
-        } else if (id == R.id.settings_option) {
+        } else if (id == R.id.user_settings_option) {
 
-        } else if (id == R.id.sign_out_option) {
+        } else if (id == R.id.user_sign_out_option) {
 
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        DrawerLayout drawerLayout = findViewById(R.id.home_drawer_layout);
+        drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 }

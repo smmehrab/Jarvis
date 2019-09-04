@@ -35,4 +35,6 @@
 
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="date_txt">Date</string>
+    <string name="time_txt">Time</string>
 </resources>
