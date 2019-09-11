@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
     defaultConfig {
@@ -31,4 +37,16 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.mikhaellopez:circularimageview:4.0.2'
     implementation files('libs/CircularImageView-master/gradle/wrapper/gradle-wrapper.jar')
+
+    //FireBase analytics
+    implementation 'com.google.firebase:firebase-analytics:17.0.1'
+    //FireBase googleAuthentication
+    implementation 'com.google.firebase:firebase-auth:19.0.0'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+
+    //Google play service
+    implementation 'com.google.gms:google-services:4.3.2'
+
 }
+
+apply plugin: 'com.google.gms.google-services'

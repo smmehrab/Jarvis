@@ -8,6 +8,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="50dp"
+    android:id="@+id/sign_in_activity"
     tools:context=".SignInActivity">
 
     <LinearLayout
