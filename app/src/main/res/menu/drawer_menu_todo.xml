@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/todo_time_option"
+        android:title="@string/time_txt"/>
+
+    <item
+        android:id="@+id/todo_date_option"
+        android:title="@string/date_txt"/>
+</menu>
