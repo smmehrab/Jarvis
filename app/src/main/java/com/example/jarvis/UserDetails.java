@@ -1,7 +1,6 @@
 package com.example.jarvis;
 
 public class UserDetails {
-
     private String email, password, confirmPassword;
 
     public String getEmail() {

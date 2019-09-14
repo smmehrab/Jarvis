@@ -1,34 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/user_voice_command_option"
-        android:title="@string/voice_command_txt"/>
 
-    <item
-        android:id="@+id/user_home_option"
-        android:title="@string/home_txt"/>
+    <group android:id="@+id/user_menu_top">
+        <item
+            android:id="@+id/user_profile_option"
+            android:icon="@drawable/icon_menu_profile"
+            android:title="@string/profile_txt"/>
 
-    <item
-        android:id="@+id/user_todo_option"
-        android:title="@string/todo_txt"/>
+        <item
+            android:id="@+id/user_voice_command_option"
+            android:icon="@drawable/icon_menu_voice_command"
+            android:title="@string/voice_command_txt"/>
+    </group>
 
-    <item
-        android:id="@+id/user_journal_option"
-        android:title="@string/journal_txt"/>
+    <group android:id="@+id/user_menu_middle">
 
-    <item
-        android:id="@+id/user_wallet_option"
-        android:title="@string/wallet_txt"/>
+        <item
+            android:id="@+id/user_home_option"
+            android:icon="@drawable/icon_menu_home"
+            android:title="@string/home_txt"/>
 
-    <item
-        android:id="@+id/user_reminder_option"
-        android:title="@string/reminder_txt"/>
+        <item
+            android:id="@+id/user_todo_option"
+            android:icon="@drawable/icon_menu_todo"
+            android:title="@string/todo_txt"/>
 
-    <item
-        android:id="@+id/user_settings_option"
-        android:title="@string/settings_txt"/>
+        <item
+            android:id="@+id/user_journal_option"
+            android:icon="@drawable/icon_menu_journal"
+            android:title="@string/journal_txt"/>
 
-    <item
-        android:id="@+id/user_sign_out_option"
-        android:title="@string/sign_out_txt"/>
+        <item
+            android:id="@+id/user_wallet_option"
+            android:icon="@drawable/icon_menu_wallet"
+            android:title="@string/wallet_txt"/>
+
+        <item
+            android:id="@+id/user_reminder_option"
+            android:icon="@drawable/icon_menu_reminder"
+            android:title="@string/reminder_txt"/>
+    </group>
+
+    <group android:id="@+id/user_menu_botttom">
+        <item
+            android:id="@+id/user_settings_option"
+            android:icon="@drawable/icon_menu_settings"
+            android:title="@string/settings_txt"/>
+
+        <item
+            android:id="@+id/user_about_option"
+            android:icon="@drawable/icon_menu_about"
+            android:title="@string/about_txt"/>
+
+        <item
+            android:id="@+id/user_sign_out_option"
+            android:icon="@drawable/icon_menu_sign_out"
+            android:title="@string/sign_out_txt"/>
+    </group>
+
 </menu>

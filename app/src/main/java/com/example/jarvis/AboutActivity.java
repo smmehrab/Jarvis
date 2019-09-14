@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class WalletActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
+public class AboutActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -37,18 +37,19 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wallet);
+        setContentView(R.layout.activity_about);
 
         settingUpXmlElements();
     }
 
+
     void settingUpXmlElements(){
         // Finding the Parent Layout
-        drawerLayout = (DrawerLayout) findViewById(R.id.wallet_drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.about_drawer_layout);
         drawerLayout.setDrawerListener(drawerToggle);
 
         // Setting Up Toolbar
-        toolbar = (Toolbar) findViewById(R.id.wallet_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.about_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -60,20 +61,17 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
 
-        activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_wallet);
+        activityDrawerBtn.setBackgroundResource(R.drawable.icon_about);
 
         activityTitle = (TextView) findViewById(R.id.activity_title);
-        activityTitle.setText(R.string.wallet_txt);
+        activityTitle.setText(R.string.about_txt);
 
         // Two Navigation View for Two Navigation Drawers
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
-        activityNavigationView = (NavigationView) findViewById(R.id.wallet_navigation_view);
-
         userNavigationView.setNavigationItemSelectedListener(this);
-        activityNavigationView.setNavigationItemSelectedListener(this);
 
-        userNavigationView.getMenu().findItem(R.id.user_wallet_option).setCheckable(true);
-        userNavigationView.getMenu().findItem(R.id.user_wallet_option).setChecked(true);
+        userNavigationView.getMenu().findItem(R.id.user_about_option).setCheckable(true);
+        userNavigationView.getMenu().findItem(R.id.user_about_option).setChecked(true);
     }
 
 
@@ -84,10 +82,9 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         toast.show();
     }
 
-
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(WalletActivity.this, HomeActivity.class);
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         startActivity(intent);
         finish();
     }
@@ -121,39 +118,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
                     else if(drawerLayout.isDrawerOpen(activityNavigationView)){
                         drawerLayout.closeDrawer(activityNavigationView);
-                    }
-                }
-            }.start();
-        }
-
-        else if(view == activityDrawerBtn){
-            new CountDownTimer(100, 20){
-                int i;
-                @Override
-                public void onTick(long l) {
-                    if(i%2==0) {
-                        activityDrawerBtn.setVisibility(View.INVISIBLE);
-                    }
-                    else{
-                        activityDrawerBtn.setVisibility(View.VISIBLE);
-                    }
-                    i++;
-                }
-
-                @Override
-                public void onFinish() {
-                    activityDrawerBtn.setVisibility(View.VISIBLE);
-
-                    if(drawerLayout.isDrawerOpen(activityNavigationView)){
-                        drawerLayout.closeDrawer(activityNavigationView);
-                    }
-
-                    else if(!drawerLayout.isDrawerOpen(activityNavigationView)){
-                        drawerLayout.openDrawer(activityNavigationView);
-                    }
-
-                    else if(drawerLayout.isDrawerOpen(userNavigationView)){
-                        drawerLayout.closeDrawer(userNavigationView);
                     }
                 }
             }.start();

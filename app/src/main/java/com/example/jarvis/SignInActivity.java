@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -28,21 +27,23 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //  Essential Variable for Google SignIn
+    //  Variables for SignInWithGoogle
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    GoogleSignInOptions gso;
+    GoogleSignInOptions googleSignInOptions;
 
-
+    // Buttons
     private Button signInBtn;
     private Button signInWithGoogleBtn;
     private Button forgotPassBtn;
 
+    // EditTexts
     private EditText emailEditTxt;
     private EditText passEditTxt;
 
+    // Variable for Local Database
     MyDatabaseHelper myDatabaseHelper;
 
     @Override
@@ -50,32 +51,21 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        loadXmlElements();
-        setListeners();
-      
-        myDatabaseHelper = new MyDatabaseHelper(this);
-        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
-      
-        initializeGoogleVariable();
+        settingUpXmlElements();
+
+        handleLocalDatabase();
+        handleRemoteDatabase();
     }
 
-    private void initializeGoogleVariable() {
-        mAuth = FirebaseAuth.getInstance();
-        // Configure Google sign in
-         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-    }
-
-    void loadXmlElements(){
+    void settingUpXmlElements(){
         signInBtn = (Button) findViewById(R.id.sign_in_btn);
         signInWithGoogleBtn = (Button) findViewById(R.id.sign_in_with_google_btn);
         forgotPassBtn = (Button) findViewById(R.id.forgot_pass_btn);
 
         emailEditTxt = (EditText) findViewById(R.id.sign_in_email_edit_txt);
         passEditTxt = (EditText) findViewById(R.id.sign_in_pass_edit_txt);
+
+        setListeners();
     }
 
     void setListeners(){
@@ -84,38 +74,67 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         forgotPassBtn.setOnClickListener(this);
     }
 
-    @Override
-    public void onClick(View view) {
+    void handleLocalDatabase(){
+        myDatabaseHelper = new MyDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+    }
 
+    void handleRemoteDatabase(){
+        initializeGoogleVariable();
+    }
+
+    private void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configure Google sign in
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+    void handleSignIn(){
         String email = emailEditTxt.getText().toString();
         String password = passEditTxt.getText().toString();
 
+        Boolean result = myDatabaseHelper.findUser(email, password);
+
+        if(result == true){
+            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else{
+            Toast.makeText(getApplicationContext(), "Email and Password didn't match", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void handleSignInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        //startActivityForResult();
+    }
+
+    void handleForgotPass(){
+        Intent intent = new Intent(SignInActivity.this, ResetPassActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onClick(View view) {
         if(view == signInBtn){
-            //here I added
-
-            Boolean result = myDatabaseHelper.findUser(email, password);
-
-            if(result == true){
-                Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else{
-                Toast.makeText(getApplicationContext(), "Email and Password didn't match", Toast.LENGTH_LONG).show();
-            }
-
-
+            handleSignIn();
         }
 
         else if(view == signInWithGoogleBtn){
-            // Here you go
-            signIn();
+            handleSignInWithGoogle();
         }
 
         else if(view == forgotPassBtn){
-            Intent intent = new Intent(SignInActivity.this, ForgotPassActivity.class);
-            startActivity(intent);
-            finish();
+            handleForgotPass();
         }
     }
 
@@ -125,15 +144,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         startActivity(intent);
         finish();
     }
-    // SingIn in google starts //  Here google intent comes; // Google Activity
-
-    private void signIn() {
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-        //startActivityForResult();
-    }
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -186,5 +196,4 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
     }
-
 }

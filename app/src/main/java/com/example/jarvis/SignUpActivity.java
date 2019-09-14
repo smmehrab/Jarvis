@@ -29,22 +29,23 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // Essential Variable for Google SignUp
+    //  Variables for SignUpWithGoogle
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    GoogleSignInOptions gso;
+    GoogleSignInOptions googleSignInOptions;
 
-
+    // Buttons
     private Button signUpBtn;
     private Button signUpWithGoogleBtn;
 
+    // EditTexts
     private EditText emailEditTxt;
     private EditText passEditTxt;
     private EditText confirmPassEditTxt;
 
-    //here I added
+    // Variable for Local Database
     MyDatabaseHelper myDatabaseHelper;
     UserDetails userDetails;
 
@@ -53,53 +54,57 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        loadXmlElements();
-        setListeners();
-      
-        myDatabaseHelper = new MyDatabaseHelper(this);
-        userDetails = new UserDetails();
-        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+        settingUpXmlElements();
 
-        initializeGoogleVariable();
+        handleLocalDatabase();
+        handleRemoteDatabase();
     }
 
-    private void initializeGoogleVariable() {
-        mAuth = FirebaseAuth.getInstance();
-        // Configure Google sign in
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-    }
-
-    void loadXmlElements(){
+    void settingUpXmlElements(){
         signUpBtn = (Button) findViewById(R.id.sign_up_btn);
         signUpWithGoogleBtn = (Button) findViewById(R.id.sign_up_with_google_btn);
 
         emailEditTxt = (EditText) findViewById(R.id.sign_up_email_edit_txt);
         passEditTxt = (EditText) findViewById(R.id.sign_up_pass_edit_txt);
         confirmPassEditTxt = (EditText) findViewById(R.id.sign_up_confirm_pass_edit_txt);
+
+        setListeners();
     }
 
     void setListeners(){
-
         signUpBtn.setOnClickListener(this);
         signUpWithGoogleBtn.setOnClickListener(this);
     }
 
-    // Though It's the same as signIn in SignInActivity
-    private void signUp() {
+    void handleLocalDatabase(){
+        myDatabaseHelper = new MyDatabaseHelper(this);
+        userDetails = new UserDetails();
+        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+    }
 
+    void handleRemoteDatabase(){
+        initializeGoogleVariable();
+    }
+
+    void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configure Google sign in
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+    void handleSignUpWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
         //startActivityForResult();
     }
 
-    @Override
-    public void onClick(View view) {
-
-        //here I added
+    void handleSignUp(){
         String email = emailEditTxt.getText().toString();
         String password = passEditTxt.getText().toString();
         String confirmPassword = confirmPassEditTxt.getText().toString();
@@ -110,35 +115,32 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         long rowId = myDatabaseHelper.insertData(userDetails);
 
-        //
-
-        if(view == signUpBtn){
-            //here I added
-
-            if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
-                if(rowId > 0){
-                    Toast.makeText(getApplicationContext(), "Row "+ rowId +" is Successfully inserted",  Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Password didn't match!!!",  Toast.LENGTH_LONG).show();
-                }
+        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
+            if(rowId > 0){
+                Toast.makeText(getApplicationContext(), "Row "+ rowId +" is Successfully inserted",  Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
             }
-
             else{
-                Toast.makeText(getApplicationContext(), "Text Fields shouldn't be empty",  Toast.LENGTH_LONG).show();
-
+                Toast.makeText(getApplicationContext(), "Password didn't match!!!",  Toast.LENGTH_LONG).show();
             }
-
-
-
-            //
         }
+
+        else{
+            Toast.makeText(getApplicationContext(), "Text Fields shouldn't be empty",  Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == signUpBtn){
+            handleSignUp();
+        }
+
         else if(view == signUpWithGoogleBtn){
-            // Here you go
-            signUp();
+            handleSignUpWithGoogle();
         }
     }
 

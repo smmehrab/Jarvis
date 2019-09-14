@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="3"
-                android:src="@drawable/icon_wallet" />
+                android:src="@drawable/image_wallet" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -58,7 +58,8 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_header_user"
-        app:menu="@menu/drawer_menu_user">
+        app:menu="@menu/drawer_menu_user"
+        android:theme="@style/UserNavigationDrawerStyle">
 
     </com.google.android.material.navigation.NavigationView>
 

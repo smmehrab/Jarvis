@@ -44,27 +44,37 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     void settingUpXmlElements(){
+        // Finding the Parent Layout
         drawerLayout = (DrawerLayout) findViewById(R.id.journal_drawer_layout);
         drawerLayout.setDrawerListener(drawerToggle);
 
+        // Setting Up Toolbar
         toolbar = (Toolbar) findViewById(R.id.journal_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        // Setting Up Components Inside Toolbar
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
 
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
 
-        activityDrawerBtn.setBackgroundResource(R.drawable.icon_journal);
+        activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_journal);
 
         activityTitle = (TextView) findViewById(R.id.activity_title);
         activityTitle.setText(R.string.journal_txt);
 
+        // Two Navigation View for Two Navigation Drawers
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.journal_navigation_view);
+
+        userNavigationView.setNavigationItemSelectedListener(this);
+        activityNavigationView.setNavigationItemSelectedListener(this);
+
+        userNavigationView.getMenu().findItem(R.id.user_journal_option).setCheckable(true);
+        userNavigationView.getMenu().findItem(R.id.user_journal_option).setChecked(true);
     }
 
     public void showToast(String message){
@@ -152,26 +162,46 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
+        if(id == R.id.user_profile_option) {
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+            startActivity(intent);
+            finish();
+        } else if (id == R.id.user_voice_command_option) {
 
-        if (id == R.id.user_voice_command_option) {
-            // Handle the camera action
         } else if (id == R.id.user_home_option) {
-
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.user_todo_option) {
-
+            Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.user_journal_option) {
-
+            Intent intent = new Intent(getApplicationContext(), JournalActivity.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.user_wallet_option) {
-
+            Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.user_reminder_option) {
-
+            Intent intent = new Intent(getApplicationContext(), ReminderActivity.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.user_settings_option) {
-
-        } else if (id == R.id.user_sign_out_option) {
-
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
+            finish();
+        } else if (id == R.id.user_about_option) {
+            Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
+            startActivity(intent);
+            finish();
+        }else if (id == R.id.user_sign_out_option) {
+            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            startActivity(intent);
+            finish();
         }
 
-        DrawerLayout drawerLayout = findViewById(R.id.todo_drawer_layout);
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }

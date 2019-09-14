@@ -2,10 +2,10 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/reminder_drawer_layout"
+    android:id="@+id/about_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ReminderActivity">
+    tools:context=".AboutActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <include
-            android:id="@+id/reminder_toolbar"
+            android:id="@+id/about_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
@@ -21,31 +21,38 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
+            android:gravity="top"
             android:orientation="vertical"
-            android:padding="50dp"
             android:weightSum="6">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/reminder_txt"
-                android:textAlignment="center"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="3"
-                android:src="@drawable/image_reminder" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/colorPrimary"
+                android:padding="50dp"
+                android:gravity="center"
+                android:elevation="4dp">
+
+                <com.mikhaellopez.circularimageview.CircularImageView
+                    android:src="@drawable/icon_about"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_details_txt"
+                    android:textAlignment="center"
+                    android:textSize="32sp"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -60,17 +67,6 @@
         app:headerLayout="@layout/drawer_header_user"
         app:menu="@menu/drawer_menu_user"
         android:theme="@style/UserNavigationDrawerStyle">
-
-    </com.google.android.material.navigation.NavigationView>
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/reminder_navigation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/drawer_header_home"
-        app:menu="@menu/drawer_menu_home">
 
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -9,12 +9,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ReminderActivity"></activity>
+        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".ReminderActivity" />
         <activity android:name=".WalletActivity" />
         <activity android:name=".JournalActivity" />
         <activity android:name=".TodoActivity" />
         <activity android:name=".HomeActivity" />
-        <activity android:name=".ForgotPassActivity" />
+        <activity android:name=".ResetPassActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".SignInActivity" />
         <activity android:name=".WelcomeActivity" />
