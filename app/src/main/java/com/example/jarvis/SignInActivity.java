@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -41,6 +43,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private EditText emailEditTxt;
     private EditText passEditTxt;
 
+    MyDatabaseHelper myDatabaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,10 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         loadXmlElements();
         setListeners();
+      
+        myDatabaseHelper = new MyDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+      
         initializeGoogleVariable();
     }
 
@@ -78,10 +86,25 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
+
+        String email = emailEditTxt.getText().toString();
+        String password = passEditTxt.getText().toString();
+
         if(view == signInBtn){
-            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-            startActivity(intent);
-            finish();
+            //here I added
+
+            Boolean result = myDatabaseHelper.findUser(email, password);
+
+            if(result == true){
+                Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Email and Password didn't match", Toast.LENGTH_LONG).show();
+            }
+
+
         }
 
         else if(view == signInWithGoogleBtn){
