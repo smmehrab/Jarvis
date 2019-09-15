@@ -90,6 +90,12 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    @Override
     public void onClick(View view) {
         if(view == userDrawerBtn){
             new CountDownTimer(100, 20){
@@ -130,37 +136,29 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
         if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_voice_command_option) {
 
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_todo_option) {
             Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_journal_option) {
             Intent intent = new Intent(getApplicationContext(), JournalActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_wallet_option) {
             Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_reminder_option) {
             Intent intent = new Intent(getApplicationContext(), ReminderActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_settings_option) {
             Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_about_option) {
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
-            finish();
         }else if (id == R.id.user_sign_out_option) {
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);

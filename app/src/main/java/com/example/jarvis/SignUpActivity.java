@@ -117,19 +117,17 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
             if(rowId > 0){
-                Toast.makeText(getApplicationContext(), "Row "+ rowId +" is Successfully inserted",  Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Successfully Signed Up!",  Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
                 startActivity(intent);
-                finish();
             }
             else{
-                Toast.makeText(getApplicationContext(), "Password didn't match!!!",  Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Password Didn't Match!",  Toast.LENGTH_LONG).show();
             }
         }
 
         else{
-            Toast.makeText(getApplicationContext(), "Text Fields shouldn't be empty",  Toast.LENGTH_LONG).show();
-
+            Toast.makeText(getApplicationContext(), "Text Fields Shouldn't Be Empty!",  Toast.LENGTH_LONG).show();
         }
     }
 
@@ -149,6 +147,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         Intent intent = new Intent(SignUpActivity.this, WelcomeActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

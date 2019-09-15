@@ -64,11 +64,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         if(view == signInActivityBtn){
             Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             finish();
         }
         else if(view == signUpActivityBtn){
             Intent intent = new Intent(WelcomeActivity.this, SignUpActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             finish();
         }
     }
