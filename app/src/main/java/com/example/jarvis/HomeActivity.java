@@ -219,6 +219,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
+            finish();
         } else if (id == R.id.user_voice_command_option) {
 
         } else if (id == R.id.user_home_option) {

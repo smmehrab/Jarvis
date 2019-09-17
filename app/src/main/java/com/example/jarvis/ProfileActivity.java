@@ -134,8 +134,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
         if(id == R.id.user_profile_option) {
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(intent);
+
         } else if (id == R.id.user_voice_command_option) {
 
         } else if (id == R.id.user_home_option) {

@@ -178,17 +178,19 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
+            finish();
         } else if (id == R.id.user_voice_command_option) {
 
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
+            finish();
         } else if (id == R.id.user_todo_option) {
             Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
             startActivity(intent);
+            finish();
         } else if (id == R.id.user_journal_option) {
-            Intent intent = new Intent(getApplicationContext(), JournalActivity.class);
-            startActivity(intent);
+
         } else if (id == R.id.user_wallet_option) {
             Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
             startActivity(intent);
