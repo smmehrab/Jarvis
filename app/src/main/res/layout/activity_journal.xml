@@ -51,6 +51,22 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/journal_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/icon_plus"
+            app:elevation="4dp"
+            app:fabSize="normal"/>
+
+    </FrameLayout>
+
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/user_navigation_view"
         android:layout_width="wrap_content"
