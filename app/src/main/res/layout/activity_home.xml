@@ -26,6 +26,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/shape_rounded_rectangle"
             android:text="@string/todo_txt"
+            android:elevation="4dp"
             android:textColor="@color/colorWhite" />
 
         <Button
@@ -36,6 +37,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/shape_rounded_rectangle"
             android:text="@string/journal_txt"
+            android:elevation="4dp"
             android:textColor="@color/colorWhite" />
 
         <Button
@@ -46,6 +48,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/shape_rounded_rectangle"
             android:text="@string/wallet_txt"
+            android:elevation="4dp"
             android:textColor="@color/colorWhite" />
 
         <Button
@@ -56,6 +59,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/shape_rounded_rectangle"
             android:text="@string/reminder_txt"
+            android:elevation="4dp"
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 

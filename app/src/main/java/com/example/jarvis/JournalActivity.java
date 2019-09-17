@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 public class JournalActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
@@ -31,6 +32,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
+    private FloatingActionButton fab;
 
     private TextView activityTitle;
 
@@ -57,9 +59,11 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         // Setting Up Components Inside Toolbar
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
+        fab = (FloatingActionButton) findViewById(R.id.journal_fab);
 
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
+        fab.setOnClickListener(this);
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_journal);
 
@@ -162,6 +166,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 }
             }.start();
+        }
+        else if(view == fab){
+            showToast("Clicked");
         }
     }
 

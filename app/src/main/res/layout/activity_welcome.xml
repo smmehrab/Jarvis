@@ -66,6 +66,7 @@
             android:textAlignment="center"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
+            android:elevation="4dp"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -82,6 +83,7 @@
             android:background="@drawable/shape_rounded_rectangle"
             android:gravity="center"
             android:text="@string/sign_up_btn_txt"
+            android:elevation="4dp"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             android:textStyle="bold" />

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 public class TodoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
@@ -31,6 +32,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
+    private FloatingActionButton fab;
 
     private TextView activityTitle;
 
@@ -56,9 +58,11 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         // Setting Up Components Inside Toolbar
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
+        fab = (FloatingActionButton) findViewById(R.id.todo_fab);
 
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
+        fab.setOnClickListener(this);
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_todo);
 
@@ -162,6 +166,10 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }.start();
+        }
+        else if(view == fab){
+            Intent intent = new Intent(getApplicationContext(), AddTodoActivity.class);
+            startActivity(intent);
         }
     }
 

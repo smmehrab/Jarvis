@@ -170,6 +170,7 @@
                 android:text="@string/sign_up_btn_txt"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
+                android:elevation="4dp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -186,6 +187,7 @@
                 android:background="@drawable/shape_rounded_outlined_rectangle"
                 android:drawableLeft="@drawable/google_icon"
                 android:padding="5dp"
+                android:elevation="4dp"
                 android:text="@string/sign_up_with_google_btn_txt"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp" />

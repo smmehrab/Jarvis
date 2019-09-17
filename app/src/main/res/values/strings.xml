@@ -45,6 +45,14 @@
     <string name="reset_details_txt">Reset Details</string>
     <string name="set_new_password_txt">Set New Password</string>
     <string name="reset_password_txt">Reset Password</string>
+    <string name="remind_me_txt">Remind Me</string>
+    <string name="remind_date_time_txt"><![CDATA[Remind Date & Time]]></string>
+    <string name="title_txt">Title</string>
+    <string name="description_txt">Description</string>
+    <string name="set_date_time_for_reminder_txt"><![CDATA[Set Date & Time for Reminder]]></string>
+    <string name="at_txt">\@</string>
+    <string name="cancel_txt"><u> Cancel </u></string>
+    <string name="add_txt">Add</string>
 
 
 </resources>
