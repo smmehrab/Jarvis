@@ -258,7 +258,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
-            FirebaseAuth.getInstance().signOut();
+            //FirebaseAuth.getInstance().signOut();
+            //new SignInActivity().signOut();
+            signOut();
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
@@ -267,4 +269,34 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    private void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configure Google sign in
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+    public void signOut() {
+        initializeGoogleVariable();
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // updateUI(null);
+                    }
+                });
+    }
+
+
 }
