@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -164,6 +165,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
