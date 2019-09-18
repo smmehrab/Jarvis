@@ -17,9 +17,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
+
+    //  Variables for Remote Database
+    private static final int RC_SIGN_IN = 1;
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    GoogleSignInOptions googleSignInOptions;
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -48,8 +61,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         settingUpXmlElements();
     }
 
-
     void settingUpXmlElements(){
+        mAuth = FirebaseAuth.getInstance();
+        
         // Finding the Parent Layout
         drawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -91,13 +105,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         reminderActivityBtn.setOnClickListener(this);
     }
 
-
     public void showToast(String message){
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -244,6 +258,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
