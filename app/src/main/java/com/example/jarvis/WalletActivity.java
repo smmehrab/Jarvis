@@ -170,7 +170,8 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             }.start();
         }
         else if(view == fab){
-            showToast("Clicked");
+            Intent intent = new Intent(getApplicationContext(), AddRecordActivity.class);
+            startActivity(intent);
         }
     }
 
