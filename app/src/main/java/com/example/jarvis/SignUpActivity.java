@@ -127,7 +127,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         else{
-            Toast.makeText(getApplicationContext(), "Text Fields Shouldn't Be Empty!",  Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!",  Toast.LENGTH_LONG).show();
         }
     }
 

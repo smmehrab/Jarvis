@@ -43,7 +43,9 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     private EditText dateEditText;
     private EditText timeEditText;
 
-    private LinearLayout dateAndTimeLinearLayout;
+    private LinearLayout dateLinearLayout;
+    private LinearLayout timeLinearLayout;
+    private LinearLayout timeGapLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +59,10 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
         addBtn = (Button) findViewById(R.id.add_todo_add_btn);
         cancelBtn = (Button) findViewById(R.id.add_todo_cancel_btn);
         remindMeBtn = (ImageButton) findViewById(R.id.add_todo_remind_me_btn);
-        copyToClipboardBtn = (ImageButton) findViewById(R.id.add_todo_copy_to_clipboard_btn);
 
         addBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
         remindMeBtn.setOnClickListener(this);
-        copyToClipboardBtn.setOnClickListener(this);
 
         remindMeSwitch = (Switch) findViewById(R.id.add_todo_remind_me_switch);
         remindMeSwitch.setOnCheckedChangeListener(this);
@@ -88,9 +88,12 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        dateAndTimeLinearLayout = (LinearLayout) findViewById(R.id.add_todo_date_and_time_linear_layout);
+        dateLinearLayout = (LinearLayout) findViewById(R.id.add_todo_date_linear_layout);
+        timeLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_linear_layout);
+        timeGapLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_gap_linear_layout);
 
-        dateAndTimeLinearLayout.setVisibility(View.INVISIBLE);
+        timeLinearLayout.setVisibility(View.GONE);
+        timeGapLinearLayout.setVisibility(View.VISIBLE);
     }
 
     public void showToast(String message){
@@ -130,10 +133,12 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if(isChecked == true){
-            dateAndTimeLinearLayout.setVisibility(View.VISIBLE);
+            timeLinearLayout.setVisibility(View.VISIBLE);
+            timeGapLinearLayout.setVisibility(View.GONE);
         }
         else{
-            dateAndTimeLinearLayout.setVisibility(View.INVISIBLE);
+            timeLinearLayout.setVisibility(View.GONE);
+            timeGapLinearLayout.setVisibility(View.VISIBLE);
         }
     }
 
