@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -95,21 +96,25 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
 
-    void handleSignIn(){
+    void handleSignIn() {
         String email = emailEditTxt.getText().toString();
         String password = passEditTxt.getText().toString();
+        //change a little
+        Boolean result;
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+            result = myDatabaseHelper.findUser(email, password);
 
-        Boolean result = myDatabaseHelper.findUser(email, password);
+            if (result == true) {
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else
+            Toast.makeText(getApplicationContext(), "Text Field can't be empty!!!", Toast.LENGTH_SHORT).show();
 
-        if(result == true){
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-            startActivity(intent);
-        }
-        else{
-            Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
-        }
     }
-
     void handleSignInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
