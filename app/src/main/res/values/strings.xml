@@ -53,6 +53,7 @@
     <string name="at_txt">\@</string>
     <string name="cancel_txt"><u> Cancel </u></string>
     <string name="add_txt">Add</string>
+    <string name="color_txt">Color</string>
 
 
 </resources>

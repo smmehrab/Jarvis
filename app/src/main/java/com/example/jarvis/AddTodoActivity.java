@@ -97,7 +97,6 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void showToast(String message){
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
