@@ -169,8 +169,8 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
             }.start();
         }
         else if(view == fab){
-            showToast("Clicked");
-        }
+            Intent intent = new Intent(getApplicationContext(), AddReminderActivity.class);
+            startActivity(intent);        }
     }
 
     @Override

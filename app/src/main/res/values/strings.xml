@@ -54,6 +54,8 @@
     <string name="cancel_txt"><u> Cancel </u></string>
     <string name="add_txt">Add</string>
     <string name="color_txt">Color</string>
+    <string name="event_txt">Event</string>
+    <string name="alarm_txt">Alarm</string>
 
 
 </resources>
