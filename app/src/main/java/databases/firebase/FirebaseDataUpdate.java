@@ -10,17 +10,17 @@ public class FirebaseDataUpdate {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    CollectionReference refTodo, refWallet,  refJournal, refReminder;
-    DocumentReference refUser;
+    private CollectionReference refTodo, refWallet,  refJournal, refReminder;
+    private DocumentReference refUser;
 
     public FirebaseDataUpdate(FirebaseAuth mAuth){
-        this.mAuth = mAuth.getInstance();
+        this.mAuth = mAuth;
         setup();
         setupCacheSize();
         initializeRef();
     }
 
-    public void setup() {
+    private void setup() {
         // [START get_firestore_instance]
         db = FirebaseFirestore.getInstance();
         // [END get_firestore_instance]
@@ -33,7 +33,7 @@ public class FirebaseDataUpdate {
         // [END set_firestore_settings]
     }
 
-    public void setupCacheSize() {
+    private void setupCacheSize() {
         // [START fs_setup_cache]
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
@@ -42,7 +42,7 @@ public class FirebaseDataUpdate {
         // [END fs_setup_cache]
     }
     private void initializeRef(){
-        //refTodo = db.collection("user").document(mAuth.getUid().toString()).collection("todo");
+        //refTodo = db.collection("user").document(mAuth.getUid().toString()).collection("todoh");
       //  refReminder = db.collection("user").document(mAuth.getUid().toString()).collection("reminder");
         refJournal = db.collection("user").document(mAuth.getUid().toString()).collection("journal");
         refWallet = db.collection("user").document(mAuth.getUid().toString()).collection("wallet");
