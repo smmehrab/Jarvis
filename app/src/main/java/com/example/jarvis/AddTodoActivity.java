@@ -120,7 +120,6 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         if(view == addBtn){
             showToast("Added");
-            FirebaseDataAdd add_data = new FirebaseDataAdd(FirebaseAuth.getInstance());
         }
         else if(view == cancelBtn){
             onBackPressed();
