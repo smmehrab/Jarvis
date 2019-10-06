@@ -4,7 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.ReminderDetails;
 import com.example.jarvis.TodoDetails;
+import com.example.jarvis.UserDetails;
+import com.example.jarvis.WalletDetails;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,14 +26,14 @@ import java.util.Map;
 public class FirebaseDataAdd {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    CollectionReference refTodo, refWallet,  refJournal, refReminder;
-    DocumentReference refUser;
+    private CollectionReference refTodo, refWallet,  refJournal, refReminder;
+    private DocumentReference refUser;
 
     public FirebaseDataAdd(FirebaseAuth mAuth){
-        this.mAuth = mAuth.getInstance();
+        this.mAuth = mAuth;
        setup();
        setupCacheSize();
-        initializeRef();
+       initializeRef();
     }
 
     public void setup() {
@@ -89,7 +92,7 @@ public class FirebaseDataAdd {
     }
 
     public void addTodoInFireBaseOld(ArrayList<TodoDetails> tasks){
-        Map<String, Object> task = new HashMap<>();
+        //Map<String, Object> task = new HashMap<>();
         Iterator i = tasks.iterator();
         int increment = 1;
         while(i.hasNext()) {
@@ -113,9 +116,9 @@ public class FirebaseDataAdd {
 
 // There must be a photo // We may have to create a class for user?
 
-    public void addUserDetails(String name){
+    public void addUserDetails(UserDetails user){
         Map<String , Object> data = new HashMap<>();
-        data.put("name ", name);
+        data.put("userdetails ", user);
         refUser.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -124,14 +127,14 @@ public class FirebaseDataAdd {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("addUserFireBase", "Faild");
+                Log.d("addUserFireBase", "Failed");
             }
         });
     }
 
 
-    public void addReminderInFireBaseCurrent(ArrayList<TodoDetails> tasks){
-        Map<String, Object> task = new HashMap<>();
+    public void addReminderInFireBase(ArrayList<ReminderDetails> tasks){
+       // Map<String, Object> task = new HashMap<>();
         Iterator i = tasks.iterator();
         int increment = 1;
         while(i.hasNext()) {
@@ -147,6 +150,50 @@ public class FirebaseDataAdd {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.d("addreminderFireBase", "Failed");
+                }
+            });
+            increment++;
+        }
+    }
+
+    public void addWalletInFirebaseCurrent(ArrayList<WalletDetails> wallets){
+        Map<String, Object> wallet = new HashMap<>();
+        Iterator i = wallets.iterator();
+        int increment = 1;
+        while(i.hasNext()){
+            refWallet.document("current").collection("wallet").
+                    document("wallet" + increment).set(i.next())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("addWalletFireBase", "Successfull");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d("addWalletFireBase", "Failed");
+                }
+            });
+            increment++;
+        }
+    }
+
+
+    public void addWalletInFirebaseOld(ArrayList<WalletDetails> wallets){
+        Map<String, Object> wallet = new HashMap<>();
+        Iterator i = wallets.iterator();
+        int increment = 1;
+        while(i.hasNext()){
+            refWallet.document("old").collection("wallet").document("wallet" + increment).set(i.next())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("addWalletFirebase", "Successfull");
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d("addWalletFireBase", "Failed");
                 }
             });
             increment++;
