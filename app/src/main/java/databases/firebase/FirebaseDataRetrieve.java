@@ -4,7 +4,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.ReminderDetails;
 import com.example.jarvis.TodoDetails;
+import com.example.jarvis.WalletDetails;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,17 +24,19 @@ import java.util.ArrayList;
 public class FirebaseDataRetrieve {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    CollectionReference refTodo, refWallet,  refJournal, refReminder;
-    DocumentReference refUser;
+    private CollectionReference refTodo, refWallet,  refJournal, refReminder;
+    private DocumentReference refUser;
 
     public FirebaseDataRetrieve(FirebaseAuth mAuth){
-        this.mAuth = mAuth.getInstance();
+        this.mAuth = mAuth;
         setup();
         setupCacheSize();
         initializeRef();
     }
 
-    public void setup() {
+
+    // Offline cache enable
+    private void setup() {
         // [START get_firestore_instance]
         db = FirebaseFirestore.getInstance();
         // [END get_firestore_instance]
@@ -45,7 +49,7 @@ public class FirebaseDataRetrieve {
         // [END set_firestore_settings]
     }
 
-    public void setupCacheSize() {
+    private void setupCacheSize() {
         // [START fs_setup_cache]
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
@@ -71,6 +75,7 @@ public class FirebaseDataRetrieve {
                             TodoDetails todo = documentSnapshot.toObject(TodoDetails.class);
                             list.add(todo);
                         }
+                        Log.d("Orreh dekh dekh", "Success");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -94,8 +99,73 @@ public class FirebaseDataRetrieve {
                             TodoDetails todo = documentSnapshot.toObject(TodoDetails.class);
                             list.add(todo);
                         }
+                        Log.d("Orreh dekh dekh", "Success");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("Exception", e.getMessage());
+            }
+        });
+        return list;
+    }
+
+
+    public ArrayList<WalletDetails> retriveCurrentWallet() {
+        ArrayList<WalletDetails> list = new ArrayList<>();
+        refTodo.document("current").collection("wallet").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            WalletDetails wallet = documentSnapshot.toObject(WalletDetails.class);
+                            list.add(wallet);
+                        }
+                        Log.d("Orreh dekh dekh", "Success");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("Exception", e.getMessage());
+            }
+        });
+        return list;
+    }
+
+
+    public ArrayList<WalletDetails> retriveOldWallet() {
+        ArrayList<WalletDetails> list = new ArrayList<>();
+        refTodo.document("old").collection("wallet").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            WalletDetails wallet = documentSnapshot.toObject(WalletDetails.class);
+                            list.add(wallet);
+                        }
+                        Log.d("Orreh dekh dekh", "Success");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("Exception", e.getMessage());
+            }
+        });
+        return list;
+    }
+
+    public ArrayList<ReminderDetails> retriveReminder(){
+        ArrayList<ReminderDetails> list = new ArrayList<>();
+        refReminder.get().addOnSuccessListener((new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                    ReminderDetails reminder = documentSnapshot.toObject(ReminderDetails.class);
+                    list.add(reminder);
+                }
+                Log.d("Orreh dekh dekh", "Success");
+            }
+        })).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d("Exception", e.getMessage());

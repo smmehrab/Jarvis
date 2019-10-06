@@ -25,10 +25,13 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import databases.firebase.FirebaseDataAdd;
 
 public class AddTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     private ImageButton remindMeBtn;
@@ -117,6 +120,7 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         if(view == addBtn){
             showToast("Added");
+            FirebaseDataAdd add_data = new FirebaseDataAdd(FirebaseAuth.getInstance());
         }
         else if(view == cancelBtn){
             onBackPressed();
