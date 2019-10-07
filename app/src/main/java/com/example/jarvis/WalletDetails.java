@@ -4,13 +4,20 @@ public class WalletDetails {
 
     private String title, desc, date, expenseType;
 
+    public String getExpenseType() {
+        return expenseType;
+    }
 
-    public WalletDetails (String title, String desc, String expenseType, String date){
+    public void setExpenseType(String expenseType) {
+        this.expenseType = expenseType;
+    }
+
+    /*public WalletDetails (String title, String desc, String expenseType, String date){
         this.title = title;
         this.desc = desc;
         this.expenseType = expenseType;
         this.date = date;
-    }
+    }*/
 
     public String getTitle() {
         return title;
@@ -34,13 +41,5 @@ public class WalletDetails {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public String getExpenseType() {
-        return expenseType;
-    }
-
-    public void setExpenseType(String expenseType) {
-        this.expenseType = expenseType;
     }
 }
