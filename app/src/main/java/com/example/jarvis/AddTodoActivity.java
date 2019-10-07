@@ -1,6 +1,7 @@
 package com.example.jarvis;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -9,7 +10,10 @@ import androidx.fragment.app.DialogFragment;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -50,14 +54,49 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     private LinearLayout timeLinearLayout;
     private LinearLayout timeGapLinearLayout;
 
+    // Variable for Local Database
+    MyDatabaseHelper myDatabaseHelper;
+    TodoDetails todoDetails;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_todo);
 
         settingUpXmlElements();
+        handleLocalDatabase();
     }
 
+    /*******changed*****/
+    void handleLocalDatabase(){
+        myDatabaseHelper = new MyDatabaseHelper(this);
+        todoDetails = new TodoDetails();
+        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+    }
+
+    void handleAddingInSQLite(){
+        String title = titleEditText.getText().toString();
+        String description = descriptionEditText.getText().toString();
+        String date = dateEditText.getText().toString();
+        String time = timeEditText.getText().toString();
+
+        todoDetails.setTitle(title);
+        todoDetails.setDesc(description);
+        todoDetails.setDate(date);
+        todoDetails.setTime(time);
+
+        long rowId = myDatabaseHelper.insertDataTodo(todoDetails);
+        if(rowId > 0){
+                Toast.makeText(getApplicationContext(), "Successfully added!",  Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Addition failed!",  Toast.LENGTH_LONG).show();
+            }
+
+    }
+
+    /*******/
     void settingUpXmlElements(){
         addBtn = (Button) findViewById(R.id.add_todo_add_btn);
         cancelBtn = (Button) findViewById(R.id.add_todo_cancel_btn);
@@ -121,7 +160,29 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if(view == addBtn){
-            showToast("Added");
+            handleAddingInSQLite();
+            //showToast("Added");
+
+            /****Just Checking****/
+            Cursor cursor = myDatabaseHelper.displayAllData(); //result set
+            if(cursor.getCount() == 0){
+                //there is no data
+                showData("Error","No data Found");
+                return;
+            }
+            StringBuffer stringBuffer = new StringBuffer();
+            while (cursor.moveToNext()){
+                stringBuffer.append("ID: " + cursor.getString(0) + "\n");
+                stringBuffer.append("Title: " + cursor.getString(1) + "\n");
+                stringBuffer.append("Description: " + cursor.getString(2) + "\n");
+                stringBuffer.append("Date: " + cursor.getString(3) + "\n");
+                stringBuffer.append("Time: " + cursor.getString(4) + "\n\n");
+
+            }
+            showData("ResultSet", stringBuffer.toString());
+
+            /***********/
+
         }
         else if(view == cancelBtn){
             onBackPressed();
@@ -164,5 +225,14 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             amPm = " AM";
         }
         timeEditText.setText(String.format("%02d:%02d", hour, minute) + amPm);
+    }
+
+    /****Just Checking****/
+    public void showData(String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setCancelable(true);
+        builder.show();
     }
 }

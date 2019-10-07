@@ -7,7 +7,7 @@ public class TodoDetails {
     private String title, desc, priority;
 
 
-    public TodoDetails(String date, String title, String desc, String priority){
+   /* public TodoDetails(String date, String title, String desc, String priority){
         this.date = date;
         this.title = title;
         this.desc = desc;
@@ -20,7 +20,7 @@ public class TodoDetails {
         this.desc = desc;
         this.time = time;
         this.priority = priority;
-    }
+    }*/
 
     public String getDate() {
         return date;
