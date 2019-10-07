@@ -164,7 +164,7 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             //showToast("Added");
 
             /****Just Checking****/
-            Cursor cursor = myDatabaseHelper.displayAllData(); //result set
+            Cursor cursor = myDatabaseHelper.displayAllDataToDo(); //result set
             if(cursor.getCount() == 0){
                 //there is no data
                 showData("Error","No data Found");

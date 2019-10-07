@@ -1,11 +1,14 @@
 package com.example.jarvis;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -36,13 +39,46 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     private EditText descriptionEditText;
     private EditText dateEditText;
 
+    // Variable for Local Database
+    MyDatabaseHelper myDatabaseHelper;
+    WalletDetails walletDetails;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_record);
 
         settingUpXmlElements();
+        handleLocalDatabase();
     }
+
+    /*****functions for local database*****/
+    void handleLocalDatabase(){
+        myDatabaseHelper = new MyDatabaseHelper(this);
+        walletDetails = new WalletDetails();
+        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+    }
+
+    void handleAddingInSQLite(){
+        String title = titleEditText.getText().toString();
+        String description = descriptionEditText.getText().toString();
+        String date = dateEditText.getText().toString();
+
+        walletDetails.setTitle(title);
+        walletDetails.setDesc(description);
+        walletDetails.setDate(date);
+
+        long rowId = myDatabaseHelper.insertDataWallet(walletDetails);
+        if(rowId > 0){
+            Toast.makeText(getApplicationContext(), "Successfully added!",  Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(getApplicationContext(), "Addition failed!",  Toast.LENGTH_LONG).show();
+        }
+
+    }
+    /*******/
+
 
     public void settingUpXmlElements(){
         customSpinner = (Spinner) findViewById(R.id.add_record_custom_spinner);
@@ -96,6 +132,10 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         CustomSpinnerItem item = (CustomSpinnerItem) adapterView.getSelectedItem();
         showToast(item.getSpinnerText());
+
+        /****set selected spinner text into wallet details****/
+        String expenseType = item.getSpinnerText();
+        walletDetails.setExpenseType(expenseType);
     }
 
     @Override
@@ -119,7 +159,27 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onClick(View view) {
         if(view == addBtn){
-            showToast("Added");
+            handleAddingInSQLite();
+            //showToast("Added");
+
+            /****Just Checking****/
+            Cursor cursor = myDatabaseHelper.displayAllDataWallet(); //result set
+            if(cursor.getCount() == 0){
+                //there is no data
+                showData("Error","No data Found");
+                return;
+            }
+            StringBuffer stringBuffer = new StringBuffer();
+            while (cursor.moveToNext()){
+                stringBuffer.append("ID: " + cursor.getString(0) + "\n");
+                stringBuffer.append("Title: " + cursor.getString(1) + "\n");
+                stringBuffer.append("Description: " + cursor.getString(2) + "\n");
+                stringBuffer.append("Date: " + cursor.getString(3) + "\n");
+                stringBuffer.append("Expense Type: " + cursor.getString(4) + "\n\n");
+
+            }
+            showData("ResultSet for Wallet", stringBuffer.toString());
+            /***********/
         }
         else if(view == cancelBtn){
             onBackPressed();
@@ -149,5 +209,14 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
+    }
+
+    /****Just Checking****/
+    public void showData(String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setCancelable(true);
+        builder.show();
     }
 }

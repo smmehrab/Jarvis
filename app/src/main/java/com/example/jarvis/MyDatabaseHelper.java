@@ -25,7 +25,15 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     private static final String TIME = "time";
     private static final String DATE = "date";
 
-    private static int VERSION_NUMBER= 2;
+    /****FOR WALLET****/
+    private static final String WALLET_TABLENAME = "wallet";
+    private static final String WALLET_TITLE = "title";
+    private static final String WALLET_DESCRIPTION = "description";
+    private static final String WALLET_DATE = "date";
+    private static final String WALLET_EXPENSE_TYPE = "expensetype";
+
+
+    private static int VERSION_NUMBER= 4;
 
     private Context context;
 
@@ -36,6 +44,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     /***Create and drop table for TO DO DETAILS****/
     private  static final String CREATE_TABLE_FOR_TODO = "CREATE TABLE "+TODOTABLENAME+"("+ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+TITLE+" VARCHAR(255) NOT NULL, "+DESCRIPTION+ " VARCHAR(255) NOT NULL, "+DATE+ " DATE, "+TIME+ " TIME); ";
     private static final String DROP_TABLE_FOR_TODO = " DROP TABLE IF EXISTS " + TODOTABLENAME;
+
+    /***Create and drop table for WALLET***/
+    private  static final String CREATE_TABLE_FOR_WALLET = "CREATE TABLE "+WALLET_TABLENAME+"("+ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+WALLET_TITLE+" VARCHAR(255) NOT NULL, "+WALLET_DESCRIPTION+ " VARCHAR(255) NOT NULL, "+WALLET_DATE+ " DATE, "+WALLET_EXPENSE_TYPE+ " VARCHAR(255) NOT NULL); ";
+    private static final String DROP_TABLE_FOR_WALLET = " DROP TABLE IF EXISTS " + WALLET_TABLENAME;
 
 
     public MyDatabaseHelper(Context context) {
@@ -50,6 +62,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "onCreate is called", Toast.LENGTH_LONG).show();
             sqLiteDatabase.execSQL(CREATE_TABLE_FOR_USER);
             sqLiteDatabase.execSQL(CREATE_TABLE_FOR_TODO);
+            sqLiteDatabase.execSQL(CREATE_TABLE_FOR_WALLET);
         }
         catch (Exception e){
             Toast.makeText(context, "Exception : " + e, Toast.LENGTH_LONG).show();
@@ -66,6 +79,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "onUpgrade is called", Toast.LENGTH_LONG).show();
             sqLiteDatabase.execSQL(DROP_TABLE_FOR_USER);
             sqLiteDatabase.execSQL(DROP_TABLE_FOR_TODO);
+            sqLiteDatabase.execSQL(DROP_TABLE_FOR_WALLET);
             onCreate(sqLiteDatabase);
 
         } catch (Exception e) {
@@ -140,11 +154,38 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    /****JUST FOR CHECK****/
-    private static final String SELECT_ALL = "SELECT * FROM " + TODOTABLENAME;
-    public Cursor displayAllData(){
+    //Insert data for Wallet
+    public long insertDataWallet(WalletDetails walletDetails) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery(SELECT_ALL, null);
+        ContentValues contentValues = new ContentValues();
+
+        String getTitle = walletDetails.getTitle();
+        String getDesc = walletDetails.getDesc();
+        String getDate = walletDetails.getDate();
+        String expense = walletDetails.getExpenseType();
+
+        contentValues.put(TITLE, getTitle);
+        contentValues.put(DESCRIPTION, getDesc);
+        contentValues.put(DATE, getDate);
+        contentValues.put(WALLET_EXPENSE_TYPE, expense);
+
+        long rowId = sqLiteDatabase.insert(WALLET_TABLENAME, null, contentValues);
+        return rowId;
+    }
+
+
+    /****JUST FOR CHECK****/
+    private static final String SELECT_ALL_TODO = "SELECT * FROM " + TODOTABLENAME;
+    public Cursor displayAllDataToDo(){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(SELECT_ALL_TODO, null);
+        return cursor;
+    }
+
+    private static final String SELECT_ALL_WALLET = "SELECT * FROM " + WALLET_TABLENAME;
+    public Cursor displayAllDataWallet(){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(SELECT_ALL_WALLET, null);
         return cursor;
     }
 }
