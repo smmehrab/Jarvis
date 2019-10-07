@@ -10,17 +10,33 @@ import android.widget.Toast;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "user_details.db";
-    private static final String TABLE_NAME = "user_details";
+
+    /****FOR USER DETAILS WHILE SIGNING UP*****/
+    private static final String USERTABLENAME = "user_details";
     private static final String ID = "_id";
     private static final String EMAIL = "Email";
     private static final String PASSWORD = "Password";
     private static final String CONFIRM_PASSWORD = "Confirm_Password";
-    private static int VERSION_NUMBER= 1;
+
+    /****FOR TO DO DETAILS****/
+    private static final String TODOTABLENAME = "todo_details";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
+    private static final String TIME = "time";
+    private static final String DATE = "date";
+
+    private static int VERSION_NUMBER= 2;
 
     private Context context;
 
-    private  static final String CREATE_TABLE = "CREATE TABLE "+TABLE_NAME+"("+ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+EMAIL+" VARCHAR(255) NOT NULL, "+PASSWORD+ " VARCHAR(255) NOT NULL, "+CONFIRM_PASSWORD+ " VARCHAR(255) NOT NULL); ";
-    private static final String DROP_TABLE = " DROP TABLE IF EXISTS " + TABLE_NAME;
+    /***Create and drop table for sign up***/
+    private  static final String CREATE_TABLE_FOR_USER = "CREATE TABLE "+USERTABLENAME+"("+ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+EMAIL+" VARCHAR(255) NOT NULL, "+PASSWORD+ " VARCHAR(255) NOT NULL, "+CONFIRM_PASSWORD+ " VARCHAR(255) NOT NULL); ";
+    private static final String DROP_TABLE_FOR_USER = " DROP TABLE IF EXISTS " + USERTABLENAME;
+
+    /***Create and drop table for TO DO DETAILS****/
+    private  static final String CREATE_TABLE_FOR_TODO = "CREATE TABLE "+TODOTABLENAME+"("+ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+TITLE+" VARCHAR(255) NOT NULL, "+DESCRIPTION+ " VARCHAR(255) NOT NULL, "+DATE+ " DATE, "+TIME+ " TIME); ";
+    private static final String DROP_TABLE_FOR_TODO = " DROP TABLE IF EXISTS " + TODOTABLENAME;
+
 
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION_NUMBER);
@@ -32,7 +48,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
         try {
             Toast.makeText(context, "onCreate is called", Toast.LENGTH_LONG).show();
-            sqLiteDatabase.execSQL(CREATE_TABLE);
+            sqLiteDatabase.execSQL(CREATE_TABLE_FOR_USER);
+            sqLiteDatabase.execSQL(CREATE_TABLE_FOR_TODO);
         }
         catch (Exception e){
             Toast.makeText(context, "Exception : " + e, Toast.LENGTH_LONG).show();
@@ -47,7 +64,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
         try {
             Toast.makeText(context, "onUpgrade is called", Toast.LENGTH_LONG).show();
-            sqLiteDatabase.execSQL(DROP_TABLE);
+            sqLiteDatabase.execSQL(DROP_TABLE_FOR_USER);
+            sqLiteDatabase.execSQL(DROP_TABLE_FOR_TODO);
             onCreate(sqLiteDatabase);
 
         } catch (Exception e) {
@@ -71,7 +89,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(PASSWORD, getPassword);
             contentValues.put(CONFIRM_PASSWORD, getConfirmPassword);
 
-            long rowId = sqLiteDatabase.insert(TABLE_NAME, null, contentValues);
+            long rowId = sqLiteDatabase.insert(USERTABLENAME, null, contentValues);
             return rowId;
 
         }
@@ -81,7 +99,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     public Boolean findUser(String mail, String pass){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + USERTABLENAME, null);
         Boolean result = false;
 
         if(cursor.getCount() == 0){
@@ -103,5 +121,30 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    //Insert data for To Do
+    public long insertDataTodo(TodoDetails todoDetails) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
 
+        String getTitle = todoDetails.getTitle();
+        String getDesc = todoDetails.getDesc();
+        String getTime = todoDetails.getTime();
+        String getDate = todoDetails.getDate();
+
+        contentValues.put(TITLE, getTitle);
+        contentValues.put(DESCRIPTION, getDesc);
+        contentValues.put(DATE, getDate);
+        contentValues.put(TIME, getTime);
+
+        long rowId = sqLiteDatabase.insert(TODOTABLENAME, null, contentValues);
+        return rowId;
+    }
+
+    /****JUST FOR CHECK****/
+    private static final String SELECT_ALL = "SELECT * FROM " + TODOTABLENAME;
+    public Cursor displayAllData(){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery(SELECT_ALL, null);
+        return cursor;
+    }
 }
