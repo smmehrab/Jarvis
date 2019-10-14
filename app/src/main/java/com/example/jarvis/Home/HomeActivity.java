@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.Home;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -10,18 +10,38 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Journal.JournalActivity;
+import com.example.jarvis.Profile.ProfileActivity;
+import com.example.jarvis.R;
+import com.example.jarvis.Reminder.ReminderActivity;
+import com.example.jarvis.Settings.SettingsActivity;
+import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Wallet.WalletActivity;
+import com.example.jarvis.WelcomeScreen.WelcomeActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class JournalActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
+
+    //  Variables for Remote Database
+    private static final int RC_SIGN_IN = 1;
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    GoogleSignInOptions googleSignInOptions;
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -33,26 +53,32 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
-    private FloatingActionButton fab;
 
-    private TextView activityTitle;
+    private Button todoActivityBtn;
+    private Button journalActivityBtn;
+    private Button walletActivityBtn;
+    private Button reminderActivityBtn;
 
+
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_journal);
+        setContentView(R.layout.activity_home);
 
         settingUpXmlElements();
     }
 
     void settingUpXmlElements(){
+        mAuth = FirebaseAuth.getInstance();
+        
         // Finding the Parent Layout
-        drawerLayout = (DrawerLayout) findViewById(R.id.journal_drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
         drawerLayout.setDrawerListener(drawerToggle);
 
         // Setting Up Toolbar
-        toolbar = (Toolbar) findViewById(R.id.journal_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -60,40 +86,60 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         // Setting Up Components Inside Toolbar
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        fab = (FloatingActionButton) findViewById(R.id.journal_fab);
 
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        fab.setOnClickListener(this);
 
-        activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_journal);
-
-        activityTitle = (TextView) findViewById(R.id.activity_title);
-        activityTitle.setText(R.string.journal_txt);
+        activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_home);
 
         // Two Navigation View for Two Navigation Drawers
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
-        activityNavigationView = (NavigationView) findViewById(R.id.journal_navigation_view);
+        activityNavigationView = (NavigationView) findViewById(R.id.home_navigation_view);
 
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
 
-        userNavigationView.getMenu().findItem(R.id.user_journal_option).setCheckable(true);
-        userNavigationView.getMenu().findItem(R.id.user_journal_option).setChecked(true);
+        userNavigationView.getMenu().findItem(R.id.user_home_option).setCheckable(true);
+        userNavigationView.getMenu().findItem(R.id.user_home_option).setChecked(true);
+
+        // Setting Up Other Buttons of the Activity
+        todoActivityBtn = (Button) findViewById(R.id.todo_activity_btn);
+        journalActivityBtn = (Button) findViewById(R.id.journal_activity_btn);
+        walletActivityBtn = (Button) findViewById(R.id.wallet_activity_btn);
+        reminderActivityBtn = (Button) findViewById(R.id.reminder_activity_btn);
+
+        todoActivityBtn.setOnClickListener(this);
+        journalActivityBtn.setOnClickListener(this);
+        walletActivityBtn.setOnClickListener(this);
+        reminderActivityBtn.setOnClickListener(this);
     }
 
     public void showToast(String message){
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
 
+
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(JournalActivity.this, HomeActivity.class);
-        startActivity(intent);
-        finish();
+        if (doubleBackToExitPressedOnce) {
+            super.finish();
+            moveTaskToBack(true);
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+
+        showToast("Press Once Again to EXIT");
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
 
     @Override
@@ -168,8 +214,25 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }.start();
         }
-        else if(view == fab){
-            showToast("Clicked");
+
+        else if(view == todoActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, TodoActivity.class);
+            startActivity(intent);
+        }
+
+        else if(view == journalActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, JournalActivity.class);
+            startActivity(intent);
+        }
+
+        else if(view == walletActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, WalletActivity.class);
+            startActivity(intent);
+        }
+
+        else if(view == reminderActivityBtn){
+            Intent intent = new Intent(HomeActivity.this, ReminderActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -185,13 +248,12 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_todo_option) {
             Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.user_journal_option) {
-
+            Intent intent = new Intent(getApplicationContext(), JournalActivity.class);
+            startActivity(intent);
         } else if (id == R.id.user_wallet_option) {
             Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
             startActivity(intent);
@@ -205,7 +267,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
-            FirebaseAuth.getInstance().signOut();
+            //FirebaseAuth.getInstance().signOut();
+            //new SignInActivity().signOut();
+            signOut();
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
@@ -214,5 +278,34 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
-}
 
+
+    private void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configure Google sign in
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+    public void signOut() {
+        initializeGoogleVariable();
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // updateUI(null);
+                    }
+                });
+    }
+
+
+}

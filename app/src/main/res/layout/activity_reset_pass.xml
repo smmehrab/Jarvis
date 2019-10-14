@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ResetPassActivity">
+    tools:context=".UserHandling.ResetPassActivity">
 
     <include
         android:id="@+id/reset_pass_toolbar"

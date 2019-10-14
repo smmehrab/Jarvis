@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.Reminder;
 
 public class ReminderDetails {
     String date, time, notifyType, title, desc;

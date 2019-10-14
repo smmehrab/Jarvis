@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.UserHandling;
 
 public class UserDetails {
     private String email, password, confirmPassword;

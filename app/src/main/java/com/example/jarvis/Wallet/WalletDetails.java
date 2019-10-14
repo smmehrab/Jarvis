@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.Wallet;
 
 public class WalletDetails {
 

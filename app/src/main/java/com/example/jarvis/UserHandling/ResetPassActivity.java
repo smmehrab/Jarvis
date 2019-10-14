@@ -1,16 +1,14 @@
-package com.example.jarvis;
+package com.example.jarvis.UserHandling;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.material.navigation.NavigationView;
+import com.example.jarvis.R;
 
 public class ResetPassActivity extends AppCompatActivity {
 

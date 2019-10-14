@@ -7,7 +7,7 @@
     android:background="@color/colorWhite"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context=".AddRecordActivity">
+    tools:context=".Wallet.AddRecordActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

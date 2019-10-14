@@ -7,7 +7,7 @@
     android:background="@color/colorWhite"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context=".AddReminderActivity">
+    tools:context=".Reminder.AddReminderActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -4,13 +4,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.jarvis.ReminderDetails;
-import com.example.jarvis.TodoDetails;
-import com.example.jarvis.WalletDetails;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.jarvis.Reminder.ReminderDetails;
+import com.example.jarvis.Todo.TodoDetails;
+import com.example.jarvis.Wallet.WalletDetails;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;

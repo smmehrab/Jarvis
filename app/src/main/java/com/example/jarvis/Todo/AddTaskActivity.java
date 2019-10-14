@@ -1,9 +1,6 @@
-package com.example.jarvis;
+package com.example.jarvis.Todo;
 
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.DatePickerDialog;
@@ -19,21 +16,17 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.jarvis.DatePickerFragment;
+import com.example.jarvis.R;
+import com.example.jarvis.TimePickerFragment;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
-import databases.firebase.FirebaseDataAdd;
-
-public class AddTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
+public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     private ImageButton remindMeBtn;
     private ImageButton copyToClipboardBtn;
     private Button cancelBtn;

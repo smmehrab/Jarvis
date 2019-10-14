@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.Wallet;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
@@ -14,12 +14,14 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.example.jarvis.CustomSpinnerAdapter;
+import com.example.jarvis.CustomSpinnerItem;
+import com.example.jarvis.DatePickerFragment;
+import com.example.jarvis.R;
 
 import java.text.DateFormat;
 import java.util.ArrayList;

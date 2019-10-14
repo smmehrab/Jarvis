@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.example.jarvis.UserHandling.UserDetails;
+
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "user_details.db";

@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.WelcomeScreen;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.jarvis.Home.HomeActivity;
+import com.example.jarvis.R;
+import com.example.jarvis.UserHandling.SignInActivity;
+import com.example.jarvis.UserHandling.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
@@ -76,7 +80,6 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void showToast(String message){
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
@@ -85,7 +88,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
+            super.finish();
+            moveTaskToBack(true);
             return;
         }
 

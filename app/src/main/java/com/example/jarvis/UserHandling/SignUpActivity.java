@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.UserHandling;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.jarvis.Home.HomeActivity;
+import com.example.jarvis.MyDatabaseHelper;
+import com.example.jarvis.R;
+import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,9 +30,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //  Variables for Remote Database
+    //  Variables for SignUpWithGoogle
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -36,21 +40,22 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     GoogleSignInOptions googleSignInOptions;
 
     // Buttons
-    private Button signInBtn;
-    private Button signInWithGoogleBtn;
-    private Button forgotPassBtn;
+    private Button signUpBtn;
+    private Button signUpWithGoogleBtn;
 
     // EditTexts
     private EditText emailEditTxt;
     private EditText passEditTxt;
+    private EditText confirmPassEditTxt;
 
     // Variable for Local Database
     MyDatabaseHelper myDatabaseHelper;
+    UserDetails userDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        setContentView(R.layout.activity_sign_up);
 
         settingUpXmlElements();
 
@@ -59,24 +64,24 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void settingUpXmlElements(){
-        signInBtn = (Button) findViewById(R.id.sign_in_btn);
-        signInWithGoogleBtn = (Button) findViewById(R.id.sign_in_with_google_btn);
-        forgotPassBtn = (Button) findViewById(R.id.forgot_pass_btn);
+        signUpBtn = (Button) findViewById(R.id.sign_up_btn);
+        signUpWithGoogleBtn = (Button) findViewById(R.id.sign_up_with_google_btn);
 
-        emailEditTxt = (EditText) findViewById(R.id.sign_in_email_edit_txt);
-        passEditTxt = (EditText) findViewById(R.id.sign_in_pass_edit_txt);
+        emailEditTxt = (EditText) findViewById(R.id.sign_up_email_edit_txt);
+        passEditTxt = (EditText) findViewById(R.id.sign_up_pass_edit_txt);
+        confirmPassEditTxt = (EditText) findViewById(R.id.sign_up_confirm_pass_edit_txt);
 
         setListeners();
     }
 
     void setListeners(){
-        signInBtn.setOnClickListener(this);
-        signInWithGoogleBtn.setOnClickListener(this);
-        forgotPassBtn.setOnClickListener(this);
+        signUpBtn.setOnClickListener(this);
+        signUpWithGoogleBtn.setOnClickListener(this);
     }
 
     void handleLocalDatabase(){
         myDatabaseHelper = new MyDatabaseHelper(this);
+        userDetails = new UserDetails();
         SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
     }
 
@@ -84,7 +89,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         initializeGoogleVariable();
     }
 
-    private void initializeGoogleVariable() {
+    void initializeGoogleVariable() {
         mAuth = FirebaseAuth.getInstance();
 
         // Configure Google sign in
@@ -96,54 +101,53 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
 
-    void handleSignIn() {
-        String email = emailEditTxt.getText().toString();
-        String password = passEditTxt.getText().toString();
-        //change a little
-        Boolean result;
-        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-            result = myDatabaseHelper.findUser(email, password);
-
-            if (result == true) {
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                startActivity(intent);
-            } else {
-                Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else
-            Toast.makeText(getApplicationContext(), "Text Field can't be empty!!!", Toast.LENGTH_SHORT).show();
-
-    }
-    void handleSignInWithGoogle() {
+    void handleSignUpWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
         //startActivityForResult();
     }
 
-    void handleForgotPass(){
-        Intent intent = new Intent(SignInActivity.this, ResetPassActivity.class);
-        startActivity(intent);
+    void handleSignUp(){
+        String email = emailEditTxt.getText().toString();
+        String password = passEditTxt.getText().toString();
+        String confirmPassword = confirmPassEditTxt.getText().toString();
+
+        userDetails.setEmail(email);
+        userDetails.setPassword(password);
+        userDetails.setConfirmPassword(confirmPassword);
+
+        long rowId = myDatabaseHelper.insertData(userDetails);
+
+        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
+            if(rowId > 0){
+                Toast.makeText(getApplicationContext(), "Successfully Signed Up!",  Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                startActivity(intent);
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Password Didn't Match!",  Toast.LENGTH_LONG).show();
+            }
+        }
+
+        else{
+            Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!",  Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onClick(View view) {
-        if(view == signInBtn){
-            handleSignIn();
+        if(view == signUpBtn){
+            handleSignUp();
         }
 
-        else if(view == signInWithGoogleBtn){
-            handleSignInWithGoogle();
-        }
-
-        else if(view == forgotPassBtn){
-            handleForgotPass();
+        else if(view == signUpWithGoogleBtn){
+            handleSignUpWithGoogle();
         }
     }
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(SignInActivity.this, WelcomeActivity.class);
+        Intent intent = new Intent(SignUpActivity.this, WelcomeActivity.class);
         startActivity(intent);
         finish();
     }
@@ -166,14 +170,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-               // Log.w(TAG, "Google sign in failed", e);
+                // Log.w(TAG, "Google sign in failed", e);
                 // ...
             }
         }
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-       // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
 
         // Ekhan theke ekta progressbar diye dis vala hoibo
@@ -186,14 +190,14 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                           // Log.d(TAG, "signInWithCredential:success");
+                            // Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(SignInActivity.this, HomeActivity.class));
+                            startActivity(new Intent(SignUpActivity.this, HomeActivity.class));
                             finish();
                             //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
-                           // Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            // Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             // updateUI(null);
                         }
@@ -205,7 +209,4 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
     }
-
-
-
 }

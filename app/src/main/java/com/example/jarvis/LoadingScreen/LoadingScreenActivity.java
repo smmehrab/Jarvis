@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.LoadingScreen;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+
+import com.example.jarvis.R;
+import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 
 public class LoadingScreenActivity extends AppCompatActivity {
 
