@@ -3,6 +3,7 @@ package com.example.jarvis.Wallet;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -18,7 +19,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.CustomSpinnerAdapter;
 import com.example.jarvis.Util.CustomSpinnerItem;
 import com.example.jarvis.Util.DatePickerFragment;
@@ -134,22 +137,22 @@ public class AddWalletActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onClick(View view) {
         if(view == addBtn){
-//            description = descriptionEditText.getText().toString();
-//            title = titleEditText.getText().toString();
-//
-//            date = dateEditText.getText().toString();
-//
-//            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
-//            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
-//
-//            String currentUser = HomeActivity.getCurrentUser();
-//            userId = sqLiteDatabaseHelper.getUserId(currentUser);
-//
-//            WalletDetails walletDetails = new WalletDetails(title, description, date, type, userId);
-//
-//            sqLiteDatabaseHelper.insertWallet(walletDetails);
-//            showToast("Added");
-//            onBackPressed();
+            description = descriptionEditText.getText().toString();
+            title = titleEditText.getText().toString();
+
+            date = dateEditText.getText().toString();
+
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+            String currentUser = HomeActivity.getCurrentUser();
+            userId = sqLiteDatabaseHelper.getUserId(currentUser);
+
+            WalletDetails walletDetails = new WalletDetails(title, description, date, type, userId);
+
+            sqLiteDatabaseHelper.insertWallet(walletDetails);
+            showToast("Added");
+            onBackPressed();
         }
         else if(view == cancelBtn){
             onBackPressed();
