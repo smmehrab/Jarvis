@@ -1,8 +1,5 @@
 package com.example.jarvis.Reminder;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,10 +10,13 @@ import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.jarvis.DatePickerFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+
 import com.example.jarvis.R;
-import com.example.jarvis.TimePickerFragment;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.DatePickerFragment;
+import com.example.jarvis.Util.TimePickerFragment;
 
 public class AddReminderActivity extends AppCompatActivity implements TimePicker.OnTimeChangedListener, View.OnClickListener{
 

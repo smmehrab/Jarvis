@@ -56,6 +56,52 @@
     <string name="color_txt">Color</string>
     <string name="event_txt">Event</string>
     <string name="alarm_txt">Alarm</string>
+    <string name="sample_txt">Sample</string>
 
 
+    <string-array name="todo_title">
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+    </string-array>
+
+
+    <string-array name="todo_desc">
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+        <item>The Longest Sea Beach On Earth</item>
+    </string-array>
+
+    <string-array name="todo_date">
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+        <item>Earth</item>
+    </string-array>
 </resources>

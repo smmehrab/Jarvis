@@ -1,8 +1,5 @@
 package com.example.jarvis.Wallet;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -18,16 +15,19 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.jarvis.CustomSpinnerAdapter;
-import com.example.jarvis.CustomSpinnerItem;
-import com.example.jarvis.DatePickerFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+
 import com.example.jarvis.R;
+import com.example.jarvis.Util.CustomSpinnerAdapter;
+import com.example.jarvis.Util.CustomSpinnerItem;
+import com.example.jarvis.Util.DatePickerFragment;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class AddRecordActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class AddWalletActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private Spinner customSpinner;
 
@@ -38,10 +38,14 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     private EditText descriptionEditText;
     private EditText dateEditText;
 
+    private String description, title;
+    private Integer type = 1, userId;
+    private String date;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_record);
+        setContentView(R.layout.activity_add_wallet);
 
         settingUpXmlElements();
     }
@@ -74,6 +78,10 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
         descriptionEditText = (EditText) findViewById(R.id.add_record_description_editText);
         dateEditText = (EditText) findViewById(R.id.add_record_date_editText);
 
+        Calendar calendar = Calendar.getInstance();
+        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
+        dateEditText.setText(currentDate);
+
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,7 +105,12 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         CustomSpinnerItem item = (CustomSpinnerItem) adapterView.getSelectedItem();
-        showToast(item.getSpinnerText());
+        if(item.getSpinnerText() == "Expense")
+            type = 1;
+        else if(item.getSpinnerText() == "Earning")
+            type = 2;
+
+        showToast(type.toString());
     }
 
     @Override
@@ -121,14 +134,25 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onClick(View view) {
         if(view == addBtn){
-            showToast("Added");
+//            description = descriptionEditText.getText().toString();
+//            title = titleEditText.getText().toString();
+//
+//            date = dateEditText.getText().toString();
+//
+//            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+//            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+//
+//            String currentUser = HomeActivity.getCurrentUser();
+//            userId = sqLiteDatabaseHelper.getUserId(currentUser);
+//
+//            WalletDetails walletDetails = new WalletDetails(title, description, date, type, userId);
+//
+//            sqLiteDatabaseHelper.insertWallet(walletDetails);
+//            showToast("Added");
+//            onBackPressed();
         }
         else if(view == cancelBtn){
             onBackPressed();
-        }
-        else if(view == dateEditText){
-            DialogFragment datePicker = new DatePickerFragment();
-            datePicker.show(getSupportFragmentManager(),"date picker");
         }
     }
 

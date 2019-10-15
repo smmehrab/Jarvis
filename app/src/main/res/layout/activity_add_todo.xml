@@ -7,7 +7,7 @@
     android:background="@color/colorWhite"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context=".Todo.AddTaskActivity">
+    tools:context=".Todo.AddTodoActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -151,7 +151,7 @@
             android:background="@color/colorWhite"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -246,7 +246,8 @@
             android:layout_weight="0.5"
             android:animateLayoutChanges="true"
             android:background="@color/colorWhite"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            android:visibility="gone"/>
 
 
         <LinearLayout

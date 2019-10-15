@@ -1,4 +1,4 @@
-package databases.firebase;
+package com.example.jarvis.Firebase;
 
 import android.util.Log;
 
@@ -30,9 +30,9 @@ public class FirebaseDataAdd {
 
     public FirebaseDataAdd(FirebaseAuth mAuth){
         this.mAuth = mAuth;
-       setup();
-       setupCacheSize();
-       initializeRef();
+        setup();
+        setupCacheSize();
+        initializeRef();
     }
 
     public void setup() {
@@ -65,7 +65,6 @@ public class FirebaseDataAdd {
     }
 
     public void addTodoInFireBaseRecent(List <TodoDetails> tasks){
-
         Iterator i = tasks.iterator();
         int increment = 1;
         while(i.hasNext()){
@@ -122,6 +121,7 @@ public class FirebaseDataAdd {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d("addUserFireBase", "Successfull");
+                //
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

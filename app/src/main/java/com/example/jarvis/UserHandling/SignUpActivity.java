@@ -1,8 +1,5 @@
 package com.example.jarvis.UserHandling;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,9 +9,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.jarvis.Home.HomeActivity;
-import com.example.jarvis.MyDatabaseHelper;
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -49,8 +49,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private EditText confirmPassEditTxt;
 
     // Variable for Local Database
-    MyDatabaseHelper myDatabaseHelper;
+    SQLiteDatabaseHelper sqLiteDatabaseHelper;
     UserDetails userDetails;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +81,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void handleLocalDatabase(){
-        myDatabaseHelper = new MyDatabaseHelper(this);
+        sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         userDetails = new UserDetails();
-        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
     }
 
     void handleRemoteDatabase(){
@@ -116,12 +117,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         userDetails.setPassword(password);
         userDetails.setConfirmPassword(confirmPassword);
 
-        long rowId = myDatabaseHelper.insertData(userDetails);
+        long rowId = sqLiteDatabaseHelper.insertUser(userDetails);
 
         if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
             if(rowId > 0){
                 Toast.makeText(getApplicationContext(), "Successfully Signed Up!",  Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                intent.putExtra("currentUser", email);
                 startActivity(intent);
             }
             else{
@@ -209,4 +211,5 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
     }
+
 }

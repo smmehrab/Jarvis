@@ -1,4 +1,4 @@
-package com.example.jarvis;
+package com.example.jarvis.Util;
 
 public class CustomSpinnerItem {
 

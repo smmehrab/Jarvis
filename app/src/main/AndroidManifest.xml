@@ -10,8 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Reminder.AddReminderActivity"></activity>
-        <activity android:name=".Wallet.AddRecordActivity" />
-        <activity android:name=".Todo.AddTaskActivity" />
+        <activity android:name=".Wallet.AddWalletActivity" />
+        <activity android:name=".Todo.AddTodoActivity" />
         <activity android:name=".Profile.ProfileActivity" />
         <activity android:name=".About.AboutActivity" />
         <activity android:name=".Settings.SettingsActivity" />
@@ -24,7 +24,7 @@
         <activity android:name=".UserHandling.SignUpActivity" />
         <activity android:name=".UserHandling.SignInActivity" />
         <activity android:name=".WelcomeScreen.WelcomeActivity" />
-        <activity android:name=".LoadingScreen.LoadingScreenActivity">
+        <activity android:name=".SplashScreen.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

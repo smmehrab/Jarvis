@@ -1,37 +1,54 @@
 package com.example.jarvis.Todo;
 
-import java.util.Date;
-
 public class TodoDetails {
-    private String date, time;
-    private String title, desc, priority;
+    private String description, title;
+    private Integer reminderState, userId;
+    private String date;
+    private String time;
 
-
-    public TodoDetails(String date, String title, String desc, String priority){
-        this.date = date;
+    public TodoDetails(String description, String title, Integer reminderState, Integer userId, String date, String time) {
+        this.description = description;
         this.title = title;
-        this.desc = desc;
-        this.priority = priority;
+        this.reminderState = reminderState;
+        this.userId = userId;
+        this.date = date;
+        this.time = time;
     }
 
-    public TodoDetails(String date, String title, String desc, String time, String priority){
-        this.date = date;
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
-        this.desc = desc;
-        this.time = time;
-        this.priority = priority;
+    }
+
+    public Integer getReminderState() {
+        return reminderState;
+    }
+
+    public void setReminderState(Integer reminderState) {
+        this.reminderState = reminderState;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getDate() {
         return date;
-    }
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
     }
 
     public void setDate(String date) {
@@ -45,21 +62,4 @@ public class TodoDetails {
     public void setTime(String time) {
         this.time = time;
     }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
 }

@@ -1,12 +1,5 @@
 package com.example.jarvis.Todo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +9,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
@@ -29,6 +30,10 @@ import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 public class TodoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -46,12 +51,19 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView activityTitle;
 
+    DatabaseReference reference;
+    FirebaseDatabase database;
+    RecyclerView todoItems;
+    ArrayList<TodoDetails> todoDetails;
+    TaskAdapter taskAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo);
 
         settingUpXmlElements();
+        // gettingDataFromFirebase();
     }
 
     void settingUpXmlElements(){
@@ -88,8 +100,40 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setChecked(true);
+
+        // Recycler View
+//        todoItems = findViewById(R.id.todo_items);
+//        todoItems.setLayoutManager(new LinearLayoutManager(this));
+//        todoDetails = new ArrayList<TodoDetails>();
     }
 
+
+    void gettingDataFromFirebase(){
+//        reference = FirebaseDatabase.getInstance().getReference().child("Todo");
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                // To Retrieve Data & Replace Layout
+//                todoDetails.clear();
+//                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+//                    TodoDetails task = dataSnapshot1.getValue(TodoDetails.class);
+//                    todoDetails.add(task);
+//                    //showToast(task.toString());
+//                }
+//
+//                taskAdapter = new TaskAdapter(TodoActivity.this, todoDetails);
+//                todoItems.setAdapter(taskAdapter);
+//                taskAdapter.notifyDataSetChanged();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                // To Show an Error
+//                showToast("No Data Found");
+//            }
+//        });
+    }
 
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
@@ -177,7 +221,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             }.start();
         }
         else if(view == fab){
-            Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
+            Intent intent = new Intent(getApplicationContext(), AddTodoActivity.class);
             startActivity(intent);
         }
     }

@@ -1,8 +1,5 @@
 package com.example.jarvis.UserHandling;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,9 +9,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.jarvis.Home.HomeActivity;
-import com.example.jarvis.MyDatabaseHelper;
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -49,7 +49,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private EditText passEditTxt;
 
     // Variable for Local Database
-    MyDatabaseHelper myDatabaseHelper;
+    SQLiteDatabaseHelper sqLiteDatabaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +80,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void handleLocalDatabase(){
-        myDatabaseHelper = new MyDatabaseHelper(this);
-        SQLiteDatabase sqLiteDatabase = myDatabaseHelper.getWritableDatabase();
+        sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
     }
 
     void handleRemoteDatabase(){
@@ -106,10 +106,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         //change a little
         Boolean result;
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-            result = myDatabaseHelper.findUser(email, password);
+            result = sqLiteDatabaseHelper.findUser(email, password);
 
-            if (result == true) {
+            if (result) {
                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("currentUser", email);
                 startActivity(intent);
             } else {
                 Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
@@ -209,7 +210,4 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
     }
-
-
-
 }

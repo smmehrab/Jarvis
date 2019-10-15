@@ -1,6 +1,4 @@
-package com.example.jarvis.LoadingScreen;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.jarvis.SplashScreen;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +8,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.jarvis.R;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 
-public class LoadingScreenActivity extends AppCompatActivity {
+public class SplashScreenActivity extends AppCompatActivity {
 
     private LinearLayout bar1;
     private LinearLayout bar2;
@@ -47,7 +47,7 @@ public class LoadingScreenActivity extends AppCompatActivity {
     }
 
     void changeActivity(){
-        Intent intent = new Intent(LoadingScreenActivity.this, WelcomeActivity.class);
+        Intent intent = new Intent(SplashScreenActivity.this, WelcomeActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         finish();

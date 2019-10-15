@@ -1,11 +1,9 @@
 package com.example.jarvis.Todo;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -19,14 +17,19 @@ import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.jarvis.DatePickerFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+
+import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
-import com.example.jarvis.TimePickerFragment;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
+import com.example.jarvis.Util.DatePickerFragment;
+import com.example.jarvis.Util.TimePickerFragment;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
+public class AddTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     private ImageButton remindMeBtn;
     private ImageButton copyToClipboardBtn;
     private Button cancelBtn;
@@ -42,6 +45,11 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
     private LinearLayout dateLinearLayout;
     private LinearLayout timeLinearLayout;
     private LinearLayout timeGapLinearLayout;
+
+    private String description, title;
+    private Integer reminderState=0, userId;
+    private String date;
+    private String time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,12 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
         dateEditText = (EditText) findViewById(R.id.add_todo_date_editText);
         timeEditText = (EditText) findViewById(R.id.add_todo_time_editText);
 
+        Calendar calendar = Calendar.getInstance();
+        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
+        dateEditText.setText(currentDate);
+
+        timeEditText.setText("Set Time");
+
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,8 +102,6 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
         timeLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_linear_layout);
         timeGapLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_gap_linear_layout);
 
-        timeLinearLayout.setVisibility(View.GONE);
-        timeGapLinearLayout.setVisibility(View.VISIBLE);
     }
 
     public void showToast(String message){
@@ -114,26 +126,37 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if(view == addBtn){
+            description = descriptionEditText.getText().toString();
+            title = titleEditText.getText().toString();
+
+            date = dateEditText.getText().toString();
+            time = timeEditText.getText().toString();
+
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+            String currentUser = HomeActivity.getCurrentUser();
+            userId = sqLiteDatabaseHelper.getUserId(currentUser);
+
+            TodoDetails todoDetails = new TodoDetails(description, title, reminderState, userId, date, time);
+
+            sqLiteDatabaseHelper.insertTodo(todoDetails);
             showToast("Added");
+            onBackPressed();
         }
         else if(view == cancelBtn){
             onBackPressed();
-        }
-        else if(view == dateEditText){
-            DialogFragment datePicker = new DatePickerFragment();
-            datePicker.show(getSupportFragmentManager(),"date picker");
         }
     }
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-        if(isChecked == true){
-            timeLinearLayout.setVisibility(View.VISIBLE);
-            timeGapLinearLayout.setVisibility(View.GONE);
+        if(isChecked){
+            reminderState = 1;
+            timeEditText.callOnClick();
         }
         else{
-            timeLinearLayout.setVisibility(View.GONE);
-            timeGapLinearLayout.setVisibility(View.VISIBLE);
+            reminderState = 0;
         }
     }
 

@@ -1,12 +1,5 @@
 package com.example.jarvis.Home;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Journal.JournalActivity;
@@ -62,10 +62,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean doubleBackToExitPressedOnce = false;
 
+    private static String currentUser = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        if(getIntent().getExtras() != null) {
+            currentUser = getIntent().getExtras().getString("currentUser");
+            showToast(currentUser);
+        }
 
         settingUpXmlElements();
     }
@@ -307,5 +314,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-
+    public static String getCurrentUser() {
+        return currentUser;
+    }
 }

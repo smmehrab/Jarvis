@@ -1,4 +1,4 @@
-package databases.firebase;
+package com.example.jarvis.Firebase;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
