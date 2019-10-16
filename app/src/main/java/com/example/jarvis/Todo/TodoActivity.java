@@ -168,7 +168,10 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                                 handleDeleteAction(position);
                                 break;
                             case R.id.todo_item_edit_rl:
-                                handleEditAction();
+                                handleEditAction(position);
+                                break;
+                            case R.id.todo_item_check_rl:
+                                handleCheckAction(position);
                                 break;
                         }
                     }
@@ -191,9 +194,24 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         dataRetrieveAndShow(sqLiteDatabaseHelper);
     }
 
-    void handleEditAction(){
+    void handleEditAction(int position){
         showToast("Edit Action");
-        //dataRetrieveAndShow();
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        TodoDetails todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getDate(),todoDetails.get(position).getTitle());
+
+        Intent intent = new Intent(getApplicationContext(), UpdateTodoActivity.class);
+        intent.putExtra("user_id", todoItem.getUserId().toString());
+        intent.putExtra("todo_title", todoItem.getUserId().toString());
+        intent.putExtra("todo_description", todoItem.getDescription());
+        intent.putExtra("todo_date", todoItem.getDate());
+        intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());
+        intent.putExtra("todo_time", todoItem.getTime());
+        startActivity(intent);
+    }
+
+    void handleCheckAction(int position){
+
     }
 
     @Override

@@ -28,11 +28,12 @@ import com.example.jarvis.Util.TimePickerFragment;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 
-public class AddTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
+public class UpdateTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     private ImageButton remindMeBtn;
     private Button cancelBtn;
-    private Button addBtn;
+    private Button updateBtn;
 
     private Switch remindMeSwitch;
 
@@ -53,33 +54,50 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_todo);
+        setContentView(R.layout.activity_update_todo);
 
         settingUpXmlElements();
     }
 
     void settingUpXmlElements(){
-        addBtn = (Button) findViewById(R.id.add_todo_add_btn);
-        cancelBtn = (Button) findViewById(R.id.add_todo_cancel_btn);
-        remindMeBtn = (ImageButton) findViewById(R.id.add_todo_remind_me_btn);
+        updateBtn = (Button) findViewById(R.id.update_todo_add_btn);
+        cancelBtn = (Button) findViewById(R.id.update_todo_cancel_btn);
+        remindMeBtn = (ImageButton) findViewById(R.id.update_todo_remind_me_btn);
 
-        addBtn.setOnClickListener(this);
+        updateBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
         remindMeBtn.setOnClickListener(this);
 
-        remindMeSwitch = (Switch) findViewById(R.id.add_todo_remind_me_switch);
+        remindMeSwitch = (Switch) findViewById(R.id.update_todo_remind_me_switch);
         remindMeSwitch.setOnCheckedChangeListener(this);
 
-        titleEditText = (EditText) findViewById(R.id.add_todo_title_editText);
-        descriptionEditText = (EditText) findViewById(R.id.add_todo_description_editText);
-        dateEditText = (EditText) findViewById(R.id.add_todo_date_editText);
-        timeEditText = (EditText) findViewById(R.id.add_todo_time_editText);
+        titleEditText = (EditText) findViewById(R.id.update_todo_title_editText);
+        descriptionEditText = (EditText) findViewById(R.id.update_todo_description_editText);
+        dateEditText = (EditText) findViewById(R.id.update_todo_date_editText);
+        timeEditText = (EditText) findViewById(R.id.update_todo_time_editText);
 
-        Calendar calendar = Calendar.getInstance();
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
+        if(getIntent().getExtras() != null) {
+            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+            title = getIntent().getExtras().getString("todo_title");
+            description = getIntent().getExtras().getString("todo_description");
+            date = getIntent().getExtras().getString("todo_date");
+            reminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
+            time = getIntent().getExtras().getString("todo_time");
 
-        timeEditText.setText("Set Time");
+            titleEditText.setText(title);
+            descriptionEditText.setText(description);
+            dateEditText.setText(date);
+
+            if(reminderState==1)
+                remindMeSwitch.setChecked(true);
+            else
+                remindMeSwitch.setChecked(false);
+
+            timeEditText.setText(time);
+        }
+
+        if(timeEditText.getText().equals(""))
+            timeEditText.setText("Set Time");
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,9 +115,9 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        dateLinearLayout = (LinearLayout) findViewById(R.id.add_todo_date_linear_layout);
-        timeLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_linear_layout);
-        timeGapLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_gap_linear_layout);
+        dateLinearLayout = (LinearLayout) findViewById(R.id.update_todo_date_linear_layout);
+        timeLinearLayout = (LinearLayout) findViewById(R.id.update_todo_time_linear_layout);
+        timeGapLinearLayout = (LinearLayout) findViewById(R.id.update_todo_time_gap_linear_layout);
 
     }
 
@@ -124,7 +142,7 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        if(view == addBtn){
+        if(view == updateBtn){
             description = descriptionEditText.getText().toString();
             title = titleEditText.getText().toString();
 
@@ -143,8 +161,10 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
 
             TodoDetails todoDetails = new TodoDetails(description, title, reminderState, userId, date, time);
 
+            sqLiteDatabaseHelper.deleteTodo(userId, date, title);
             sqLiteDatabaseHelper.insertTodo(todoDetails);
-            showToast("Added");
+
+            showToast("Updated");
             onBackPressed();
         }
         else if(view == cancelBtn){

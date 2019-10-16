@@ -167,10 +167,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public Boolean findTodo(TodoDetails todoDetails){
-        return false;
-    }
-
     public long insertTodo(TodoDetails todoDetails){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -193,6 +189,37 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
+    public TodoDetails findTodo(Integer userId, String date, String title){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_TODO,
+                null,
+                USER_ID + " = ? AND " + TODO_DATE + " = ? AND " + TODO_TITLE + " = ?",
+                new String[] {userId+"", date, title},
+                null,
+                null,
+                TODO_DATE);
+
+//        Cursor cursor = sqLiteDatabase.rawQuery("SELECT *" +
+//                " FROM " + TABLE_TODO +
+//                " WHERE " + USER_ID + " = " + userId +
+//                " AND " + TODO_DATE + " = " + date +
+//                " AND " + TODO_TITLE + " = " + title, null);
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
+
+
+        return new TodoDetails(cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION)),
+                cursor.getString(cursor.getColumnIndex(TODO_TITLE)),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE))),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
+                cursor.getString(cursor.getColumnIndex(TODO_DATE)),
+                cursor.getString(cursor.getColumnIndex(TODO_TIME)));
+
+
+        //return new TodoDetails(description, title, reminderState, userId, date, time);
+    }
+
     public void deleteTodo(Integer userId, String date, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
@@ -201,28 +228,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[] {userId+"", date, title});
 
         sqLiteDatabase.close();
-    }
-
-    public long updateTodo(TodoDetails todoDetails){
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-
-        Integer user_id = todoDetails.getUserId();
-        String title = todoDetails.getTitle();
-        String description = todoDetails.getDescription();
-        String date = todoDetails.getDate();
-        Integer reminderState = todoDetails.getReminderState();
-        String time = todoDetails.getTime();
-
-        contentValues.put(USER_ID, user_id);
-        contentValues.put(TODO_TITLE, title);
-        contentValues.put(TODO_DESCRIPTION, description);
-        contentValues.put(TODO_DATE, date);
-        contentValues.put(TODO_REMINDER_STATE, reminderState);
-        contentValues.put(TODO_TIME, time);
-
-        long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
-        return rowId;
     }
 
     public ArrayList<TodoDetails> loadTodoItems(){

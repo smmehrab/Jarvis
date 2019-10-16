@@ -57,6 +57,7 @@
     <string name="event_txt">Event</string>
     <string name="alarm_txt">Alarm</string>
     <string name="sample_txt">Sample</string>
+    <string name="update_txt">Update</string>
 
 
     <string-array name="todo_title">
