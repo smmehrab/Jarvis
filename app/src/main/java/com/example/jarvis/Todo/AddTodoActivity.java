@@ -132,6 +132,10 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             date = dateEditText.getText().toString();
             time = timeEditText.getText().toString();
 
+            if(time.equals("Set Time")){
+                time = null;
+            }
+
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
@@ -152,9 +156,13 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if(isChecked){
-            reminderState = 1;
-            if(timeEditText.getText().toString().equals("Set Time"))
+            if(timeEditText.getText().toString().equals("Set Time")) {
+                showToast("Set Time First!");
                 timeEditText.callOnClick();
+                compoundButton.setChecked(false);
+            }
+            else
+                reminderState = 1;
         }
         else{
             reminderState = 0;

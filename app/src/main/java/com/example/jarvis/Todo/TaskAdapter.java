@@ -23,6 +23,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         this.todoDetails = todoDetails;
     }
 
+    public void setTodoDetails(ArrayList<TodoDetails> todoDetails) {
+        this.todoDetails = todoDetails;
+    }
+
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -32,8 +36,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder taskViewHolder, int position) {
         taskViewHolder.title.setText(todoDetails.get(position).getTitle());
-        taskViewHolder.desc.setText(todoDetails.get(position).getDescription());
+        taskViewHolder.description.setText(todoDetails.get(position).getDescription());
         taskViewHolder.date.setText(todoDetails.get(position).getDate());
+        taskViewHolder.time.setText(todoDetails.get(position).getTime());
     }
 
     @Override
@@ -43,13 +48,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     class TaskViewHolder extends RecyclerView.ViewHolder{
 
-        TextView title, desc, date;
+        TextView title, description, date, time;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.todo_item_title);
-            desc = (TextView) itemView.findViewById(R.id.todo_item_desc);
+            description = (TextView) itemView.findViewById(R.id.todo_item_description);
             date = (TextView) itemView.findViewById(R.id.todo_item_date);
+            time = (TextView) itemView.findViewById(R.id.todo_item_time);
         }
     }
 }

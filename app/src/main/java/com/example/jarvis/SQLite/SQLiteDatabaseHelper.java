@@ -55,6 +55,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(" + USER_ID + ") REFERENCES " + TABLE_USER + "(" + USER_ID + "), " +
             "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_DATE +  ")); ";
 
+
     // TABLE WALLET
     private static final String TABLE_WALLET = "table_wallet";
     private static final String WALLET_TITLE = "wallet_title";
@@ -166,6 +167,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public Boolean findTodo(TodoDetails todoDetails){
+        return false;
+    }
 
     public long insertTodo(TodoDetails todoDetails){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -189,8 +193,36 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public Boolean findTodo(TodoDetails todoDetails){
-        return false;
+    public void deleteTodo(Integer userId, String date, String title){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        int i = sqLiteDatabase.delete(TABLE_TODO,
+                USER_ID + " = ? AND " + TODO_DATE + " = ? AND " + TODO_TITLE + " = ?",
+                new String[] {userId+"", date, title});
+
+        sqLiteDatabase.close();
+    }
+
+    public long updateTodo(TodoDetails todoDetails){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        Integer user_id = todoDetails.getUserId();
+        String title = todoDetails.getTitle();
+        String description = todoDetails.getDescription();
+        String date = todoDetails.getDate();
+        Integer reminderState = todoDetails.getReminderState();
+        String time = todoDetails.getTime();
+
+        contentValues.put(USER_ID, user_id);
+        contentValues.put(TODO_TITLE, title);
+        contentValues.put(TODO_DESCRIPTION, description);
+        contentValues.put(TODO_DATE, date);
+        contentValues.put(TODO_REMINDER_STATE, reminderState);
+        contentValues.put(TODO_TIME, time);
+
+        long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
+        return rowId;
     }
 
     public ArrayList<TodoDetails> loadTodoItems(){
@@ -218,6 +250,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return todoDetails;
     }
 
+    public Boolean findWallet(WalletDetails walletDetails){
+        return false;
+    }
+
     public long insertWallet(WalletDetails walletDetails){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -238,8 +274,14 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public Boolean findWallet(WalletDetails walletDetails){
-        return false;
+    public void deleteWallet(Integer userId, String date, String title, int type){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        int i = sqLiteDatabase.delete(TABLE_WALLET,
+                USER_ID + " = ? AND " + WALLET_DATE + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
+                new String[] {userId+"", date, title, type+""});
+
+        sqLiteDatabase.close();
     }
 
     public void showToast(String message){

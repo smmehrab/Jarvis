@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +29,7 @@ import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
+import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -59,6 +61,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView todoItems;
     ArrayList<TodoDetails> todoDetails;
     TaskAdapter taskAdapter;
+
+    RecyclerTouchListener touchListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +111,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         // Recycler View
         todoItems = findViewById(R.id.todo_items);
         todoItems.setLayoutManager(new LinearLayoutManager(this));
+
         todoDetails = new ArrayList<TodoDetails>();
     }
 
@@ -139,13 +144,62 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        dataRetrieveAndShow(sqLiteDatabaseHelper);
 
+        touchListener = new RecyclerTouchListener(this,todoItems);
+        touchListener
+                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+                    @Override
+                    public void onRowClicked(int position) {
+                        Toast.makeText(getApplicationContext(),todoDetails.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onIndependentViewClicked(int independentViewID, int position) {
+
+                    }
+                })
+                .setSwipeOptionViews(R.id.todo_item_delete_rl,R.id.todo_item_edit_rl)
+                .setSwipeable(R.id.todo_item_fg, R.id.todo_item_bg, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+                    @Override
+                    public void onSwipeOptionClicked(int viewID, int position) {
+                        switch (viewID){
+                            case R.id.todo_item_delete_rl:
+                                handleDeleteAction(position);
+                                break;
+                            case R.id.todo_item_edit_rl:
+                                handleEditAction();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    void dataRetrieveAndShow(SQLiteDatabaseHelper sqLiteDatabaseHelper){
         todoDetails.clear();
         todoDetails = sqLiteDatabaseHelper.loadTodoItems();
-
+        todoItems.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         taskAdapter = new TaskAdapter(TodoActivity.this, todoDetails);
         todoItems.setAdapter(taskAdapter);
         taskAdapter.notifyDataSetChanged();
+    }
+
+    void handleDeleteAction(int position){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getDate(),todoDetails.get(position).getTitle());
+        dataRetrieveAndShow(sqLiteDatabaseHelper);
+    }
+
+    void handleEditAction(){
+        showToast("Edit Action");
+        //dataRetrieveAndShow();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        todoItems.addOnItemTouchListener(touchListener);
     }
 
     public void showToast(String message){
