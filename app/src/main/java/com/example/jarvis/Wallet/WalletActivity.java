@@ -52,6 +52,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_wallet);
 
         settingUpXmlElements();
+        // loadingDataFromDB();
     }
 
     void settingUpXmlElements(){

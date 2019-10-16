@@ -1,6 +1,7 @@
 package com.example.jarvis.Todo;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
@@ -24,6 +26,7 @@ import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
@@ -63,7 +66,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_todo);
 
         settingUpXmlElements();
-        // gettingDataFromFirebase();
+        loadingDataFromDB();
     }
 
     void settingUpXmlElements(){
@@ -102,13 +105,13 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setChecked(true);
 
         // Recycler View
-//        todoItems = findViewById(R.id.todo_items);
-//        todoItems.setLayoutManager(new LinearLayoutManager(this));
-//        todoDetails = new ArrayList<TodoDetails>();
+        todoItems = findViewById(R.id.todo_items);
+        todoItems.setLayoutManager(new LinearLayoutManager(this));
+        todoDetails = new ArrayList<TodoDetails>();
     }
 
 
-    void gettingDataFromFirebase(){
+    void loadingDataFromDB(){
 //        reference = FirebaseDatabase.getInstance().getReference().child("Todo");
 //        reference.addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -133,6 +136,16 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 //                showToast("No Data Found");
 //            }
 //        });
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
+        todoDetails.clear();
+        todoDetails = sqLiteDatabaseHelper.loadTodoItems();
+
+        taskAdapter = new TaskAdapter(TodoActivity.this, todoDetails);
+        todoItems.setAdapter(taskAdapter);
+        taskAdapter.notifyDataSetChanged();
     }
 
     public void showToast(String message){

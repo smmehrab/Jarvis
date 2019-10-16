@@ -12,6 +12,8 @@ import com.example.jarvis.Todo.TodoDetails;
 import com.example.jarvis.UserHandling.UserDetails;
 import com.example.jarvis.Wallet.WalletDetails;
 
+import java.util.ArrayList;
+
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     // Database
@@ -189,6 +191,31 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     public Boolean findTodo(TodoDetails todoDetails){
         return false;
+    }
+
+    public ArrayList<TodoDetails> loadTodoItems(){
+        ArrayList<TodoDetails> todoDetails = new ArrayList<TodoDetails>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO, null);
+
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            while (cursor.moveToNext()){
+                Integer userId = Integer.parseInt(cursor.getString(0));
+                String title = cursor.getString(1);
+                String description = cursor.getString(2);
+                String date = cursor.getString(3);
+                Integer reminderState = Integer.parseInt(cursor.getString(4));
+                String time = cursor.getString(5);
+
+                todoDetails.add(new TodoDetails(description, title, reminderState, userId, date, time));
+            }
+        }
+
+        return todoDetails;
     }
 
     public long insertWallet(WalletDetails walletDetails){

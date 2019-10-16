@@ -153,7 +153,8 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         if(isChecked){
             reminderState = 1;
-            timeEditText.callOnClick();
+            if(timeEditText.getText().toString().equals("Set Time"))
+                timeEditText.callOnClick();
         }
         else{
             reminderState = 0;
