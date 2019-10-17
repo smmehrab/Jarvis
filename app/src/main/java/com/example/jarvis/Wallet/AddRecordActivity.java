@@ -85,7 +85,7 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
         dateEditText = (EditText) findViewById(R.id.add_record_date_editText);
 
         amountEditText = (EditText) findViewById(R.id.add_record_amount_editText);
-        amountEditText.setText("0.00 BDT");
+        amountEditText.setText("0.00");
 
         Calendar calendar = Calendar.getInstance();
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());

@@ -176,6 +176,7 @@
                     android:layout_weight="1"
                     android:editable="true"
                     android:focusable="true"
+                    android:inputType="numberDecimal"
                     android:focusableInTouchMode="true"
                     android:gravity="start"
                     android:textColor="@color/secondary_text"

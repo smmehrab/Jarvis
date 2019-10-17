@@ -170,18 +170,18 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
     void handleEditAction(int position){
         showToast("Edit Action");
 
-//        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
-//        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-//        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), records.get(position).getDate(),records.get(position).getTitle(), records.get(position).getType());
-//
-//        Intent intent = new Intent(getApplicationContext(), UpdateRecordActivity.class);
-//        intent.putExtra("user_id", record.getUserId().toString());
-//        intent.putExtra("wallet_title", record.getTitle());
-//        intent.putExtra("wallet_description", record.getDescription());
-//        intent.putExtra("wallet_date", record.getDate());
-//        intent.putExtra("wallet_type", record.getType().toString());
-//        intent.putExtra("wallet_amount", record.getAmount());
-//        startActivity(intent);
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), records.get(position).getDate(),records.get(position).getTitle(), records.get(position).getType());
+
+        Intent intent = new Intent(getApplicationContext(), UpdateRecordActivity.class);
+        intent.putExtra("user_id", record.getUserId().toString());
+        intent.putExtra("wallet_title", record.getTitle());
+        intent.putExtra("wallet_description", record.getDescription());
+        intent.putExtra("wallet_date", record.getDate());
+        intent.putExtra("wallet_type", record.getType().toString());
+        intent.putExtra("wallet_amount", record.getAmount());
+        startActivity(intent);
     }
 
     void handleCheckAction(int position){
@@ -288,7 +288,9 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
-        if(id == R.id.user_profile_option) {
+        if (id == R.id.user_sync_option) {
+
+        } else if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
             finish();

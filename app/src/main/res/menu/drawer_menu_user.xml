@@ -3,6 +3,11 @@
 
     <group android:id="@+id/user_menu_top">
         <item
+            android:id="@+id/user_sync_option"
+            android:icon="@drawable/icon_sync"
+            android:title="@string/sync_txt"/>
+
+        <item
             android:id="@+id/user_profile_option"
             android:icon="@drawable/icon_menu_profile"
             android:title="@string/profile_txt"/>

@@ -339,7 +339,9 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
-        if(id == R.id.user_profile_option) {
+        if (id == R.id.user_sync_option) {
+
+        } else if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
             finish();

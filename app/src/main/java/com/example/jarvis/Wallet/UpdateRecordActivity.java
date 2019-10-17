@@ -29,6 +29,7 @@ import com.example.jarvis.Util.DatePickerFragment;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class UpdateRecordActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
@@ -83,22 +84,23 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
 
 
         amountEditText = (EditText) findViewById(R.id.add_record_amount_editText);
-        amountEditText.setText("0.00 BDT");
+        amountEditText.setText("0.00");
 
-//        if(getIntent().getExtras() != null) {
-//            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
-//            title = getIntent().getExtras().getString("wallet_title");
-//            description = getIntent().getExtras().getString("wallet_description");
-//            date = getIntent().getExtras().getString("wallet_date");
-//            type = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
-//
-//            titleEditText.setText(title);
-//            descriptionEditText.setText(description);
-//            dateEditText.setText(date);
-//
-//
-//            customSpinner.setSelection(type-1);
-//        }
+        if(getIntent().getExtras() != null) {
+            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+            title = getIntent().getExtras().getString("wallet_title");
+            description = getIntent().getExtras().getString("wallet_description");
+            date = getIntent().getExtras().getString("wallet_date");
+            type = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
+            amount = getIntent().getExtras().getString("wallet_amount");
+
+            titleEditText.setText(title);
+            descriptionEditText.setText(description);
+            dateEditText.setText(date);
+            amountEditText.setText(amount);
+
+            customSpinner.setSelection(type-1);
+        }
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
