@@ -1,6 +1,7 @@
 package com.example.jarvis.Wallet;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.Gravity;
@@ -16,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
@@ -23,12 +27,18 @@ import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 public class WalletActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
 
@@ -46,13 +56,21 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
     private TextView activityTitle;
 
+    DatabaseReference reference;
+    FirebaseDatabase database;
+    RecyclerView walletItems;
+    ArrayList<Record> records;
+    RecordAdapter recordAdapter;
+
+    RecyclerTouchListener touchListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet);
 
         settingUpXmlElements();
-        // loadingDataFromDB();
+        loadingDataFromDB();
     }
 
     void settingUpXmlElements(){
@@ -89,15 +107,98 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setChecked(true);
+
+        // Recycler View
+        walletItems = findViewById(R.id.wallet_items);
+        walletItems.setLayoutManager(new LinearLayoutManager(this));
+
+        records = new ArrayList<Record>();
     }
 
+    void loadingDataFromDB(){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        dataRetrieveAndShow(sqLiteDatabaseHelper);
+
+        touchListener = new RecyclerTouchListener(this,walletItems);
+        touchListener
+                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+                    @Override
+                    public void onRowClicked(int position) {
+                        Toast.makeText(getApplicationContext(),records.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onIndependentViewClicked(int independentViewID, int position) {
+
+                    }
+                })
+                .setSwipeOptionViews(R.id.wallet_item_delete_rl,R.id.wallet_item_edit_rl)
+                .setSwipeable(R.id.wallet_item_fg, R.id.wallet_item_bg, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+                    @Override
+                    public void onSwipeOptionClicked(int viewID, int position) {
+                        switch (viewID){
+                            case R.id.wallet_item_delete_rl:
+                                handleDeleteAction(position);
+                                break;
+                            case R.id.wallet_item_edit_rl:
+                                handleEditAction(position);
+                                break;
+                        }
+                    }
+                });
+    }
+
+    void dataRetrieveAndShow(SQLiteDatabaseHelper sqLiteDatabaseHelper){
+        records.clear();
+        records = sqLiteDatabaseHelper.loadWalletItems();
+        walletItems.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recordAdapter = new RecordAdapter(WalletActivity.this, records);
+        walletItems.setAdapter(recordAdapter);
+        recordAdapter.notifyDataSetChanged();
+    }
+
+    void handleDeleteAction(int position){
+        showToast("Delete Action");
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        sqLiteDatabaseHelper.deleteRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),records.get(position).getTitle(), records.get(position).getDate(), records.get(position).getType());
+        dataRetrieveAndShow(sqLiteDatabaseHelper);
+    }
+
+    void handleEditAction(int position){
+        showToast("Edit Action");
+
+//        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+//        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+//        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), records.get(position).getDate(),records.get(position).getTitle(), records.get(position).getType());
+//
+//        Intent intent = new Intent(getApplicationContext(), UpdateRecordActivity.class);
+//        intent.putExtra("user_id", record.getUserId().toString());
+//        intent.putExtra("wallet_title", record.getTitle());
+//        intent.putExtra("wallet_description", record.getDescription());
+//        intent.putExtra("wallet_date", record.getDate());
+//        intent.putExtra("wallet_type", record.getType().toString());
+//        intent.putExtra("wallet_amount", record.getAmount());
+//        startActivity(intent);
+    }
+
+    void handleCheckAction(int position){
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        walletItems.addOnItemTouchListener(touchListener);
+    }
 
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
-
 
     @Override
     public void onBackPressed() {
@@ -179,7 +280,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             }.start();
         }
         else if(view == fab){
-            Intent intent = new Intent(getApplicationContext(), AddWalletActivity.class);
+            Intent intent = new Intent(getApplicationContext(), AddRecordActivity.class);
             startActivity(intent);
         }
     }

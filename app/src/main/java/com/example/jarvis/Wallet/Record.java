@@ -1,9 +1,18 @@
 package com.example.jarvis.Wallet;
 
-public class WalletDetails {
+public class Record {
     private String title, description;
-    private String date;
+    private String date, amount;
     private Integer type, userId;
+
+    public Record(Integer userId, String title, String description, String date,  Integer type, String amount) {
+        this.title = title;
+        this.description = description;
+        this.date = date;
+        this.amount = amount;
+        this.type = type;
+        this.userId = userId;
+    }
 
     public String getTitle() {
         return title;
@@ -29,6 +38,14 @@ public class WalletDetails {
         this.date = date;
     }
 
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
     public Integer getType() {
         return type;
     }
@@ -42,14 +59,6 @@ public class WalletDetails {
     }
 
     public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public WalletDetails(String title, String description, String date, Integer type, Integer userId) {
-        this.title = title;
-        this.description = description;
-        this.date = date;
-        this.type = type;
         this.userId = userId;
     }
 }

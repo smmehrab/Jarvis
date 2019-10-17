@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.TodoDetails;
 import com.example.jarvis.UserHandling.UserDetails;
-import com.example.jarvis.Wallet.WalletDetails;
+import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -155,7 +155,7 @@ public class FirebaseDataAdd {
         }
     }
 
-    public void addWalletInFirebaseCurrent(ArrayList<WalletDetails> wallets){
+    public void addWalletInFirebaseCurrent(ArrayList<Record> wallets){
         Map<String, Object> wallet = new HashMap<>();
         Iterator i = wallets.iterator();
         int increment = 1;
@@ -178,7 +178,7 @@ public class FirebaseDataAdd {
     }
 
 
-    public void addWalletInFirebaseOld(ArrayList<WalletDetails> wallets){
+    public void addWalletInFirebaseOld(ArrayList<Record> wallets){
         Map<String, Object> wallet = new HashMap<>();
         Iterator i = wallets.iterator();
         int increment = 1;

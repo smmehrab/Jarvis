@@ -160,7 +160,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 })
                 .setSwipeOptionViews(R.id.todo_item_delete_rl,R.id.todo_item_edit_rl)
-                .setSwipeable(R.id.todo_item_fg, R.id.todo_item_bg, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+                .setSwipeable(R.id.todo_item_fg, R.id.todo_item_bg_end, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
                     @Override
                     public void onSwipeOptionClicked(int viewID, int position) {
                         switch (viewID){
@@ -170,12 +170,37 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                             case R.id.todo_item_edit_rl:
                                 handleEditAction(position);
                                 break;
-                            case R.id.todo_item_check_rl:
-                                handleCheckAction(position);
-                                break;
+//                            case R.id.todo_item_check_rl:
+//                                handleCheckAction(position);
+//                                break;
                         }
                     }
                 });
+
+//        RecyclerTouchListener touchListenerStart = new RecyclerTouchListener(this, todoItems);
+//        touchListenerStart
+//                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+//                    @Override
+//                    public void onRowClicked(int position) {
+//                        Toast.makeText(getApplicationContext(),todoDetails.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onIndependentViewClicked(int independentViewID, int position) {
+//
+//                    }
+//                })
+//                .setSwipeOptionViews(R.id.todo_item_check_rl)
+//                .setSwipeable(R.id.todo_item_fg, R.id.todo_item_bg_start, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+//                    @Override
+//                    public void onSwipeOptionClicked(int viewID, int position) {
+//                        switch (viewID){
+//                            case R.id.todo_item_check_rl:
+//                                handleCheckAction(position);
+//                                break;
+//                        }
+//                    }
+//                });
     }
 
     void dataRetrieveAndShow(SQLiteDatabaseHelper sqLiteDatabaseHelper){
@@ -202,7 +227,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         Intent intent = new Intent(getApplicationContext(), UpdateTodoActivity.class);
         intent.putExtra("user_id", todoItem.getUserId().toString());
-        intent.putExtra("todo_title", todoItem.getUserId().toString());
+        intent.putExtra("todo_title", todoItem.getTitle());
         intent.putExtra("todo_description", todoItem.getDescription());
         intent.putExtra("todo_date", todoItem.getDate());
         intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());

@@ -5,7 +5,7 @@
     <color name="colorAccent">#F15B40</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDarkGrey">#8A000000</color>
-
+    <color name="colorGreen">#4CAF50</color>
 
 
     <color name="amber">#FFC107</color>
@@ -29,4 +29,5 @@
 
     <color name="primary_ligher">#E1E4F4</color>
     <color name="primary_lightest">#F0F1F9</color>
+
 </resources>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    android:orientation="vertical"
+    android:weightSum="5"
+    tools:context=".Wallet.UpdateRecordActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="4">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+            <EditText
+                android:id="@+id/update_record_title_editText"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="32dp"
+                android:layout_weight="0.5"
+                android:backgroundTint="@color/colorWhite"
+                android:gravity="start|bottom"
+                android:hint="@string/title_txt"
+                android:inputType="textAutoCorrect|textCapSentences"
+                android:lines="2"
+                android:maxLength="30"
+                android:maxLines="3"
+                android:textColor="@color/icons"
+                android:textCursorDrawable="@null" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:background="@color/colorWhite" />
+
+            <EditText
+                android:id="@+id/update_record_description_editText"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="32dp"
+                android:layout_weight="0.5"
+                android:gravity="start|bottom"
+                android:hint="@string/description_txt"
+                android:inputType="textMultiLine|textCapSentences"
+                android:lines="2"
+                android:maxLines="3"
+                android:scrollbars="vertical"
+                android:textColor="@color/primary_text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/update_record_date_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="32dp"
+            android:layout_weight="0.5"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:background="@color/colorWhite"
+                android:gravity="center_vertical"
+                android:weightSum="3">
+
+                <ImageButton
+                    android:id="@+id/update_record_date_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:src="@drawable/icon_date" />
+
+                <EditText
+                    android:id="@+id/update_record_date_editText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:gravity="start"
+                    android:textColor="@color/secondary_text"
+                    android:textIsSelectable="false" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/add_record_amount_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="32dp"
+            android:layout_weight="0.5"
+            android:animateLayoutChanges="true"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:gravity="center_vertical"
+                android:weightSum="3">
+
+                <ImageButton
+                    android:id="@+id/add_record_amount_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:src="@drawable/icon_amount" />
+
+                <EditText
+                    android:id="@+id/add_record_amount_editText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:editable="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="start"
+                    android:textColor="@color/secondary_text"
+                    android:textIsSelectable="false" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.5" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/update_record_color_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="32dp"
+            android:layout_weight="0.5"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <ImageButton
+                    android:id="@+id/update_record_color_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="0.5"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/icon_color" />
+
+                <TextView
+                    android:id="@+id/update_record_color_textView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.25"
+                    android:gravity="center_vertical"
+                    android:text="@string/color_txt"
+                    android:textColor="@color/secondary_text"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/update_record_custom_spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="20dp"
+                    android:layout_weight="1.25"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="0.5"
+            android:background="@color/colorWhite"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/update_record_cancel_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorWhite"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:shadowColor="@color/colorWhite"
+                    android:stateListAnimator="@null"
+                    android:text="@string/cancel_txt"
+                    android:textColor="@color/grey600" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2" />
+
+                <Button
+                    android:id="@+id/update_record_update_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_rounded_rectangle"
+                    android:text="@string/update_txt"
+                    android:textColor="@color/colorWhite" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

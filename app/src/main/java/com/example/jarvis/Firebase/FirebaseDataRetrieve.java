@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.TodoDetails;
-import com.example.jarvis.Wallet.WalletDetails;
+import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -109,14 +109,14 @@ public class FirebaseDataRetrieve {
     }
 
 
-    public ArrayList<WalletDetails> retriveCurrentWallet() {
-        ArrayList<WalletDetails> list = new ArrayList<>();
+    public ArrayList<Record> retriveCurrentWallet() {
+        ArrayList<Record> list = new ArrayList<>();
         refTodo.document("current").collection("wallet").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            WalletDetails wallet = documentSnapshot.toObject(WalletDetails.class);
+                            Record wallet = documentSnapshot.toObject(Record.class);
                             list.add(wallet);
                         }
                         Log.d("Orreh dekh dekh", "Success");
@@ -131,14 +131,14 @@ public class FirebaseDataRetrieve {
     }
 
 
-    public ArrayList<WalletDetails> retriveOldWallet() {
-        ArrayList<WalletDetails> list = new ArrayList<>();
+    public ArrayList<Record> retriveOldWallet() {
+        ArrayList<Record> list = new ArrayList<>();
         refTodo.document("old").collection("wallet").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            WalletDetails wallet = documentSnapshot.toObject(WalletDetails.class);
+                            Record wallet = documentSnapshot.toObject(Record.class);
                             list.add(wallet);
                         }
                         Log.d("Orreh dekh dekh", "Success");

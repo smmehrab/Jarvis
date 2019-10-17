@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.example.jarvis.Todo.TodoDetails;
 import com.example.jarvis.UserHandling.UserDetails;
-import com.example.jarvis.Wallet.WalletDetails;
+import com.example.jarvis.Wallet.Record;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     // Others
     private Context context;
-    private static int VERSION_NUMBER = 1;
+    private static int VERSION_NUMBER = 3;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // TABLE USER
@@ -62,13 +62,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String WALLET_DESCRIPTION = "wallet_description";
     private static final String WALLET_DATE = "wallet_date";
     private static final String WALLET_TYPE = "wallet_type";
+    private static final String WALLET_AMOUNT = "wallet_amount";
 
     private static final String CREATE_TABLE_WALLET = "CREATE TABLE " + TABLE_WALLET + "(" +
             USER_ID + " INTEGER, " +
             WALLET_TITLE + " TEXT NOT NULL, " +
-            WALLET_DESCRIPTION + " TEXT NOT NULL, " +
+            WALLET_DESCRIPTION + " TEXT, " +
             WALLET_DATE + " TEXT NOT NULL, " +
             WALLET_TYPE + " INTEGER NOT NULL, " +
+            WALLET_AMOUNT + " TEXT, " +
             "FOREIGN KEY(" + USER_ID + ") REFERENCES " + TABLE_USER + "(" + USER_ID + "), " +
             "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_DATE + ", " + WALLET_TYPE + ")); ";
 
@@ -255,31 +257,54 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return todoDetails;
     }
 
-    public Boolean findWallet(WalletDetails walletDetails){
-        return false;
+    public Record findRecord(Integer userId, String date, String title, Integer type) {
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_WALLET,
+                null,
+                USER_ID + " = ? AND " + WALLET_DATE + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
+                new String[]{userId + "", date, title, type + ""},
+                null,
+                null,
+                WALLET_DATE);
+
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
+
+
+        return new Record(
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
+                cursor.getString(cursor.getColumnIndex(WALLET_TITLE)),
+                cursor.getString(cursor.getColumnIndex(WALLET_DESCRIPTION)),
+                cursor.getString(cursor.getColumnIndex(WALLET_DATE)),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_TYPE))),
+                cursor.getString(cursor.getColumnIndex(WALLET_AMOUNT)));
+
     }
 
-    public long insertWallet(WalletDetails walletDetails){
+    public long insertRecord(Record record){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        Integer user_id = walletDetails.getUserId();
-        String title = walletDetails.getTitle();
-        String description = walletDetails.getDescription();
-        String date = walletDetails.getDate().toString();
-        Integer type = walletDetails.getType();
+        Integer user_id = record.getUserId();
+        String title = record.getTitle();
+        String description = record.getDescription();
+        String date = record.getDate();
+        Integer type = record.getType();
+        String amount = record.getAmount();
 
         contentValues.put(USER_ID, user_id);
         contentValues.put(WALLET_TITLE, title);
         contentValues.put(WALLET_DESCRIPTION, description);
         contentValues.put(WALLET_DATE, date);
         contentValues.put(WALLET_TYPE, type);
+        contentValues.put(WALLET_AMOUNT, amount);
 
         long rowId = sqLiteDatabase.insert(TABLE_WALLET, null, contentValues);
         return rowId;
     }
 
-    public void deleteWallet(Integer userId, String date, String title, int type){
+    public void deleteRecord(Integer userId, String title, String date, int type){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         int i = sqLiteDatabase.delete(TABLE_WALLET,
@@ -288,6 +313,33 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.close();
     }
+
+    public ArrayList<Record> loadWalletItems(){
+        ArrayList<Record> records = new ArrayList<Record>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET, null);
+        cursor.moveToFirst();
+
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            while (cursor.moveToNext()){
+                Integer userId = Integer.parseInt(cursor.getString(0));
+                String title = cursor.getString(1);
+                String description = cursor.getString(2);
+                String date = cursor.getString(3);
+                Integer type = Integer.parseInt(cursor.getString(4));
+                String amount = cursor.getString(5);
+
+                records.add(new Record(userId, title, description, date, type, amount));
+            }
+        }
+
+        return records;
+    }
+
 
     public void showToast(String message){
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);

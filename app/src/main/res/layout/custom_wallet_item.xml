@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,81 +8,16 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/todo_item_bg_start"
+        android:id="@+id/wallet_item_bg"
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:padding="10dp"
-        android:background="@drawable/custom_todo_item_option"
-        android:orientation="horizontal">
-
-        <RelativeLayout
-            android:id="@+id/todo_item_check_rl"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/todo_item_check_img"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/icon_checkbox"
-                    android:tint="@android:color/white"/>
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/todo_item_bg_end"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
+        android:layout_height="90dp"
         android:layout_alignParentEnd="true"
         android:padding="10dp"
-        android:background="@drawable/custom_todo_item_option"
+        android:background="@drawable/custom_wallet_item_option"
         android:orientation="horizontal">
 
-<!--        <RelativeLayout-->
-<!--            android:id="@+id/todo_item_check_rl"-->
-<!--            android:layout_width="40dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:clickable="true"-->
-<!--            android:focusable="true"-->
-<!--            android:orientation="vertical">-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_centerInParent="true"-->
-<!--                android:gravity="center"-->
-<!--                android:orientation="vertical">-->
-
-<!--                <ImageView-->
-<!--                    android:id="@+id/todo_item_check_img"-->
-<!--                    android:layout_width="30dp"-->
-<!--                    android:layout_height="30dp"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:src="@drawable/icon_checkbox"-->
-<!--                    android:tint="@android:color/white"/>-->
-
-<!--            </LinearLayout>-->
-
-<!--        </RelativeLayout>-->
-
         <RelativeLayout
-            android:id="@+id/todo_item_edit_rl"
+            android:id="@+id/wallet_item_edit_rl"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -98,7 +32,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/todo_item_edit_img"
+                    android:id="@+id/wallet_item_edit_img"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"
@@ -110,7 +44,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/todo_item_delete_rl"
+            android:id="@+id/wallet_item_delete_rl"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -125,7 +59,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/todo_item_delete_img"
+                    android:id="@+id/wallet_item_delete_img"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"
@@ -139,10 +73,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/todo_item_fg"
+        android:id="@+id/wallet_item_fg"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/custom_todo_item"
+        android:layout_height="90dp"
+        android:background="@drawable/custom_wallet_item"
         android:clickable="true"
         android:elevation="4dp"
         android:weightSum="6"
@@ -166,7 +100,7 @@
                 android:layout_weight="0.5" />
 
             <TextView
-                android:id="@+id/todo_item_title"
+                android:id="@+id/wallet_item_title"
                 android:textSize="16sp"
                 android:textColor="@color/primary_text"
                 android:text="Buy Ferrari"
@@ -177,7 +111,7 @@
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/todo_item_description"
+                android:id="@+id/wallet_item_description"
                 android:textSize="12sp"
                 android:textColor="@color/primary_text"
                 android:text="From Shanghai, China"
@@ -197,42 +131,22 @@
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:gravity="center"
             android:layout_gravity="center"
-            android:weightSum="3.0">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5" />
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="25dp"
+            android:weightSum="4.0">
 
             <TextView
-                android:id="@+id/todo_item_date"
-                android:textSize="12sp"
+                android:id="@+id/wallet_item_amount"
+                android:textSize="16sp"
                 android:textColor="@color/colorPrimary"
-                android:text="Tomorrow"
+                android:text="20.00 BDT"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:id="@+id/todo_item_time"
-                android:textSize="12sp"
-                android:textColor="@color/colorPrimary"
-                android:text="8:00 PM"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.5" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

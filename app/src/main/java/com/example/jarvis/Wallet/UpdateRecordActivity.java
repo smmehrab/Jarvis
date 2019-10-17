@@ -30,31 +30,31 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class AddWalletActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class UpdateRecordActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     private Spinner customSpinner;
 
     private Button cancelBtn;
-    private Button addBtn;
+    private Button updateBtn;
 
     private EditText titleEditText;
     private EditText descriptionEditText;
     private EditText dateEditText;
+    private EditText amountEditText;
 
-    private String description, title;
+    private String description, title, date, amount;
     private Integer type = 1, userId;
-    private String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_wallet);
+        setContentView(R.layout.activity_update_record);
 
         settingUpXmlElements();
     }
 
     public void settingUpXmlElements(){
-        customSpinner = (Spinner) findViewById(R.id.add_record_custom_spinner);
+        customSpinner = (Spinner) findViewById(R.id.update_record_custom_spinner);
 
         // Creating Spinner Item List for Spinner
 
@@ -71,19 +71,34 @@ public class AddWalletActivity extends AppCompatActivity implements AdapterView.
             customSpinner.setOnItemSelectedListener(this);
         }
 
-        addBtn = (Button) findViewById(R.id.add_record_add_btn);
-        cancelBtn = (Button) findViewById(R.id.add_record_cancel_btn);
+        updateBtn = (Button) findViewById(R.id.update_record_update_btn);
+        cancelBtn = (Button) findViewById(R.id.update_record_cancel_btn);
 
-        addBtn.setOnClickListener((View.OnClickListener) this);
+        updateBtn.setOnClickListener((View.OnClickListener) this);
         cancelBtn.setOnClickListener((View.OnClickListener) this);
 
-        titleEditText = (EditText) findViewById(R.id.add_record_title_editText);
-        descriptionEditText = (EditText) findViewById(R.id.add_record_description_editText);
-        dateEditText = (EditText) findViewById(R.id.add_record_date_editText);
+        titleEditText = (EditText) findViewById(R.id.update_record_title_editText);
+        descriptionEditText = (EditText) findViewById(R.id.update_record_description_editText);
+        dateEditText = (EditText) findViewById(R.id.update_record_date_editText);
 
-        Calendar calendar = Calendar.getInstance();
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
+
+        amountEditText = (EditText) findViewById(R.id.add_record_amount_editText);
+        amountEditText.setText("0.00 BDT");
+
+//        if(getIntent().getExtras() != null) {
+//            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+//            title = getIntent().getExtras().getString("wallet_title");
+//            description = getIntent().getExtras().getString("wallet_description");
+//            date = getIntent().getExtras().getString("wallet_date");
+//            type = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
+//
+//            titleEditText.setText(title);
+//            descriptionEditText.setText(description);
+//            dateEditText.setText(date);
+//
+//
+//            customSpinner.setSelection(type-1);
+//        }
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,9 +123,9 @@ public class AddWalletActivity extends AppCompatActivity implements AdapterView.
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         CustomSpinnerItem item = (CustomSpinnerItem) adapterView.getSelectedItem();
-        if(item.getSpinnerText() == "Expense")
+        if(item.getSpinnerText().equals("Expense"))
             type = 1;
-        else if(item.getSpinnerText() == "Earning")
+        else if(item.getSpinnerText().equals("Earning"))
             type = 2;
 
         showToast(type.toString());
@@ -136,7 +151,7 @@ public class AddWalletActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onClick(View view) {
-        if(view == addBtn){
+        if(view == updateBtn){
             description = descriptionEditText.getText().toString();
             title = titleEditText.getText().toString();
 
@@ -147,11 +162,12 @@ public class AddWalletActivity extends AppCompatActivity implements AdapterView.
 
             String currentUser = HomeActivity.getCurrentUser();
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
+            amount = amountEditText.getText().toString();
 
-            WalletDetails walletDetails = new WalletDetails(title, description, date, type, userId);
+            Record record = new Record(userId, title, description, date, type, amount);
 
-            sqLiteDatabaseHelper.insertWallet(walletDetails);
-            showToast("Added");
+            sqLiteDatabaseHelper.insertRecord(record);
+            showToast("Updated");
             onBackPressed();
         }
         else if(view == cancelBtn){
