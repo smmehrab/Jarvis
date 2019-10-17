@@ -1,26 +1,19 @@
 package com.example.jarvis.Todo;
 
 public class TodoDetails {
-    private String description, title;
-    private Integer reminderState, userId;
-    private String date;
-    private String time;
+    private Integer userId;
+    private String title, description;
+    private String year, month, day;
+    private String hour, minute;
+    private Integer reminderState;
+    private Integer checked;
 
-    public TodoDetails(String description, String title, Integer reminderState, Integer userId, String date, String time) {
-        this.description = description;
-        this.title = title;
-        this.reminderState = reminderState;
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
         this.userId = userId;
-        this.date = date;
-        this.time = time;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getTitle() {
@@ -31,6 +24,54 @@ public class TodoDetails {
         this.title = title;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public String getHour() {
+        return hour;
+    }
+
+    public void setHour(String hour) {
+        this.hour = hour;
+    }
+
+    public String getMinute() {
+        return minute;
+    }
+
+    public void setMinute(String minute) {
+        this.minute = minute;
+    }
+
     public Integer getReminderState() {
         return reminderState;
     }
@@ -39,27 +80,24 @@ public class TodoDetails {
         this.reminderState = reminderState;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getChecked() {
+        return checked;
     }
 
-    public void setUserId(Integer userId) {
+    public void setChecked(Integer checked) {
+        this.checked = checked;
+    }
+
+    public TodoDetails(Integer userId, String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState) {
         this.userId = userId;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+        this.title = title;
+        this.description = description;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.reminderState = reminderState;
+        this.checked = 0;
     }
 }

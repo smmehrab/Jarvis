@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,6 +47,10 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
 
     private String description, title, date, amount;
     private Integer type = 1, userId;
+    private String day, month, year;
+    private String oldDescription, oldTitle, oldAmount;
+    private Integer oldType=0;
+    private String oldYear, oldMonth, oldDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +79,8 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
         }
 
         updateBtn = (Button) findViewById(R.id.update_record_update_btn);
+        disableButton(updateBtn);
+
         cancelBtn = (Button) findViewById(R.id.update_record_cancel_btn);
 
         updateBtn.setOnClickListener((View.OnClickListener) this);
@@ -82,24 +90,33 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
         descriptionEditText = (EditText) findViewById(R.id.update_record_description_editText);
         dateEditText = (EditText) findViewById(R.id.update_record_date_editText);
 
+        titleEditText.setOnClickListener(this);
 
         amountEditText = (EditText) findViewById(R.id.add_record_amount_editText);
-        amountEditText.setText("0.00");
+        amountEditText.setText("0");
+        amountEditText.setOnClickListener(this);
 
         if(getIntent().getExtras() != null) {
             userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
-            title = getIntent().getExtras().getString("wallet_title");
-            description = getIntent().getExtras().getString("wallet_description");
-            date = getIntent().getExtras().getString("wallet_date");
-            type = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
-            amount = getIntent().getExtras().getString("wallet_amount");
+            oldTitle = getIntent().getExtras().getString("wallet_title");
+            oldDescription = getIntent().getExtras().getString("wallet_description");
 
-            titleEditText.setText(title);
-            descriptionEditText.setText(description);
+            oldYear = getIntent().getExtras().getString("wallet_year");
+            oldMonth = getIntent().getExtras().getString("wallet_month");
+            oldDay = getIntent().getExtras().getString("wallet_day");
+
+            oldType = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
+            oldAmount = getIntent().getExtras().getString("wallet_amount");
+
+            titleEditText.setText(oldTitle);
+            descriptionEditText.setText(oldDescription);
+
+            String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+            date = oldDay + " " + months[Integer.parseInt(oldMonth)] + ", " + oldYear;
             dateEditText.setText(date);
-            amountEditText.setText(amount);
 
-            customSpinner.setSelection(type-1);
+            amountEditText.setText(oldAmount);
+            customSpinner.setSelection(oldType-1);
         }
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +124,53 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
             public void onClick(View view) {
                 DialogFragment datePicker = new DatePickerFragment();
                 datePicker.show(getSupportFragmentManager(),"date picker");
+            }
+        });
+
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!editable.toString().equals(oldTitle))
+                    enableButton(updateBtn);
+                else
+                    disableButton(updateBtn);
+            }
+        });
+
+        amountEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String s = editable.toString();
+
+                try{
+                    double d = Double.parseDouble(s);
+                    if(d!=0)
+                        enableButton(updateBtn);
+                    else
+                        disableButton(updateBtn);
+                }catch (Exception e){
+                    showToast(e.toString());
+                }
             }
         });
     }
@@ -129,8 +193,6 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
             type = 1;
         else if(item.getSpinnerText().equals("Earning"))
             type = 2;
-
-        showToast(type.toString());
     }
 
     @Override
@@ -154,21 +216,19 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     @Override
     public void onClick(View view) {
         if(view == updateBtn){
-            description = descriptionEditText.getText().toString();
-            title = titleEditText.getText().toString();
-
-            date = dateEditText.getText().toString();
-
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
             String currentUser = HomeActivity.getCurrentUser();
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
+
+            description = descriptionEditText.getText().toString();
+            title = titleEditText.getText().toString();
             amount = amountEditText.getText().toString();
 
-            Record record = new Record(userId, title, description, date, type, amount);
+            Record record = new Record(userId, title, description, year, month, day, type, amount);
 
-            sqLiteDatabaseHelper.insertRecord(record);
+            sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
             showToast("Updated");
             onBackPressed();
         }
@@ -178,11 +238,21 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     }
 
     @Override
-    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+    public void onDateSet(DatePicker datePicker, int y, int m, int d) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.YEAR, y);
+        calendar.set(Calendar.MONTH, m);
+        calendar.set(Calendar.DAY_OF_MONTH, d);
+
+
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+
+        if(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))
+            disableButton(updateBtn);
+        else
+            enableButton(updateBtn);
 
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
@@ -197,4 +267,36 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
     }
+
+    void disableButton(Button button){
+        button.setEnabled(false);
+        button.setAlpha(.5f);
+        button.setClickable(false);
+    }
+
+    void enableButton(Button button){
+        button.setEnabled(true);
+        button.setAlpha(1f);
+        button.setClickable(true);
+    }
+
+//
+//    public class DecimalDigitsInputFilter implements InputFilter {
+//
+//        Pattern mPattern;
+//
+//        public DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
+//            mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");
+//        }
+//
+//        @Override
+//        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+//
+//            Matcher matcher=mPattern.matcher(dest);
+//            if(!matcher.matches())
+//                return "";
+//            return null;
+//        }
+//
+//    }
 }

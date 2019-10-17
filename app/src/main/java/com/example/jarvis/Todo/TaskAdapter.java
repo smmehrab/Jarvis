@@ -37,8 +37,28 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void onBindViewHolder(@NonNull TaskViewHolder taskViewHolder, int position) {
         taskViewHolder.title.setText(todoDetails.get(position).getTitle());
         taskViewHolder.description.setText(todoDetails.get(position).getDescription());
-        taskViewHolder.date.setText(todoDetails.get(position).getDate());
-        taskViewHolder.time.setText(todoDetails.get(position).getTime());
+
+        String date = null;
+        String[] month = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        date = todoDetails.get(position).getDay() + " " +
+                month[Integer.parseInt(todoDetails.get(position).getMonth())] + ", " +
+                todoDetails.get(position).getYear();
+
+        taskViewHolder.date.setText(date);
+
+        String time = null;
+        if(todoDetails.get(position).getHour()!=null && todoDetails.get(position).getMinute()!=null) {
+            Integer hour = Integer.parseInt(todoDetails.get(position).getHour());
+            String amPm = " AM";
+            if (hour >= 12) {
+                amPm = " PM";
+                hour = hour - 12;
+            }
+            time = hour.toString() + ":" + todoDetails.get(position).getMinute() + amPm;
+        }
+
+
+        taskViewHolder.time.setText(time);
     }
 
     @Override

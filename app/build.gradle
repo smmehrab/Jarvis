@@ -70,6 +70,9 @@ dependencies {
 
     // Simple Swipe Menu Library Add
     implementation 'io.sulek.ssml:simpleswipemenulayout:1.0.4'
+
+    // For Specific Pattern Inside EditText
+    implementation 'com.szagurskii:patternedtextwatcher:0.5.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

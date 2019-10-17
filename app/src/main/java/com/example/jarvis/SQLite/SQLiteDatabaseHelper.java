@@ -21,7 +21,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     // Others
     private Context context;
-    private static int VERSION_NUMBER = 3;
+    private static int VERSION_NUMBER = 5;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // TABLE USER
@@ -41,26 +41,42 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_TODO = "table_todo";
     private static final String TODO_TITLE = "todo_title";
     private static final String TODO_DESCRIPTION = "todo_description";
-    private static final String TODO_DATE = "todo_date";
+
+    private static final String TODO_YEAR = "todo_year";
+    private static final String TODO_MONTH = "todo_month";
+    private static final String TODO_DAY = "todo_day";
+
+    private static final String TODO_HOUR = "todo_hour";
+    private static final String TODO_MINUTE = "todo_minute";
+
     private static final String TODO_REMINDER_STATE = "todo_reminderState";
-    private static final String TODO_TIME = "todo_time";
 
     private static final String CREATE_TABLE_TODO = "CREATE TABLE " + TABLE_TODO + "(" +
             USER_ID + " INTEGER, "  +
             TODO_TITLE + " TEXT NOT NULL, " +
             TODO_DESCRIPTION + " TEXT, " +
-            TODO_DATE + " TEXT NOT NULL, " +
+
+            TODO_YEAR + " TEXT NOT NULL, " +
+            TODO_MONTH + " TEXT NOT NULL, " +
+            TODO_DAY + " TEXT NOT NULL, " +
+
+            TODO_HOUR + " TEXT, " +
+            TODO_MINUTE + " TEXT, " +
+
             TODO_REMINDER_STATE + " INTEGER, " +
-            TODO_TIME + " TEXT, " +
             "FOREIGN KEY(" + USER_ID + ") REFERENCES " + TABLE_USER + "(" + USER_ID + "), " +
-            "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_DATE +  ")); ";
+            "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY +  ")); ";
 
 
     // TABLE WALLET
     private static final String TABLE_WALLET = "table_wallet";
     private static final String WALLET_TITLE = "wallet_title";
     private static final String WALLET_DESCRIPTION = "wallet_description";
-    private static final String WALLET_DATE = "wallet_date";
+
+    private static final String WALLET_YEAR = "wallet_year";
+    private static final String WALLET_MONTH = "wallet_month";
+    private static final String WALLET_DAY = "wallet_day";
+
     private static final String WALLET_TYPE = "wallet_type";
     private static final String WALLET_AMOUNT = "wallet_amount";
 
@@ -68,11 +84,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             USER_ID + " INTEGER, " +
             WALLET_TITLE + " TEXT NOT NULL, " +
             WALLET_DESCRIPTION + " TEXT, " +
-            WALLET_DATE + " TEXT NOT NULL, " +
+
+            WALLET_YEAR + " TEXT NOT NULL, " +
+            WALLET_MONTH + " TEXT NOT NULL, " +
+            WALLET_DAY + " TEXT NOT NULL, " +
+
             WALLET_TYPE + " INTEGER NOT NULL, " +
             WALLET_AMOUNT + " TEXT, " +
             "FOREIGN KEY(" + USER_ID + ") REFERENCES " + TABLE_USER + "(" + USER_ID + "), " +
-            "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_DATE + ", " + WALLET_TYPE + ")); ";
+            "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_YEAR  + ", " + WALLET_MONTH + ", " + WALLET_DAY + ", " + WALLET_TYPE + ")); ";
 
 
     public SQLiteDatabaseHelper(Context context) {
@@ -173,61 +193,107 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        Integer user_id = todoDetails.getUserId();
+        Integer userId = todoDetails.getUserId();
         String title = todoDetails.getTitle();
         String description = todoDetails.getDescription();
-        String date = todoDetails.getDate();
-        Integer reminderState = todoDetails.getReminderState();
-        String time = todoDetails.getTime();
 
-        contentValues.put(USER_ID, user_id);
+        String year = todoDetails.getYear();
+        String month = todoDetails.getMonth();
+        String day = todoDetails.getDay();
+
+        String hour = todoDetails.getHour();
+        String minute = todoDetails.getMinute();
+
+        Integer reminderState = todoDetails.getReminderState();
+
+        contentValues.put(USER_ID, userId);
         contentValues.put(TODO_TITLE, title);
         contentValues.put(TODO_DESCRIPTION, description);
-        contentValues.put(TODO_DATE, date);
+
+        contentValues.put(TODO_YEAR, year);
+        contentValues.put(TODO_MONTH, month);
+        contentValues.put(TODO_DAY, day);
+
+        contentValues.put(TODO_HOUR, hour);
+        contentValues.put(TODO_MINUTE, minute);
+
         contentValues.put(TODO_REMINDER_STATE, reminderState);
-        contentValues.put(TODO_TIME, time);
 
         long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
         return rowId;
     }
 
-    public TodoDetails findTodo(Integer userId, String date, String title){
+    public void updateTodo(TodoDetails todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        Integer userId = todoDetails.getUserId();
+        String title = todoDetails.getTitle();
+        String description = todoDetails.getDescription();
+
+        String year = todoDetails.getYear();
+        String month = todoDetails.getMonth();
+        String day = todoDetails.getDay();
+
+        String hour = todoDetails.getHour();
+        String minute = todoDetails.getMinute();
+
+        Integer reminderState = todoDetails.getReminderState();
+
+        contentValues.put(USER_ID, userId);
+        contentValues.put(TODO_TITLE, title);
+        contentValues.put(TODO_DESCRIPTION, description);
+
+        contentValues.put(TODO_YEAR, year);
+        contentValues.put(TODO_MONTH, month);
+        contentValues.put(TODO_DAY, day);
+
+        contentValues.put(TODO_HOUR, hour);
+        contentValues.put(TODO_MINUTE, minute);
+
+        contentValues.put(TODO_REMINDER_STATE, reminderState);
+
+        sqLiteDatabase.update(TABLE_TODO, contentValues,
+                USER_ID + " = ? AND " + TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
+                new String[] {userId+"", oldYear, oldMonth, oldDay, oldTitle});
+    }
+
+
+    public TodoDetails findTodo(Integer userId, String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_TODO,
                 null,
-                USER_ID + " = ? AND " + TODO_DATE + " = ? AND " + TODO_TITLE + " = ?",
-                new String[] {userId+"", date, title},
+                USER_ID + " = ? AND " + TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
+                new String[] {userId+"", year, month, day, title},
                 null,
                 null,
-                TODO_DATE);
+                TODO_YEAR + " ASC, " + TODO_MONTH  + " ASC, " + TODO_DAY  + " ASC");
 
-//        Cursor cursor = sqLiteDatabase.rawQuery("SELECT *" +
-//                " FROM " + TABLE_TODO +
-//                " WHERE " + USER_ID + " = " + userId +
-//                " AND " + TODO_DATE + " = " + date +
-//                " AND " + TODO_TITLE + " = " + title, null);
+
         cursor.moveToPosition(0);
         sqLiteDatabase.close();
 
-
-        return new TodoDetails(cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION)),
+        return new TodoDetails(Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
                 cursor.getString(cursor.getColumnIndex(TODO_TITLE)),
-                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE))),
-                Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
-                cursor.getString(cursor.getColumnIndex(TODO_DATE)),
-                cursor.getString(cursor.getColumnIndex(TODO_TIME)));
+                cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION)),
 
+                cursor.getString(cursor.getColumnIndex(TODO_YEAR)),
+                cursor.getString(cursor.getColumnIndex(TODO_MONTH)),
+                cursor.getString(cursor.getColumnIndex(TODO_DAY)),
 
-        //return new TodoDetails(description, title, reminderState, userId, date, time);
+                cursor.getString(cursor.getColumnIndex(TODO_HOUR)),
+                cursor.getString(cursor.getColumnIndex(TODO_MINUTE)),
+
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE))));
     }
 
-    public void deleteTodo(Integer userId, String date, String title){
+    public void deleteTodo(Integer userId, String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         int i = sqLiteDatabase.delete(TABLE_TODO,
-                USER_ID + " = ? AND " + TODO_DATE + " = ? AND " + TODO_TITLE + " = ?",
-                new String[] {userId+"", date, title});
+                USER_ID + " = ? AND " + TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
+                new String[] {userId+"", year, month, day, title});
 
         sqLiteDatabase.close();
     }
@@ -236,37 +302,45 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<TodoDetails> todoDetails = new ArrayList<TodoDetails>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO, null);
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO +
+                " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ";", null);
+        cursor.moveToPosition(0);
 
         if(cursor.getCount() == 0){
-            showToast("No Data Found");
+          showToast("No Data Found");
         }
         else{
             while (cursor.moveToNext()){
                 Integer userId = Integer.parseInt(cursor.getString(0));
                 String title = cursor.getString(1);
                 String description = cursor.getString(2);
-                String date = cursor.getString(3);
-                Integer reminderState = Integer.parseInt(cursor.getString(4));
-                String time = cursor.getString(5);
 
-                todoDetails.add(new TodoDetails(description, title, reminderState, userId, date, time));
+                String year = cursor.getString(3);
+                String month = cursor.getString(4);
+                String day = cursor.getString(5);
+
+                String hour = cursor.getString(6);
+                String minute = cursor.getString(7);
+
+                Integer reminderState = Integer.parseInt(cursor.getString(8));
+
+                todoDetails.add(new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState));
             }
         }
 
         return todoDetails;
     }
 
-    public Record findRecord(Integer userId, String date, String title, Integer type) {
+    public Record findRecord(Integer userId, String year, String month, String day, String title, Integer type) {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_WALLET,
                 null,
-                USER_ID + " = ? AND " + WALLET_DATE + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
-                new String[]{userId + "", date, title, type + ""},
+                USER_ID + " = ? AND " + WALLET_YEAR + " = ? AND " + WALLET_MONTH + " = ? AND " + WALLET_DAY + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
+                new String[]{userId + "", year, month, day, title, type + ""},
                 null,
                 null,
-                WALLET_DATE);
+                WALLET_YEAR + " ASC, " + WALLET_MONTH  + " ASC, " + WALLET_DAY  + " ASC");
 
         cursor.moveToPosition(0);
         sqLiteDatabase.close();
@@ -276,7 +350,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
                 cursor.getString(cursor.getColumnIndex(WALLET_TITLE)),
                 cursor.getString(cursor.getColumnIndex(WALLET_DESCRIPTION)),
-                cursor.getString(cursor.getColumnIndex(WALLET_DATE)),
+
+                cursor.getString(cursor.getColumnIndex(WALLET_YEAR)),
+                cursor.getString(cursor.getColumnIndex(WALLET_MONTH)),
+                cursor.getString(cursor.getColumnIndex(WALLET_DAY)),
+
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_TYPE))),
                 cursor.getString(cursor.getColumnIndex(WALLET_AMOUNT)));
 
@@ -289,14 +367,22 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         Integer user_id = record.getUserId();
         String title = record.getTitle();
         String description = record.getDescription();
-        String date = record.getDate();
+
+        String year = record.getYear();
+        String month = record.getMonth();
+        String day = record.getDay();
+
         Integer type = record.getType();
         String amount = record.getAmount();
 
         contentValues.put(USER_ID, user_id);
         contentValues.put(WALLET_TITLE, title);
         contentValues.put(WALLET_DESCRIPTION, description);
-        contentValues.put(WALLET_DATE, date);
+
+        contentValues.put(WALLET_YEAR, year);
+        contentValues.put(WALLET_MONTH, month);
+        contentValues.put(WALLET_DAY, day);
+
         contentValues.put(WALLET_TYPE, type);
         contentValues.put(WALLET_AMOUNT, amount);
 
@@ -304,12 +390,45 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public void deleteRecord(Integer userId, String title, String date, int type){
+    public void updateRecord(Record record, String oldYear, String oldMonth, String oldDay, String oldTitle, Integer oldType){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        Integer userId = record.getUserId();
+        String title = record.getTitle();
+        String description = record.getDescription();
+
+        String year = record.getYear();
+        String month = record.getMonth();
+        String day = record.getDay();
+
+        Integer type = record.getType();
+        String amount = record.getAmount();
+
+        contentValues.put(USER_ID, userId);
+        contentValues.put(WALLET_TITLE, title);
+        contentValues.put(WALLET_DESCRIPTION, description);
+
+        contentValues.put(WALLET_YEAR, year);
+        contentValues.put(WALLET_MONTH, month);
+        contentValues.put(WALLET_DAY, day);
+
+        contentValues.put(WALLET_TYPE, type);
+        contentValues.put(WALLET_AMOUNT, amount);
+
+        sqLiteDatabase.update(TABLE_WALLET, contentValues,
+                USER_ID + " = ? AND " + WALLET_YEAR + " = ? AND " + WALLET_MONTH + " = ? AND " + WALLET_DAY + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
+                new String[] {userId+"", oldYear, oldMonth, oldDay, oldTitle, oldType+""});
+
+        sqLiteDatabase.close();
+    }
+
+    public void deleteRecord(Integer userId, String title, String year, String month, String day, Integer type){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         int i = sqLiteDatabase.delete(TABLE_WALLET,
-                USER_ID + " = ? AND " + WALLET_DATE + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
-                new String[] {userId+"", date, title, type+""});
+                USER_ID + " = ? AND " + WALLET_YEAR + " = ? AND " + WALLET_MONTH + " = ? AND " + WALLET_DAY + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
+                new String[]{userId + "", year, month, day, title, type + ""});
 
         sqLiteDatabase.close();
     }
@@ -318,9 +437,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Record> records = new ArrayList<Record>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET, null);
-        cursor.moveToFirst();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
+                " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
 
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
         if(cursor.getCount() == 0){
             showToast("No Data Found");
         }
@@ -329,17 +450,20 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer userId = Integer.parseInt(cursor.getString(0));
                 String title = cursor.getString(1);
                 String description = cursor.getString(2);
-                String date = cursor.getString(3);
-                Integer type = Integer.parseInt(cursor.getString(4));
-                String amount = cursor.getString(5);
 
-                records.add(new Record(userId, title, description, date, type, amount));
+                String year = cursor.getString(3);
+                String month = cursor.getString(4);
+                String day = cursor.getString(5);
+
+                Integer type = Integer.parseInt(cursor.getString(6));
+                String amount = cursor.getString(7);
+
+                records.add(new Record(userId, title, description, year, month, day, type, amount));
             }
         }
 
         return records;
     }
-
 
     public void showToast(String message){
         Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);

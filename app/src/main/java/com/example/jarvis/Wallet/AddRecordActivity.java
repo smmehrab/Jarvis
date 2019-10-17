@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,6 +49,7 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
 
     private String description, title, date, amount;
     private Integer type = 1, userId;
+    private String day, month, year;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,8 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
         cancelBtn = (Button) findViewById(R.id.add_record_cancel_btn);
 
         addBtn.setOnClickListener((View.OnClickListener) this);
+        disableButton(addBtn);
+
         cancelBtn.setOnClickListener((View.OnClickListener) this);
 
         titleEditText = (EditText) findViewById(R.id.add_record_title_editText);
@@ -85,9 +90,28 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
         dateEditText = (EditText) findViewById(R.id.add_record_date_editText);
 
         amountEditText = (EditText) findViewById(R.id.add_record_amount_editText);
-        amountEditText.setText("0.00");
+        amountEditText.setText("0");
+
+        titleEditText.setOnClickListener(this);
+        amountEditText.setOnClickListener(this);
+
+
+//        amountEditText.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(5,2)});
+
+//        PatternedTextWatcher patternedTextWatcher = new PatternedTextWatcher.Builder("###.###")
+//                .fillExtraCharactersAutomatically(true)
+//                .deleteExtraCharactersAutomatically(true)
+//                .specialChar("#")
+//                .respectPatternLength(true)
+//                .saveAllInput(false)
+//                .build();
+//        amountEditText.addTextChangedListener(patternedTextWatcher);
 
         Calendar calendar = Calendar.getInstance();
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
 
@@ -96,6 +120,53 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
             public void onClick(View view) {
                 DialogFragment datePicker = new DatePickerFragment();
                 datePicker.show(getSupportFragmentManager(),"date picker");
+            }
+        });
+
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+//                if(editable.toString().length()!=0)
+//                    enableButton(addBtn);
+//                else
+//                    disableButton(addBtn);
+            }
+        });
+
+        amountEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String s = editable.toString();
+
+                try{
+                    double d = Double.parseDouble(s);
+                    if(d!=0)
+                        enableButton(addBtn);
+                    else
+                        disableButton(addBtn);
+                }catch (Exception e){
+                    showToast(e.toString());
+                }
             }
         });
     }
@@ -118,8 +189,6 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
             type = 1;
         else if(item.getSpinnerText().equals("Earning"))
             type = 2;
-
-        showToast(type.toString());
     }
 
     @Override
@@ -151,10 +220,9 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
 
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
-            date = dateEditText.getText().toString();
             amount = amountEditText.getText().toString();
 
-            Record record = new Record(userId, title, description, date, type, amount);
+            Record record = new Record(userId, title, description, year, month, day, type, amount);
 
             sqLiteDatabaseHelper.insertRecord(record);
 
@@ -167,11 +235,15 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     }
 
     @Override
-    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+    public void onDateSet(DatePicker datePicker, int y, int m, int d) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.YEAR, y);
+        calendar.set(Calendar.MONTH, m);
+        calendar.set(Calendar.DAY_OF_MONTH, d);
+
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
 
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
@@ -186,4 +258,36 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
     }
+
+
+    void disableButton(Button button){
+        button.setEnabled(false);
+        button.setAlpha(.5f);
+        button.setClickable(false);
+    }
+
+    void enableButton(Button button){
+        button.setEnabled(true);
+        button.setAlpha(1f);
+        button.setClickable(true);
+    }
+
+//    public class DecimalDigitsInputFilter implements InputFilter {
+//
+//        Pattern mPattern;
+//
+//        public DecimalDigitsInputFilter(int digitsBeforeZero,int digitsAfterZero) {
+//            mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");
+//        }
+//
+//        @Override
+//        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+//
+//            Matcher matcher=mPattern.matcher(dest);
+//            if(!matcher.matches())
+//                return "";
+//            return null;
+//        }
+//
+//    }
 }

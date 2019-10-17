@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -50,6 +52,9 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     private String date;
     private String time;
 
+    private String day, month, year;
+    String hour, minute;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +69,8 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
         remindMeBtn = (ImageButton) findViewById(R.id.add_todo_remind_me_btn);
 
         addBtn.setOnClickListener(this);
+        disableButton(addBtn);
+
         cancelBtn.setOnClickListener(this);
         remindMeBtn.setOnClickListener(this);
 
@@ -76,10 +83,37 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
         timeEditText = (EditText) findViewById(R.id.add_todo_time_editText);
 
         Calendar calendar = Calendar.getInstance();
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
 
         timeEditText.setText("Set Time");
+        hour = null;
+        minute = null;
+
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.toString().length()!=0)
+                    enableButton(addBtn);
+                else
+                    disableButton(addBtn);
+            }
+        });
+
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,26 +159,20 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         if(view == addBtn){
-            description = descriptionEditText.getText().toString();
-            title = titleEditText.getText().toString();
-
-            date = dateEditText.getText().toString();
-            time = timeEditText.getText().toString();
-
-            if(time.equals("Set Time")){
-                time = null;
-            }
-
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
             String currentUser = HomeActivity.getCurrentUser();
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
 
-            TodoDetails todoDetails = new TodoDetails(description, title, reminderState, userId, date, time);
+            title = titleEditText.getText().toString();
+            description = descriptionEditText.getText().toString();
+
+            showToast(hour);
+            TodoDetails todoDetails = new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState);
 
             sqLiteDatabaseHelper.insertTodo(todoDetails);
-            showToast("Added");
+            //showToast("Added");
             onBackPressed();
         }
         else if(view == cancelBtn){
@@ -169,24 +197,47 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+    public void onDateSet(DatePicker datePicker, int y, int m, int d) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.YEAR, y);
+        calendar.set(Calendar.MONTH, m);
+        calendar.set(Calendar.DAY_OF_MONTH, d);
+
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
 
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
     }
 
     @Override
-    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+    public void onTimeSet(TimePicker timePicker, int h, int m) {
         String amPm;
-        if (hour >= 12) {
+        if (h >= 12) {
             amPm = " PM";
         } else {
             amPm = " AM";
         }
-        timeEditText.setText(String.format("%02d:%02d", hour, minute) + amPm);
+
+        hour = Integer.toString(h);
+        minute = Integer.toString(m);
+
+        if(h>=12)
+            h = h - 12;
+
+        timeEditText.setText(String.format("%02d:%02d", h, m) + amPm);
+    }
+
+    void disableButton(Button button){
+        button.setEnabled(false);
+        button.setAlpha(.5f);
+        button.setClickable(false);
+    }
+
+    void enableButton(Button button){
+        button.setEnabled(true);
+        button.setAlpha(1f);
+        button.setClickable(true);
     }
 }

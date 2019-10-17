@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -46,10 +48,19 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
     private LinearLayout timeLinearLayout;
     private LinearLayout timeGapLinearLayout;
 
+    private String oldDescription, oldTitle;
+    private Integer oldReminderState=0;
+    private String oldYear, oldMonth, oldDay;
+    private String oldHour=null, oldMinute=null, oldAmPm = " AM";
+
     private String description, title;
     private Integer reminderState=0, userId;
-    private String date;
-    private String time;
+    private String year, month, day;
+    private String hour=null, minute=null, amPm = " AM";
+
+    private String date, time="Set Time";
+
+    private Boolean isUpdated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +76,8 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
         remindMeBtn = (ImageButton) findViewById(R.id.update_todo_remind_me_btn);
 
         updateBtn.setOnClickListener(this);
+        disableButton(updateBtn);
+
         cancelBtn.setOnClickListener(this);
         remindMeBtn.setOnClickListener(this);
 
@@ -78,26 +91,96 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
 
         if(getIntent().getExtras() != null) {
             userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
-            title = getIntent().getExtras().getString("todo_title");
-            description = getIntent().getExtras().getString("todo_description");
-            date = getIntent().getExtras().getString("todo_date");
-            reminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
-            time = getIntent().getExtras().getString("todo_time");
+            oldTitle = getIntent().getExtras().getString("todo_title");
+            title = oldTitle;
 
-            titleEditText.setText(title);
-            descriptionEditText.setText(description);
+            oldDescription = getIntent().getExtras().getString("todo_description");
+            description = oldDescription;
+
+            oldYear = getIntent().getExtras().getString("todo_year");
+            year = oldYear;
+
+            oldMonth = getIntent().getExtras().getString("todo_month");
+            month = oldMonth;
+
+            oldDay = getIntent().getExtras().getString("todo_day");
+            day = oldDay;
+
+            oldReminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
+            reminderState = oldReminderState;
+
+            String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+            date = day + " " + months[Integer.parseInt(oldMonth)] + ", " + year;
+
+            oldHour = getIntent().getExtras().getString("todo_hour");
+            oldMinute = getIntent().getExtras().getString("todo_minute");
+
+            if(oldHour!=null && oldMinute!=null){
+                if(Integer.parseInt(oldHour)>=12){
+                    oldAmPm = " PM";
+                }
+            }
+
+            titleEditText.setText(oldTitle);
+            descriptionEditText.setText(oldDescription);
             dateEditText.setText(date);
 
-            if(reminderState==1)
+            if(oldHour!=null && oldMinute!=null && amPm!=null)
+                time = Integer.toString(Integer.parseInt(oldHour) % 12) + ":" + oldMinute + amPm;
+            else
+                time = "Set Time";
+            timeEditText.setText(time);
+
+            if(oldReminderState==1)
                 remindMeSwitch.setChecked(true);
             else
                 remindMeSwitch.setChecked(false);
-
-            timeEditText.setText(time);
         }
 
-        if(timeEditText.getText().equals(""))
-            timeEditText.setText("Set Time");
+
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!editable.toString().equals(oldTitle) && editable.toString().length()!=0){
+                    enableButton(updateBtn);
+                    title = editable.toString();
+                }
+                else
+                    disableButton(updateBtn);
+            }
+        });
+
+        descriptionEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(!editable.toString().equals(oldDescription)){
+                    enableButton(updateBtn);
+                    description = editable.toString();
+                }
+                else
+                    disableButton(updateBtn);
+            }
+        });
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,27 +226,22 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         if(view == updateBtn){
-            description = descriptionEditText.getText().toString();
-            title = titleEditText.getText().toString();
-
-            date = dateEditText.getText().toString();
-            time = timeEditText.getText().toString();
-
-            if(time.equals("Set Time")){
-                time = null;
-            }
-
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
             String currentUser = HomeActivity.getCurrentUser();
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
 
-            TodoDetails todoDetails = new TodoDetails(description, title, reminderState, userId, date, time);
+            title = titleEditText.getText().toString();
+            description = descriptionEditText.getText().toString();
 
-            sqLiteDatabaseHelper.deleteTodo(userId, date, title);
-            sqLiteDatabaseHelper.insertTodo(todoDetails);
+            if(hour==null || minute == null){
+                hour = oldHour;
+                minute = oldMinute;
+            }
 
+            TodoDetails todoDetails = new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState);
+            sqLiteDatabaseHelper.updateTodo(todoDetails, oldYear, oldMonth, oldDay, oldTitle);
             showToast("Updated");
             onBackPressed();
         }
@@ -180,33 +258,73 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
                 timeEditText.callOnClick();
                 compoundButton.setChecked(false);
             }
-            else
+            else {
                 reminderState = 1;
+            }
         }
         else{
             reminderState = 0;
         }
+        if(!reminderState.equals(oldReminderState))
+            enableButton(updateBtn);
+        else
+            disableButton(updateBtn);
     }
 
     @Override
-    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+    public void onDateSet(DatePicker datePicker, int y, int m, int d) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.YEAR, y);
+        calendar.set(Calendar.MONTH, m);
+        calendar.set(Calendar.DAY_OF_MONTH, d);
+
+
+            year = Integer.toString(calendar.get(Calendar.YEAR));
+            month = Integer.toString(calendar.get(Calendar.MONTH));
+            day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+
+            if(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))
+                disableButton(updateBtn);
+            else
+                enableButton(updateBtn);
 
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
         dateEditText.setText(currentDate);
     }
 
     @Override
-    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+    public void onTimeSet(TimePicker timePicker, int h, int m) {
         String amPm;
-        if (hour >= 12) {
+        if (h >= 12) {
             amPm = " PM";
         } else {
             amPm = " AM";
         }
-        timeEditText.setText(String.format("%02d:%02d", hour, minute) + amPm);
+
+
+            hour = Integer.toString(h);
+            minute = Integer.toString(m);
+
+        if(h>=12)
+            h = h - 12;
+
+        if(Integer.toString(h).equals(oldHour) && Integer.toString(m).equals(oldMinute))
+            disableButton(updateBtn);
+        else
+            enableButton(updateBtn);
+
+        timeEditText.setText(String.format("%02d:%02d", h, m) + amPm);
+    }
+
+    void disableButton(Button button){
+        button.setEnabled(false);
+        button.setAlpha(.5f);
+        button.setClickable(false);
+    }
+
+    void enableButton(Button button){
+        button.setEnabled(true);
+        button.setAlpha(1f);
+        button.setClickable(true);
     }
 }

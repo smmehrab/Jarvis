@@ -159,34 +159,42 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void handleDeleteAction(int position){
-        showToast("Delete Action");
-
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        sqLiteDatabaseHelper.deleteRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),records.get(position).getTitle(), records.get(position).getDate(), records.get(position).getType());
+        sqLiteDatabaseHelper.deleteRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),
+                records.get(position).getYear(),records.get(position).getMonth(),records.get(position).getDay(),
+                records.get(position).getTitle(),
+                records.get(position).getType());
+
         dataRetrieveAndShow(sqLiteDatabaseHelper);
+        showToast("Delete Action");
     }
 
     void handleEditAction(int position){
-        showToast("Edit Action");
-
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), records.get(position).getDate(),records.get(position).getTitle(), records.get(position).getType());
+
+        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),
+                records.get(position).getYear(),records.get(position).getMonth(),records.get(position).getDay(),
+                records.get(position).getTitle(),
+                records.get(position).getType());
 
         Intent intent = new Intent(getApplicationContext(), UpdateRecordActivity.class);
         intent.putExtra("user_id", record.getUserId().toString());
         intent.putExtra("wallet_title", record.getTitle());
         intent.putExtra("wallet_description", record.getDescription());
-        intent.putExtra("wallet_date", record.getDate());
+
+        intent.putExtra("wallet_year", record.getYear());
+        intent.putExtra("wallet_month", record.getMonth());
+        intent.putExtra("wallet_day", record.getDay());
+
         intent.putExtra("wallet_type", record.getType().toString());
         intent.putExtra("wallet_amount", record.getAmount());
+
+        showToast("Edit Action");
         startActivity(intent);
     }
 
-    void handleCheckAction(int position){
-
-    }
 
     @Override
     public void onResume() {

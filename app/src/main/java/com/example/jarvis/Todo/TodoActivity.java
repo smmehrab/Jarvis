@@ -117,33 +117,9 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
 
     void loadingDataFromDB(){
-//        reference = FirebaseDatabase.getInstance().getReference().child("Todo");
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                // To Retrieve Data & Replace Layout
-//                todoDetails.clear();
-//                for(DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
-//                    TodoDetails task = dataSnapshot1.getValue(TodoDetails.class);
-//                    todoDetails.add(task);
-//                    //showToast(task.toString());
-//                }
-//
-//                taskAdapter = new TaskAdapter(TodoActivity.this, todoDetails);
-//                todoItems.setAdapter(taskAdapter);
-//                taskAdapter.notifyDataSetChanged();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                // To Show an Error
-//                showToast("No Data Found");
-//            }
-//        });
-
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
         dataRetrieveAndShow(sqLiteDatabaseHelper);
 
         touchListener = new RecyclerTouchListener(this,todoItems);
@@ -176,31 +152,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
-
-//        RecyclerTouchListener touchListenerStart = new RecyclerTouchListener(this, todoItems);
-//        touchListenerStart
-//                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
-//                    @Override
-//                    public void onRowClicked(int position) {
-//                        Toast.makeText(getApplicationContext(),todoDetails.get(position).getTitle(),Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    @Override
-//                    public void onIndependentViewClicked(int independentViewID, int position) {
-//
-//                    }
-//                })
-//                .setSwipeOptionViews(R.id.todo_item_check_rl)
-//                .setSwipeable(R.id.todo_item_fg, R.id.todo_item_bg_start, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
-//                    @Override
-//                    public void onSwipeOptionClicked(int viewID, int position) {
-//                        switch (viewID){
-//                            case R.id.todo_item_check_rl:
-//                                handleCheckAction(position);
-//                                break;
-//                        }
-//                    }
-//                });
     }
 
     void dataRetrieveAndShow(SQLiteDatabaseHelper sqLiteDatabaseHelper){
@@ -215,7 +166,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     void handleDeleteAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getDate(),todoDetails.get(position).getTitle());
+        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),  todoDetails.get(position).getYear(),todoDetails.get(position).getMonth(),todoDetails.get(position).getDay(), todoDetails.get(position).getTitle());
         dataRetrieveAndShow(sqLiteDatabaseHelper);
     }
 
@@ -223,15 +174,18 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         showToast("Edit Action");
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        TodoDetails todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getDate(),todoDetails.get(position).getTitle());
+        TodoDetails todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getYear(),todoDetails.get(position).getMonth(),todoDetails.get(position).getDay(),todoDetails.get(position).getTitle());
 
         Intent intent = new Intent(getApplicationContext(), UpdateTodoActivity.class);
         intent.putExtra("user_id", todoItem.getUserId().toString());
         intent.putExtra("todo_title", todoItem.getTitle());
         intent.putExtra("todo_description", todoItem.getDescription());
-        intent.putExtra("todo_date", todoItem.getDate());
+        intent.putExtra("todo_year", todoItem.getYear());
+        intent.putExtra("todo_month", todoItem.getMonth());
+        intent.putExtra("todo_day", todoItem.getDay());
+        intent.putExtra("todo_hour", todoItem.getHour());
+        intent.putExtra("todo_minute", todoItem.getMinute());
         intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());
-        intent.putExtra("todo_time", todoItem.getTime());
         startActivity(intent);
     }
 
