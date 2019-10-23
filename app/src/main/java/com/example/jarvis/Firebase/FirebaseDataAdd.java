@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.jarvis.Reminder.ReminderDetails;
-import com.example.jarvis.Todo.TodoDetails;
+import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.UserDetails;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -64,14 +64,14 @@ public class FirebaseDataAdd {
         refUser = db.collection("user").document(mAuth.getUid().toString());
     }
 
-    public void addTodoInFireBaseRecent(List <TodoDetails> tasks){
+    public void addTodoInFireBaseRecent(List <Task> tasks){
         Iterator i = tasks.iterator();
         int increment = 1;
         while(i.hasNext()){
           //  Map<String, Object> task = new HashMap<>();
             //task.put(("task" + increment).toString(), i.next());
 
-            //List<TodoDetails> task = Arrays.asList();
+            //List<Task> task = Arrays.asList();
             refTodo.document("recent").collection("todo")
                     .document(("task" + increment))
                     .set(i.next()).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -89,7 +89,7 @@ public class FirebaseDataAdd {
         }
     }
 
-    public void addTodoInFireBaseOld(ArrayList<TodoDetails> tasks){
+    public void addTodoInFireBaseOld(ArrayList<Task> tasks){
         //Map<String, Object> task = new HashMap<>();
         Iterator i = tasks.iterator();
         int increment = 1;

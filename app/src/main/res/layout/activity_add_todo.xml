@@ -7,7 +7,7 @@
     android:background="@color/colorWhite"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context=".Todo.AddTodoActivity">
+    tools:context=".Todo.AddTaskActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

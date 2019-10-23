@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -32,111 +30,70 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class UpdateTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
-    private ImageButton remindMeBtn;
-    private Button cancelBtn;
-    private Button updateBtn;
+public class UpdateTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
+    // Buttons
+    private Button updateBtn;
+    private Button cancelBtn;
+
+    // Switch
     private Switch remindMeSwitch;
 
+    // EditTexts
     private EditText titleEditText;
     private EditText descriptionEditText;
     private EditText dateEditText;
     private EditText timeEditText;
 
-    private LinearLayout dateLinearLayout;
-    private LinearLayout timeLinearLayout;
-    private LinearLayout timeGapLinearLayout;
+    // Old Task Variables
+    private String oldTitle;
+    private String oldDescription;
 
-    private String oldDescription, oldTitle;
-    private Integer oldReminderState=0;
     private String oldYear, oldMonth, oldDay;
-    private String oldHour=null, oldMinute=null, oldAmPm = " AM";
+    private String oldHour=null, oldMinute=null,  oldAmPm = " AM";
+    private Integer oldReminderState=0;
 
-    private String description, title;
-    private Integer reminderState=0, userId;
+    // Updated Task Variables
+    private Integer userId;
+    private String title;
+    private String description;
+
     private String year, month, day;
     private String hour=null, minute=null, amPm = " AM";
+    private Integer reminderState=0;
 
     private String date, time="Set Time";
-
-    private Boolean isUpdated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_todo);
 
-        settingUpXmlElements();
+        setUI();
     }
 
-    void settingUpXmlElements(){
+    void setUI(){
+        findXmlElements();
+        setListeners();
+        getDataFromTodoActivity();
+        initializeUI();
+    }
+
+    public void findXmlElements(){
         updateBtn = (Button) findViewById(R.id.update_todo_add_btn);
         cancelBtn = (Button) findViewById(R.id.update_todo_cancel_btn);
-        remindMeBtn = (ImageButton) findViewById(R.id.update_todo_remind_me_btn);
-
-        updateBtn.setOnClickListener(this);
-        disableButton(updateBtn);
-
-        cancelBtn.setOnClickListener(this);
-        remindMeBtn.setOnClickListener(this);
-
         remindMeSwitch = (Switch) findViewById(R.id.update_todo_remind_me_switch);
-        remindMeSwitch.setOnCheckedChangeListener(this);
 
         titleEditText = (EditText) findViewById(R.id.update_todo_title_editText);
         descriptionEditText = (EditText) findViewById(R.id.update_todo_description_editText);
         dateEditText = (EditText) findViewById(R.id.update_todo_date_editText);
         timeEditText = (EditText) findViewById(R.id.update_todo_time_editText);
+    }
 
-        if(getIntent().getExtras() != null) {
-            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
-            oldTitle = getIntent().getExtras().getString("todo_title");
-            title = oldTitle;
-
-            oldDescription = getIntent().getExtras().getString("todo_description");
-            description = oldDescription;
-
-            oldYear = getIntent().getExtras().getString("todo_year");
-            year = oldYear;
-
-            oldMonth = getIntent().getExtras().getString("todo_month");
-            month = oldMonth;
-
-            oldDay = getIntent().getExtras().getString("todo_day");
-            day = oldDay;
-
-            oldReminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
-            reminderState = oldReminderState;
-
-            String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-            date = day + " " + months[Integer.parseInt(oldMonth)] + ", " + year;
-
-            oldHour = getIntent().getExtras().getString("todo_hour");
-            oldMinute = getIntent().getExtras().getString("todo_minute");
-
-            if(oldHour!=null && oldMinute!=null){
-                if(Integer.parseInt(oldHour)>=12){
-                    oldAmPm = " PM";
-                }
-            }
-
-            titleEditText.setText(oldTitle);
-            descriptionEditText.setText(oldDescription);
-            dateEditText.setText(date);
-
-            if(oldHour!=null && oldMinute!=null && amPm!=null)
-                time = Integer.toString(Integer.parseInt(oldHour) % 12) + ":" + oldMinute + amPm;
-            else
-                time = "Set Time";
-            timeEditText.setText(time);
-
-            if(oldReminderState==1)
-                remindMeSwitch.setChecked(true);
-            else
-                remindMeSwitch.setChecked(false);
-        }
-
+    public void setListeners(){
+        updateBtn.setOnClickListener(this);
+        cancelBtn.setOnClickListener(this);
+        remindMeSwitch.setOnCheckedChangeListener(this);
 
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -197,11 +154,58 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
                 timePicker.show(getSupportFragmentManager(),"time picker");
             }
         });
+    }
 
-        dateLinearLayout = (LinearLayout) findViewById(R.id.update_todo_date_linear_layout);
-        timeLinearLayout = (LinearLayout) findViewById(R.id.update_todo_time_linear_layout);
-        timeGapLinearLayout = (LinearLayout) findViewById(R.id.update_todo_time_gap_linear_layout);
+    public void getDataFromTodoActivity(){
+        if(getIntent().getExtras() != null) {
+            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+            oldTitle = getIntent().getExtras().getString("todo_title");
+            oldDescription = getIntent().getExtras().getString("todo_description");
+            oldYear = getIntent().getExtras().getString("todo_year");
+            oldMonth = getIntent().getExtras().getString("todo_month");
+            oldDay = getIntent().getExtras().getString("todo_day");
+            oldReminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
+        }
+    }
 
+    public void initializeUI(){
+        title = oldTitle;
+        description = oldDescription;
+
+        year = oldYear;
+        month = oldMonth;
+        day = oldDay;
+
+        reminderState = oldReminderState;
+
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        date = day + " " + months[Integer.parseInt(oldMonth)] + ", " + year;
+
+        oldHour = getIntent().getExtras().getString("todo_hour");
+        oldMinute = getIntent().getExtras().getString("todo_minute");
+
+        if(oldHour!=null && oldMinute!=null){
+            if(Integer.parseInt(oldHour)>=12){
+                oldAmPm = " PM";
+            }
+        }
+
+        titleEditText.setText(oldTitle);
+        descriptionEditText.setText(oldDescription);
+        dateEditText.setText(date);
+
+        if(oldHour!=null && oldMinute!=null && amPm!=null)
+            time = Integer.toString(Integer.parseInt(oldHour) % 12) + ":" + oldMinute + amPm;
+        else
+            time = "Set Time";
+        timeEditText.setText(time);
+
+        if(oldReminderState==1)
+            remindMeSwitch.setChecked(true);
+        else
+            remindMeSwitch.setChecked(false);
+
+        disableButton(updateBtn);
     }
 
     public void showToast(String message){
@@ -240,8 +244,8 @@ public class UpdateTodoActivity extends AppCompatActivity implements View.OnClic
                 minute = oldMinute;
             }
 
-            TodoDetails todoDetails = new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState);
-            sqLiteDatabaseHelper.updateTodo(todoDetails, oldYear, oldMonth, oldDay, oldTitle);
+            Task tasks = new Task(userId, title, description, year, month, day, hour, minute, reminderState);
+            sqLiteDatabaseHelper.updateTodo(tasks, oldYear, oldMonth, oldDay, oldTitle);
             showToast("Updated");
             onBackPressed();
         }

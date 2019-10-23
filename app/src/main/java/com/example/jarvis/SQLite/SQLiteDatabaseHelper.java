@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.example.jarvis.Todo.TodoDetails;
+import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.UserDetails;
 import com.example.jarvis.Wallet.Record;
 
@@ -189,7 +189,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long insertTodo(TodoDetails todoDetails){
+    public long insertTodo(Task todoDetails){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -223,7 +223,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public void updateTodo(TodoDetails todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
+    public void updateTodo(Task todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -259,7 +259,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public TodoDetails findTodo(Integer userId, String year, String month, String day, String title){
+    public Task findTodo(Integer userId, String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_TODO,
@@ -274,7 +274,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToPosition(0);
         sqLiteDatabase.close();
 
-        return new TodoDetails(Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
+        return new Task(Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
                 cursor.getString(cursor.getColumnIndex(TODO_TITLE)),
                 cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION)),
 
@@ -298,8 +298,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public ArrayList<TodoDetails> loadTodoItems(){
-        ArrayList<TodoDetails> todoDetails = new ArrayList<TodoDetails>();
+    public ArrayList<Task> loadTodoItems(){
+        ArrayList<Task> todoDetails = new ArrayList<Task>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO +
@@ -324,7 +324,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
                 Integer reminderState = Integer.parseInt(cursor.getString(8));
 
-                todoDetails.add(new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState));
+                todoDetails.add(new Task(userId, title, description, year, month, day, hour, minute, reminderState));
             }
         }
 

@@ -59,7 +59,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     DatabaseReference reference;
     FirebaseDatabase database;
     RecyclerView todoItems;
-    ArrayList<TodoDetails> todoDetails;
+    ArrayList<Task> tasks;
     TaskAdapter taskAdapter;
 
     RecyclerTouchListener touchListener;
@@ -112,7 +112,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         todoItems = findViewById(R.id.todo_items);
         todoItems.setLayoutManager(new LinearLayoutManager(this));
 
-        todoDetails = new ArrayList<TodoDetails>();
+        tasks = new ArrayList<Task>();
     }
 
 
@@ -127,7 +127,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                 .setClickable(new RecyclerTouchListener.OnRowClickListener() {
                     @Override
                     public void onRowClicked(int position) {
-                        Toast.makeText(getApplicationContext(),todoDetails.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),tasks.get(position).getTitle(),Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -155,10 +155,10 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void dataRetrieveAndShow(SQLiteDatabaseHelper sqLiteDatabaseHelper){
-        todoDetails.clear();
-        todoDetails = sqLiteDatabaseHelper.loadTodoItems();
+        tasks.clear();
+        tasks = sqLiteDatabaseHelper.loadTodoItems();
         todoItems.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        taskAdapter = new TaskAdapter(TodoActivity.this, todoDetails);
+        taskAdapter = new TaskAdapter(TodoActivity.this, tasks);
         todoItems.setAdapter(taskAdapter);
         taskAdapter.notifyDataSetChanged();
     }
@@ -166,7 +166,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     void handleDeleteAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),  todoDetails.get(position).getYear(),todoDetails.get(position).getMonth(),todoDetails.get(position).getDay(), todoDetails.get(position).getTitle());
+        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),  tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
         dataRetrieveAndShow(sqLiteDatabaseHelper);
     }
 
@@ -174,9 +174,9 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         showToast("Edit Action");
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        TodoDetails todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), todoDetails.get(position).getYear(),todoDetails.get(position).getMonth(),todoDetails.get(position).getDay(),todoDetails.get(position).getTitle());
+        Task todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(),tasks.get(position).getTitle());
 
-        Intent intent = new Intent(getApplicationContext(), UpdateTodoActivity.class);
+        Intent intent = new Intent(getApplicationContext(), UpdateTaskActivity.class);
         intent.putExtra("user_id", todoItem.getUserId().toString());
         intent.putExtra("todo_title", todoItem.getTitle());
         intent.putExtra("todo_description", todoItem.getDescription());
@@ -285,7 +285,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             }.start();
         }
         else if(view == fab){
-            Intent intent = new Intent(getApplicationContext(), AddTodoActivity.class);
+            Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
             startActivity(intent);
         }
     }
