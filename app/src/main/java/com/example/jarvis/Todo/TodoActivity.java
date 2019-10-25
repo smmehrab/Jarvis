@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -75,6 +76,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<Task> tasks;
     TaskAdapter taskAdapter;
     RecyclerTouchListener touchListener;
+    CheckBox checkBox;
+    boolean isChecked;
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -117,6 +120,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.todo_navigation_view);
         todoRecyclerView = (RecyclerView) findViewById(R.id.todo_recycler_view);
+        checkBox = (CheckBox) findViewById(R.id.todo_item_checkbox);
 
         progressBar = (ProgressBar) findViewById(R.id.todo_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.todo_voice_command_toggle_btn);
