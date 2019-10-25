@@ -52,6 +52,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
     private String oldYear, oldMonth, oldDay;
     private String oldHour=null, oldMinute=null,  oldAmPm = " AM";
     private Integer oldReminderState=0;
+    private Integer oldIsCompleted;
 
     /** Task Variables (Current) */
     private Integer userId;
@@ -61,6 +62,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
     private String year, month, day;
     private String hour=null, minute=null, amPm = " AM";
     private Integer reminderState;
+    private Integer isCompleted;
 
     private String date, time="Set Time";
 
@@ -173,6 +175,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
             oldMinute = getIntent().getExtras().getString("todo_minute");
 
             oldReminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
+            oldIsCompleted = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_isCompleted")));
         }
     }
 
@@ -186,6 +189,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         day = oldDay;
 
         reminderState = oldReminderState;
+        isCompleted = oldIsCompleted;
 
         /** Formatting Date to set on EditText */
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -239,9 +243,9 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
                 minute = oldMinute;
             }
 
-            Task tasks = new Task(userId, title, description, year, month, day, hour, minute, reminderState);
+            Task task = new Task(userId, title, description, year, month, day, hour, minute, reminderState, isCompleted);
 
-            sqLiteDatabaseHelper.updateTodo(tasks, oldYear, oldMonth, oldDay, oldTitle);
+            sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
             onBackPressed();
         }
         else if(view == cancelBtn){

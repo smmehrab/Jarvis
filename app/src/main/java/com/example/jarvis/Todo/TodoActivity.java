@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -75,6 +76,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<Task> tasks;
     TaskAdapter taskAdapter;
     RecyclerTouchListener touchListener;
+    CheckBox checkBox;
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -150,7 +152,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                 .setClickable(new RecyclerTouchListener.OnRowClickListener() {
                     @Override
                     public void onRowClicked(int position) {
-                        Toast.makeText(getApplicationContext(),tasks.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+                        handleCheckAction(position);
+//                        showToast("Double Tap on Task to Mark as Completed");
                     }
 
                     @Override
@@ -171,7 +174,12 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                                 break;
                         }
                     }
-                });
+                }).setLongClickable(false, new RecyclerTouchListener.OnRowLongClickListener() {
+            @Override
+            public void onRowLongClicked(int position) {
+
+            }
+        });
 
         // Voice Command On/Off
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -215,6 +223,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     public void loadData(SQLiteDatabaseHelper sqLiteDatabaseHelper){
         tasks.clear();
         tasks = sqLiteDatabaseHelper.loadTodoItems();
+
         todoRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         taskAdapter = new TaskAdapter(TodoActivity.this, tasks);
         todoRecyclerView.setAdapter(taskAdapter);
@@ -248,11 +257,34 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("todo_hour", todoItem.getHour());
         intent.putExtra("todo_minute", todoItem.getMinute());
         intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());
+        intent.putExtra("todo_isCompleted", todoItem.getIsCompleted().toString());
         startActivity(intent);
     }
 
     void handleCheckAction(int position){
 
+        if(tasks.get(position).getIsCompleted()==0) {
+            tasks.get(position).setIsCompleted(1);
+            showToast("Marked as Completed");
+        }
+        else {
+            tasks.get(position).setIsCompleted(0);
+            showToast("Marked as Incomplete");
+        }
+
+        taskAdapter = new TaskAdapter(TodoActivity.this, tasks);
+        todoRecyclerView.setAdapter(taskAdapter);
+        taskAdapter.notifyDataSetChanged();
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
+//        tasks = taskAdapter.getTasks();
+//        sqLiteDatabaseHelper.updateTodoDatabase(tasks);
+
+        sqLiteDatabaseHelper.updateTodo(tasks.get(position), tasks.get(position).getYear(), tasks.get(position).getMonth(), tasks.get(position).getDay(), tasks.get(position).getTitle());
+
+        sqLiteDatabase.close();
     }
 
     @Override
@@ -361,9 +393,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.user_voice_command_option) {
-
-        } else if (id == R.id.user_home_option) {
+        }  else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
             finish();

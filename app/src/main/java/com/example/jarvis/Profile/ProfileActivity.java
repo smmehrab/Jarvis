@@ -147,8 +147,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         } else if(id == R.id.user_profile_option) {
 
-        } else if (id == R.id.user_voice_command_option) {
-
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
