@@ -16,15 +16,17 @@
             android:id="@+id/wallet_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/wallet_items"
+                android:id="@+id/wallet_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
@@ -35,12 +37,38 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            android:id="@+id/todo_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/todo_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/icon_mic_disable"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
+
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingRight="20dp"
+        android:paddingBottom="30dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/wallet_fab"

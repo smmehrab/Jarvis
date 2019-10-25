@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -31,68 +29,61 @@ import com.example.jarvis.Util.TimePickerFragment;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class AddTodoActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
-    private ImageButton remindMeBtn;
-    private Button cancelBtn;
-    private Button addBtn;
+public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
+    /** Buttons */
+    private Button addBtn;
+    private Button cancelBtn;
+
+    /** Switch */
     private Switch remindMeSwitch;
 
+    /** EditTexts */
     private EditText titleEditText;
     private EditText descriptionEditText;
     private EditText dateEditText;
     private EditText timeEditText;
 
-    private LinearLayout dateLinearLayout;
-    private LinearLayout timeLinearLayout;
-    private LinearLayout timeGapLinearLayout;
-
-    private String description, title;
-    private Integer reminderState=0, userId;
-    private String date;
-    private String time;
+    /** Task Variables */
+    private Integer userId;
+    private String title;
+    private String description;
 
     private String day, month, year;
-    String hour, minute;
+    private String hour, minute;
+    private Integer reminderState;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_todo);
 
-        settingUpXmlElements();
+        setUI();
     }
 
-    void settingUpXmlElements(){
+    void setUI(){
+        findXmlElements();
+        setListeners();
+        initializeUI();
+    }
+
+    public void findXmlElements(){
         addBtn = (Button) findViewById(R.id.add_todo_add_btn);
         cancelBtn = (Button) findViewById(R.id.add_todo_cancel_btn);
-        remindMeBtn = (ImageButton) findViewById(R.id.add_todo_remind_me_btn);
-
-        addBtn.setOnClickListener(this);
-        disableButton(addBtn);
-
-        cancelBtn.setOnClickListener(this);
-        remindMeBtn.setOnClickListener(this);
 
         remindMeSwitch = (Switch) findViewById(R.id.add_todo_remind_me_switch);
-        remindMeSwitch.setOnCheckedChangeListener(this);
 
         titleEditText = (EditText) findViewById(R.id.add_todo_title_editText);
         descriptionEditText = (EditText) findViewById(R.id.add_todo_description_editText);
         dateEditText = (EditText) findViewById(R.id.add_todo_date_editText);
         timeEditText = (EditText) findViewById(R.id.add_todo_time_editText);
+    }
 
-        Calendar calendar = Calendar.getInstance();
-        year = Integer.toString(calendar.get(Calendar.YEAR));
-        month = Integer.toString(calendar.get(Calendar.MONTH));
-        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
-
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
-
-        timeEditText.setText("Set Time");
-        hour = null;
-        minute = null;
+    public void setListeners(){
+        addBtn.setOnClickListener(this);
+        cancelBtn.setOnClickListener(this);
+        remindMeSwitch.setOnCheckedChangeListener(this);
 
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -114,7 +105,6 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,30 +120,27 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
                 timePicker.show(getSupportFragmentManager(),"time picker");
             }
         });
-
-        dateLinearLayout = (LinearLayout) findViewById(R.id.add_todo_date_linear_layout);
-        timeLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_linear_layout);
-        timeGapLinearLayout = (LinearLayout) findViewById(R.id.add_todo_time_gap_linear_layout);
-
     }
 
-    public void showToast(String message){
-        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
+    public void initializeUI(){
+        /** Initializing variables */
+        title = null;
+        description = null;
+        hour = null;
+        minute = null;
+        reminderState = 0;
 
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
-        startActivity(intent);
-        finish();
-    }
+        /** Formatting Present Date so that we can set the date on EditText */
+        Calendar calendar = Calendar.getInstance();
+        year = Integer.toString(calendar.get(Calendar.YEAR));
+        month = Integer.toString(calendar.get(Calendar.MONTH));
+        day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+        String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        /** Initializing UI */
+        dateEditText.setText(selectedDate);
+        timeEditText.setText("Set Time");
+        disableButton(addBtn);
     }
 
     @Override
@@ -162,17 +149,18 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
+            /** Getting the email of the current user */
             String currentUser = HomeActivity.getCurrentUser();
+
+            /** Getting the id of the current user */
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
 
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
 
-            showToast(hour);
-            TodoDetails todoDetails = new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState);
+            Task task = new Task(userId, title, description, year, month, day, hour, minute, reminderState);
 
-            sqLiteDatabaseHelper.insertTodo(todoDetails);
-            //showToast("Added");
+            sqLiteDatabaseHelper.insertTodo(task);
             onBackPressed();
         }
         else if(view == cancelBtn){
@@ -198,35 +186,59 @@ public class AddTodoActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onDateSet(DatePicker datePicker, int y, int m, int d) {
+        /** Formatting Selected Date so that we can set the date on EditText */
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m);
         calendar.set(Calendar.DAY_OF_MONTH, d);
+        String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
 
+        /** Setting Selected Date to the EditText */
+        dateEditText.setText(selectedDate);
+
+        /** Assigning Selected Date to the following variables
+         * so that we can use these variables to create task object */
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
-
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
     }
 
     @Override
     public void onTimeSet(TimePicker timePicker, int h, int m) {
-        String amPm;
-        if (h >= 12) {
-            amPm = " PM";
-        } else {
-            amPm = " AM";
-        }
-
+        /** Assigning Selected Time to the following variables
+         * so that we can use these variables to create task object */
         hour = Integer.toString(h);
         minute = Integer.toString(m);
 
-        if(h>=12)
+        /** Formatting Selected Time so that we can set the time on EditText */
+        String amPm = " AM";
+        if (h >= 12) {
+            amPm = " PM";
             h = h - 12;
+        }
+        String selectedTime = String.format("%02d:%02d", h, m) + amPm;
 
-        timeEditText.setText(String.format("%02d:%02d", h, m) + amPm);
+        /** Setting Selected Time to the EditText */
+        timeEditText.setText(selectedTime);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    public void showToast(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     void disableButton(Button button){

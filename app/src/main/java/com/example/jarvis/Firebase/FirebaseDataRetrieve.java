@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.jarvis.Reminder.ReminderDetails;
-import com.example.jarvis.Todo.TodoDetails;
+import com.example.jarvis.Todo.Task;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,14 +63,14 @@ public class FirebaseDataRetrieve {
         refUser = db.collection("user").document(mAuth.getUid().toString());
     }
 
-    public ArrayList<TodoDetails> retriveRecentTodo(){
-        ArrayList<TodoDetails> list = new ArrayList<>();
+    public ArrayList<Task> retriveRecentTodo(){
+        ArrayList<Task> list = new ArrayList<>();
         refTodo.document("recent").collection("todo").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
-                            TodoDetails todo = documentSnapshot.toObject(TodoDetails.class);
+                            Task todo = documentSnapshot.toObject(Task.class);
                             list.add(todo);
                         }
                         Log.d("Orreh dekh dekh", "Success");
@@ -87,14 +87,14 @@ public class FirebaseDataRetrieve {
 
     }
 
-    public ArrayList<TodoDetails> retriveOldTodo() {
-        ArrayList<TodoDetails> list = new ArrayList<>();
+    public ArrayList<Task> retriveOldTodo() {
+        ArrayList<Task> list = new ArrayList<>();
         refTodo.document("old").collection("todo").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            TodoDetails todo = documentSnapshot.toObject(TodoDetails.class);
+                            Task todo = documentSnapshot.toObject(Task.class);
                             list.add(todo);
                         }
                         Log.d("Orreh dekh dekh", "Success");

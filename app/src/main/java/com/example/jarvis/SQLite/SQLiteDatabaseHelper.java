@@ -8,23 +8,23 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.example.jarvis.Todo.TodoDetails;
-import com.example.jarvis.UserHandling.UserDetails;
+import com.example.jarvis.Todo.Task;
+import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
 
 import java.util.ArrayList;
 
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
-    // Database
+    /*** Database ***/
     private static final String DATABASE_NAME = "database_local.db";
 
-    // Others
+    /*** Others ***/
     private Context context;
     private static int VERSION_NUMBER = 5;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
-    // TABLE USER
+    /*** TABLE USER ***/
     private static final String TABLE_USER = "table_user";
     private static final String USER_ID = "user_id";
     private static final String USER_EMAIL = "user_email";
@@ -34,10 +34,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USER = "CREATE TABLE " + TABLE_USER + "(" +
             USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             USER_EMAIL + " TEXT NOT NULL, " +
-            USER_PASSWORD + " TEXT NOT NULL, " +
-            USER_CONFIRM_PASSWORD + " TEXT NOT NULL); ";
+            USER_PASSWORD + " TEXT NOT NULL); ";
 
-    // TABLE TODO
+
+    /*** TABLE TODO ***/
     private static final String TABLE_TODO = "table_todo";
     private static final String TODO_TITLE = "todo_title";
     private static final String TODO_DESCRIPTION = "todo_description";
@@ -68,7 +68,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY +  ")); ";
 
 
-    // TABLE WALLET
+    /*** TABLE WALLET ***/
     private static final String TABLE_WALLET = "table_wallet";
     private static final String WALLET_TITLE = "wallet_title";
     private static final String WALLET_DESCRIPTION = "wallet_description";
@@ -95,14 +95,17 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_YEAR  + ", " + WALLET_MONTH + ", " + WALLET_DAY + ", " + WALLET_TYPE + ")); ";
 
 
+    /*** Constructor ***/
     public SQLiteDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION_NUMBER);
         this.context = context;
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         try {
+            /*** To Create Tables ***/
             sqLiteDatabase.execSQL(CREATE_TABLE_USER);
             sqLiteDatabase.execSQL(CREATE_TABLE_TODO);
             sqLiteDatabase.execSQL(CREATE_TABLE_WALLET);
@@ -115,6 +118,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         try {
+            /*** To Drop & Recreate Tables ***/
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_USER);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_TODO);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
@@ -124,28 +128,23 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public long insertUser(UserDetails userDetails){
+    /*** To Insert New User ***/
+    public long insertUser(User user){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        String getEmail = userDetails.getEmail();
-        String getPassword = userDetails.getPassword();
-        String getConfirmPassword = userDetails.getConfirmPassword();
+        String getEmail = user.getEmail();
+        String getPassword = user.getPassword();
 
-        if(getPassword.equals(getConfirmPassword)){
-            contentValues.put(USER_EMAIL, getEmail);
-            contentValues.put(USER_PASSWORD, getPassword);
-            contentValues.put(USER_CONFIRM_PASSWORD, getConfirmPassword);
+        contentValues.put(USER_EMAIL, getEmail);
+        contentValues.put(USER_PASSWORD, getPassword);
 
-            long rowId = sqLiteDatabase.insert(TABLE_USER, null, contentValues);
-            return rowId;
-        }
-        else {
-            return 0;
-        }
+        long rowId = sqLiteDatabase.insert(TABLE_USER, null, contentValues);
+        return rowId;
     }
 
-    public Boolean findUser(String mail, String pass){
+    /*** To Find User ***/
+    public Boolean findUser(String givenEmail, String givenPassword){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
         Boolean result = false;
@@ -158,17 +157,17 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 String email = cursor.getString(1);
                 String password = cursor.getString(2);
 
-                if(email.equals(mail) && password.equals(pass)){
+                if(email.equals(givenEmail) && password.equals(givenPassword)){
                     result = true;
                     break;
                 }
             }
         }
-
         return result;
     }
 
-    public Integer getUserId(String mail){
+    /*** To Get UserId from User Email ***/
+    public Integer getUserId(String givenEmail){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
         Integer result = null;
@@ -180,7 +179,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext()){
                 String email = cursor.getString(1);
 
-                if(email.equals(mail)){
+                if(email.equals(givenEmail)){
                     result = Integer.parseInt(cursor.getString(0));
                     break;
                 }
@@ -189,7 +188,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long insertTodo(TodoDetails todoDetails){
+    public long insertTodo(Task todoDetails){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -223,7 +222,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public void updateTodo(TodoDetails todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
+    public void updateTodo(Task todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -259,7 +258,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public TodoDetails findTodo(Integer userId, String year, String month, String day, String title){
+    public Task findTodo(Integer userId, String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_TODO,
@@ -274,7 +273,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToPosition(0);
         sqLiteDatabase.close();
 
-        return new TodoDetails(Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
+        return new Task(Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID))),
                 cursor.getString(cursor.getColumnIndex(TODO_TITLE)),
                 cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION)),
 
@@ -298,8 +297,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
-    public ArrayList<TodoDetails> loadTodoItems(){
-        ArrayList<TodoDetails> todoDetails = new ArrayList<TodoDetails>();
+    public ArrayList<Task> loadTodoItems(){
+        ArrayList<Task> todoDetails = new ArrayList<Task>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO +
@@ -324,7 +323,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
                 Integer reminderState = Integer.parseInt(cursor.getString(8));
 
-                todoDetails.add(new TodoDetails(userId, title, description, year, month, day, hour, minute, reminderState));
+                todoDetails.add(new Task(userId, title, description, year, month, day, hour, minute, reminderState));
             }
         }
 
@@ -442,6 +441,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         cursor.moveToPosition(0);
         sqLiteDatabase.close();
+
         if(cursor.getCount() == 0){
             showToast("No Data Found");
         }

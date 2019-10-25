@@ -16,15 +16,15 @@ import java.util.ArrayList;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     Context context;
-    ArrayList<TodoDetails> todoDetails;
+    ArrayList<Task> tasks;
 
-    public TaskAdapter(Context context, ArrayList<TodoDetails> todoDetails){
+    public TaskAdapter(Context context, ArrayList<Task> tasks){
         this.context = context;
-        this.todoDetails = todoDetails;
+        this.tasks = tasks;
     }
 
-    public void setTodoDetails(ArrayList<TodoDetails> todoDetails) {
-        this.todoDetails = todoDetails;
+    public void setTodoDetails(ArrayList<Task> tasks) {
+        this.tasks = tasks;
     }
 
     @NonNull
@@ -35,26 +35,26 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder taskViewHolder, int position) {
-        taskViewHolder.title.setText(todoDetails.get(position).getTitle());
-        taskViewHolder.description.setText(todoDetails.get(position).getDescription());
+        taskViewHolder.title.setText(tasks.get(position).getTitle());
+        taskViewHolder.description.setText(tasks.get(position).getDescription());
 
         String date = null;
         String[] month = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-        date = todoDetails.get(position).getDay() + " " +
-                month[Integer.parseInt(todoDetails.get(position).getMonth())] + ", " +
-                todoDetails.get(position).getYear();
+        date = tasks.get(position).getDay() + " " +
+                month[Integer.parseInt(tasks.get(position).getMonth())] + ", " +
+                tasks.get(position).getYear();
 
         taskViewHolder.date.setText(date);
 
         String time = null;
-        if(todoDetails.get(position).getHour()!=null && todoDetails.get(position).getMinute()!=null) {
-            Integer hour = Integer.parseInt(todoDetails.get(position).getHour());
+        if(tasks.get(position).getHour()!=null && tasks.get(position).getMinute()!=null) {
+            Integer hour = Integer.parseInt(tasks.get(position).getHour());
             String amPm = " AM";
             if (hour >= 12) {
                 amPm = " PM";
                 hour = hour - 12;
             }
-            time = hour.toString() + ":" + todoDetails.get(position).getMinute() + amPm;
+            time = hour.toString() + ":" + tasks.get(position).getMinute() + amPm;
         }
 
 
@@ -63,7 +63,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public int getItemCount() {
-        return todoDetails.size();
+        return tasks.size();
     }
 
     class TaskViewHolder extends RecyclerView.ViewHolder{

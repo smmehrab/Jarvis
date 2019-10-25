@@ -1,10 +1,13 @@
 package com.example.jarvis.Todo;
 
-public class TodoDetails {
+public class Task {
     private Integer userId;
-    private String title, description;
+    private String title;
+    private String description;
+
     private String year, month, day;
     private String hour, minute;
+
     private Integer reminderState;
     private Integer checked;
 
@@ -88,7 +91,7 @@ public class TodoDetails {
         this.checked = checked;
     }
 
-    public TodoDetails(Integer userId, String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState) {
+    public Task(Integer userId, String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState) {
         this.userId = userId;
         this.title = title;
         this.description = description;
