@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     Context context;
     ArrayList<Task> tasks;
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
 
     public TaskAdapter(Context context, ArrayList<Task> tasks){
         this.context = context;
@@ -43,7 +48,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         date = tasks.get(position).getDay() + " " +
                 month[Integer.parseInt(tasks.get(position).getMonth())] + ", " +
                 tasks.get(position).getYear();
-
         taskViewHolder.date.setText(date);
 
         String time = null;
@@ -56,9 +60,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
             time = hour.toString() + ":" + tasks.get(position).getMinute() + amPm;
         }
-
-
         taskViewHolder.time.setText(time);
+
+        taskViewHolder.checkBox.setOnCheckedChangeListener(null);
+
+        if(tasks.get(position).getIsCompleted() == 0)
+            taskViewHolder.checkBox.setChecked(false);
+        else
+            taskViewHolder.checkBox.setChecked(true);
+
+//        taskViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if(isChecked) {
+//                    tasks.get(taskViewHolder.getAdapterPosition()).setIsCompleted(1);
+//                }
+//                else {
+//                    tasks.get(taskViewHolder.getAdapterPosition()).setIsCompleted(0);
+//                }
+//            }
+//        });
+
     }
 
     @Override
@@ -69,6 +91,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     class TaskViewHolder extends RecyclerView.ViewHolder{
 
         TextView title, description, date, time;
+        CheckBox checkBox;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +99,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             description = (TextView) itemView.findViewById(R.id.todo_item_description);
             date = (TextView) itemView.findViewById(R.id.todo_item_date);
             time = (TextView) itemView.findViewById(R.id.todo_item_time);
+            checkBox = (CheckBox) itemView.findViewById(R.id.todo_item_checkbox);
         }
     }
 }

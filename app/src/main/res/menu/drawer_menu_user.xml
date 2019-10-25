@@ -12,10 +12,6 @@
             android:icon="@drawable/icon_menu_profile"
             android:title="@string/profile_txt"/>
 
-        <item
-            android:id="@+id/user_voice_command_option"
-            android:icon="@drawable/icon_menu_voice_command"
-            android:title="@string/voice_command_txt"/>
     </group>
 
     <group android:id="@+id/user_menu_middle">

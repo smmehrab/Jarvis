@@ -50,6 +50,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String TODO_MINUTE = "todo_minute";
 
     private static final String TODO_REMINDER_STATE = "todo_reminderState";
+    private static final String TODO_IS_COMPLETED = "todo_isCompleted";
 
     private static final String CREATE_TABLE_TODO = "CREATE TABLE " + TABLE_TODO + "(" +
             USER_ID + " INTEGER, "  +
@@ -64,6 +65,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             TODO_MINUTE + " TEXT, " +
 
             TODO_REMINDER_STATE + " INTEGER, " +
+            TODO_IS_COMPLETED + " INTEGER, " +
             "FOREIGN KEY(" + USER_ID + ") REFERENCES " + TABLE_USER + "(" + USER_ID + "), " +
             "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY +  ")); ";
 
@@ -188,22 +190,23 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long insertTodo(Task todoDetails){
+    public long insertTodo(Task task){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        Integer userId = todoDetails.getUserId();
-        String title = todoDetails.getTitle();
-        String description = todoDetails.getDescription();
+        Integer userId = task.getUserId();
+        String title = task.getTitle();
+        String description = task.getDescription();
 
-        String year = todoDetails.getYear();
-        String month = todoDetails.getMonth();
-        String day = todoDetails.getDay();
+        String year = task.getYear();
+        String month = task.getMonth();
+        String day = task.getDay();
 
-        String hour = todoDetails.getHour();
-        String minute = todoDetails.getMinute();
+        String hour = task.getHour();
+        String minute = task.getMinute();
 
-        Integer reminderState = todoDetails.getReminderState();
+        Integer reminderState = task.getReminderState();
+        Integer isCompleted = task.getIsCompleted();
 
         contentValues.put(USER_ID, userId);
         contentValues.put(TODO_TITLE, title);
@@ -217,27 +220,29 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TODO_MINUTE, minute);
 
         contentValues.put(TODO_REMINDER_STATE, reminderState);
+        contentValues.put(TODO_IS_COMPLETED, isCompleted);
 
         long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
         return rowId;
     }
 
-    public void updateTodo(Task todoDetails, String oldYear, String oldMonth, String oldDay,  String oldTitle){
+    public void updateTodo(Task task, String oldYear, String oldMonth, String oldDay, String oldTitle){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        Integer userId = todoDetails.getUserId();
-        String title = todoDetails.getTitle();
-        String description = todoDetails.getDescription();
+        Integer userId = task.getUserId();
+        String title = task.getTitle();
+        String description = task.getDescription();
 
-        String year = todoDetails.getYear();
-        String month = todoDetails.getMonth();
-        String day = todoDetails.getDay();
+        String year = task.getYear();
+        String month = task.getMonth();
+        String day = task.getDay();
 
-        String hour = todoDetails.getHour();
-        String minute = todoDetails.getMinute();
+        String hour = task.getHour();
+        String minute = task.getMinute();
 
-        Integer reminderState = todoDetails.getReminderState();
+        Integer reminderState = task.getReminderState();
+        Integer isCompleted = task.getIsCompleted();
 
         contentValues.put(USER_ID, userId);
         contentValues.put(TODO_TITLE, title);
@@ -251,12 +256,50 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TODO_MINUTE, minute);
 
         contentValues.put(TODO_REMINDER_STATE, reminderState);
+        contentValues.put(TODO_IS_COMPLETED, isCompleted);
 
         sqLiteDatabase.update(TABLE_TODO, contentValues,
                 USER_ID + " = ? AND " + TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
                 new String[] {userId+"", oldYear, oldMonth, oldDay, oldTitle});
     }
 
+    public void updateTodoDatabase(ArrayList<Task> tasks){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        for(int i=0; i<tasks.size(); i++){
+            ContentValues contentValues = new ContentValues();
+
+            Integer userId = tasks.get(i).getUserId();
+            String title =  tasks.get(i).getTitle();
+            String description =  tasks.get(i).getDescription();
+
+            String year =  tasks.get(i).getYear();
+            String month =  tasks.get(i).getMonth();
+            String day =  tasks.get(i).getDay();
+
+            String hour =  tasks.get(i).getHour();
+            String minute =  tasks.get(i).getMinute();
+
+            Integer reminderState =  tasks.get(i).getReminderState();
+
+            contentValues.put(USER_ID, userId);
+            contentValues.put(TODO_TITLE, title);
+            contentValues.put(TODO_DESCRIPTION, description);
+
+            contentValues.put(TODO_YEAR, year);
+            contentValues.put(TODO_MONTH, month);
+            contentValues.put(TODO_DAY, day);
+
+            contentValues.put(TODO_HOUR, hour);
+            contentValues.put(TODO_MINUTE, minute);
+
+            contentValues.put(TODO_REMINDER_STATE, reminderState);
+
+            sqLiteDatabase.update(TABLE_TODO, contentValues,
+                    USER_ID + " = ? AND " + TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
+                    new String[] {userId+"", year, month, day, title});
+        }
+    }
 
     public Task findTodo(Integer userId, String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -284,7 +327,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(cursor.getColumnIndex(TODO_HOUR)),
                 cursor.getString(cursor.getColumnIndex(TODO_MINUTE)),
 
-                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE))));
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE))),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_COMPLETED))));
     }
 
     public void deleteTodo(Integer userId, String year, String month, String day, String title){
@@ -298,11 +342,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Task> loadTodoItems(){
-        ArrayList<Task> todoDetails = new ArrayList<Task>();
+        ArrayList<Task> tasks = new ArrayList<Task>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO +
-                " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ";", null);
+                " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
         cursor.moveToPosition(0);
 
         if(cursor.getCount() == 0){
@@ -322,12 +366,13 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 String minute = cursor.getString(7);
 
                 Integer reminderState = Integer.parseInt(cursor.getString(8));
+                Integer isCompleted = Integer.parseInt(cursor.getString(9));
 
-                todoDetails.add(new Task(userId, title, description, year, month, day, hour, minute, reminderState));
+                tasks.add(new Task(userId, title, description, year, month, day, hour, minute, reminderState, isCompleted));
             }
         }
 
-        return todoDetails;
+        return tasks;
     }
 
     public Record findRecord(Integer userId, String year, String month, String day, String title, Integer type) {

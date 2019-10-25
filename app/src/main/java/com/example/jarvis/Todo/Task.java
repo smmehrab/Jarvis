@@ -9,7 +9,7 @@ public class Task {
     private String hour, minute;
 
     private Integer reminderState;
-    private Integer checked;
+    private Integer isCompleted;
 
     public Integer getUserId() {
         return userId;
@@ -83,12 +83,12 @@ public class Task {
         this.reminderState = reminderState;
     }
 
-    public Integer getChecked() {
-        return checked;
+    public Integer getIsCompleted() {
+        return isCompleted;
     }
 
-    public void setChecked(Integer checked) {
-        this.checked = checked;
+    public void setIsCompleted(Integer isCompleted) {
+        this.isCompleted = isCompleted;
     }
 
     public Task(Integer userId, String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState) {
@@ -101,6 +101,19 @@ public class Task {
         this.hour = hour;
         this.minute = minute;
         this.reminderState = reminderState;
-        this.checked = 0;
+        this.isCompleted = 0;
+    }
+
+    public Task(Integer userId, String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState, Integer isCompleted) {
+        this.userId = userId;
+        this.title = title;
+        this.description = description;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.reminderState = reminderState;
+        this.isCompleted = isCompleted;
     }
 }
