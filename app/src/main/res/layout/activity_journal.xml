@@ -16,45 +16,50 @@
             android:id="@+id/journal_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
             android:orientation="vertical"
-            android:padding="50dp"
-            android:weightSum="6">
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/journal_txt"
-                android:textAlignment="center"
-                android:textSize="28sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="3"
-                android:src="@drawable/image_journal" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2" />
 
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/journal_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/journal_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/icon_mic_disable"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
 
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingRight="20dp"
+        android:paddingBottom="30dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/journal_fab"

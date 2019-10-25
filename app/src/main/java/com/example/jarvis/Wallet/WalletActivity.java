@@ -119,8 +119,8 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         activityNavigationView = (NavigationView) findViewById(R.id.wallet_navigation_view);
         walletRecyclerView = findViewById(R.id.wallet_recycler_view);
 
-        progressBar = (ProgressBar) findViewById(R.id.todo_progress_bar);
-        voiceCommandToggleButton = (ToggleButton) findViewById(R.id.todo_voice_command_toggle_btn);
+        progressBar = (ProgressBar) findViewById(R.id.wallet_progress_bar);
+        voiceCommandToggleButton = (ToggleButton) findViewById(R.id.wallet_voice_command_toggle_btn);
     }
 
     public void setToolbar(){
@@ -520,12 +520,15 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         for (String result : matches)
             text += result + "\n";
 
+        showToast(matches.get(0));
+
         if(matches.get(0).equals("go to profile")){
-            Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("sync data")){
-            Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+            showToast("Data Synced");
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("turn off voice command")){
@@ -564,7 +567,23 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
-        } else {
+        }
+
+        else if(matches.get(0).equals("show activity options")){
+            activityDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("hide activity options")){
+            activityDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("show user options")){
+            userDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("hide user options")){
+            userDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        }
+
+        else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
             voiceCommandToggleButton.setChecked(false);
         }

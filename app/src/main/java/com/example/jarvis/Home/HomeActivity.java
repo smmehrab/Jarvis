@@ -518,11 +518,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         showToast(matches.get(0));
 
         if(matches.get(0).equals("go to profile")){
-            Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("sync data")){
-            Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+            showToast("Data Synced");
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("turn off voice command")){
@@ -562,7 +563,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(intent);
             finish();
-        } else {
+        }
+
+        else if(matches.get(0).equals("show activity options")){
+            activityDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("hide activity options")){
+            activityDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("show user options")){
+            userDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        } else if(matches.get(0).equals("hide user options")){
+            userDrawerBtn.callOnClick();
+            voiceCommandToggleButton.setChecked(false);
+        }
+
+        else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
             voiceCommandToggleButton.setChecked(false);
         }

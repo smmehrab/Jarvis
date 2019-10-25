@@ -16,12 +16,14 @@
             android:id="@+id/about_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:gravity="top"
+            android:layout_weight="10"
             android:orientation="vertical"
             android:weightSum="6">
 
@@ -55,6 +57,32 @@
             </LinearLayout>
 
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/about_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/about_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/icon_mic_disable"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
+
 
     </LinearLayout>
 

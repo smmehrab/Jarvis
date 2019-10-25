@@ -38,7 +38,7 @@
         </LinearLayout>
 
         <ProgressBar
-            android:id="@+id/todo_progress_bar"
+            android:id="@+id/wallet_progress_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -46,7 +46,7 @@
             android:visibility="invisible"/>
 
         <ToggleButton
-            android:id="@+id/todo_voice_command_toggle_btn"
+            android:id="@+id/wallet_voice_command_toggle_btn"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

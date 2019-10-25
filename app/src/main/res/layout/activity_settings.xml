@@ -16,11 +16,13 @@
             android:id="@+id/settings_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
             android:gravity="top"
             android:orientation="vertical"
             android:weightSum="6">
@@ -56,7 +58,49 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            android:id="@+id/settings_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/settings_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/icon_mic_disable"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
+
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="20dp"
+        android:paddingBottom="30dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/settings_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/icon_save"
+            app:elevation="4dp"
+            app:fabSize="normal"/>
+
+    </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/user_navigation_view"
