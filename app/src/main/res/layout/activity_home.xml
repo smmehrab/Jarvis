@@ -10,59 +10,125 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="12.5">
 
         <include
             android:id="@+id/home_toolbar"
             layout="@layout/action_bar_custom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-        <Button
-            android:id="@+id/todo_activity_btn"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/shape_rounded_rectangle"
-            android:text="@string/todo_txt"
-            android:elevation="4dp"
-            android:textColor="@color/colorWhite" />
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:layout_weight="10"
+            android:weightSum="10">
 
-        <Button
-            android:id="@+id/journal_activity_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/shape_rounded_rectangle"
-            android:text="@string/journal_txt"
-            android:elevation="4dp"
-            android:textColor="@color/colorWhite" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
 
-        <Button
-            android:id="@+id/wallet_activity_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/shape_rounded_rectangle"
-            android:text="@string/wallet_txt"
-            android:elevation="4dp"
-            android:textColor="@color/colorWhite" />
+            <Button
+                android:id="@+id/todo_activity_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/shape_rounded_rectangle"
+                android:text="@string/todo_txt"
+                android:elevation="4dp"
+                android:textColor="@color/colorWhite" />
 
-        <Button
-            android:id="@+id/reminder_activity_btn"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+            <Button
+                android:id="@+id/journal_activity_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/shape_rounded_rectangle"
+                android:text="@string/journal_txt"
+                android:elevation="4dp"
+                android:textColor="@color/colorWhite" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+            <Button
+                android:id="@+id/wallet_activity_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/shape_rounded_rectangle"
+                android:text="@string/wallet_txt"
+                android:elevation="4dp"
+                android:textColor="@color/colorWhite" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25" />
+
+            <Button
+                android:id="@+id/reminder_activity_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/shape_rounded_rectangle"
+                android:text="@string/reminder_txt"
+                android:elevation="4dp"
+                android:textColor="@color/colorWhite" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/home_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/shape_rounded_rectangle"
-            android:text="@string/reminder_txt"
-            android:elevation="4dp"
-            android:textColor="@color/colorWhite" />
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/home_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/icon_mic_disable"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
+
     </LinearLayout>
-
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/user_navigation_view"

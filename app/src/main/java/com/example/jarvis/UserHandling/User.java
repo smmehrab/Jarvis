@@ -1,7 +1,17 @@
 package com.example.jarvis.UserHandling;
 
-public class UserDetails {
-    private String email, password, confirmPassword;
+public class User {
+    private String email;
+    private String password;
+
+    public User(){
+
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     public String getEmail() {
         return email;
@@ -17,13 +27,5 @@ public class UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 }

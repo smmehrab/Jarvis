@@ -40,10 +40,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
         recordViewHolder.description.setText(records.get(position).getDescription());
         recordViewHolder.amount.setText(records.get(position).getAmount());
 
-        if(records.get(position).getType() == 1) {
+        if(records.get(position).getType() == 0) {
             recordViewHolder.amount.setTextColor(Color.parseColor("#F15B40"));
         }
-        else if(records.get(position).getType() == 2) {
+        else if(records.get(position).getType() == 1) {
             recordViewHolder.amount.setTextColor(Color.parseColor("#4CAF50"));
         }
     }

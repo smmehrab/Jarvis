@@ -31,27 +31,27 @@ import java.util.Calendar;
 
 public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
-    // Buttons
+    /** Buttons */
     private Button addBtn;
     private Button cancelBtn;
 
-    // Switch
+    /** Switch */
     private Switch remindMeSwitch;
 
-    // EditTexts
+    /** EditTexts */
     private EditText titleEditText;
     private EditText descriptionEditText;
     private EditText dateEditText;
     private EditText timeEditText;
 
-    // Task Variables
+    /** Task Variables */
     private Integer userId;
     private String title;
     private String description;
 
     private String day, month, year;
     private String hour, minute;
-    private Integer reminderState=0;
+    private Integer reminderState;
 
 
     @Override
@@ -123,38 +123,24 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void initializeUI(){
-        disableButton(addBtn);
+        /** Initializing variables */
+        title = null;
+        description = null;
+        hour = null;
+        minute = null;
+        reminderState = 0;
 
+        /** Formatting Present Date so that we can set the date on EditText */
         Calendar calendar = Calendar.getInstance();
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+        String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
-
+        /** Initializing UI */
+        dateEditText.setText(selectedDate);
         timeEditText.setText("Set Time");
-        hour = null;
-        minute = null;
-    }
-
-    public void showToast(String message){
-        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+        disableButton(addBtn);
     }
 
     @Override
@@ -163,17 +149,18 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
+            /** Getting the email of the current user */
             String currentUser = HomeActivity.getCurrentUser();
+
+            /** Getting the id of the current user */
             userId = sqLiteDatabaseHelper.getUserId(currentUser);
 
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
 
-            showToast(hour);
             Task task = new Task(userId, title, description, year, month, day, hour, minute, reminderState);
 
             sqLiteDatabaseHelper.insertTodo(task);
-            //showToast("Added");
             onBackPressed();
         }
         else if(view == cancelBtn){
@@ -199,35 +186,59 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onDateSet(DatePicker datePicker, int y, int m, int d) {
+        /** Formatting Selected Date so that we can set the date on EditText */
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m);
         calendar.set(Calendar.DAY_OF_MONTH, d);
+        String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
 
+        /** Setting Selected Date to the EditText */
+        dateEditText.setText(selectedDate);
+
+        /** Assigning Selected Date to the following variables
+         * so that we can use these variables to create task object */
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
-
-        String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
-        dateEditText.setText(currentDate);
     }
 
     @Override
     public void onTimeSet(TimePicker timePicker, int h, int m) {
-        String amPm;
-        if (h >= 12) {
-            amPm = " PM";
-        } else {
-            amPm = " AM";
-        }
-
+        /** Assigning Selected Time to the following variables
+         * so that we can use these variables to create task object */
         hour = Integer.toString(h);
         minute = Integer.toString(m);
 
-        if(h>=12)
+        /** Formatting Selected Time so that we can set the time on EditText */
+        String amPm = " AM";
+        if (h >= 12) {
+            amPm = " PM";
             h = h - 12;
+        }
+        String selectedTime = String.format("%02d:%02d", h, m) + amPm;
 
-        timeEditText.setText(String.format("%02d:%02d", h, m) + amPm);
+        /** Setting Selected Time to the EditText */
+        timeEditText.setText(selectedTime);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    public void showToast(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     void disableButton(Button button){

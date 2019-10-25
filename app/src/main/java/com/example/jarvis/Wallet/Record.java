@@ -2,9 +2,15 @@ package com.example.jarvis.Wallet;
 
 public class Record {
     private Integer userId;
-    private String title, description;
+    private String title;
+    private String description;
+
     private String year, month, day;
+
     private Integer type;
+    // Type 0 - Expense - Red
+    // Type 1 - Earning - Green
+
     private String amount;
 
     public Integer getUserId() {

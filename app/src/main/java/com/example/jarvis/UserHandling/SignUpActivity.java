@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +51,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     // Variable for Local Database
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
-    UserDetails userDetails;
+    User user;
 
 
     @Override
@@ -82,7 +83,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     void handleLocalDatabase(){
         sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
-        userDetails = new UserDetails();
+        user = new User();
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
     }
 
@@ -113,26 +114,25 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         String password = passEditTxt.getText().toString();
         String confirmPassword = confirmPassEditTxt.getText().toString();
 
-        userDetails.setEmail(email);
-        userDetails.setPassword(password);
-        userDetails.setConfirmPassword(confirmPassword);
+        if(TextUtils.isEmpty(email)){
+            showToast("Please, Enter a Valid Email Address!");
+        } else if(TextUtils.isEmpty(password)){
+            showToast("Please, Enter a Valid Password!");
+        } else if(!password.equals(confirmPassword)){
+            showToast("Password Didn't Match! Try Again!");
+        } else {
+            user.setEmail(email);
+            user.setPassword(password);
 
-        long rowId = sqLiteDatabaseHelper.insertUser(userDetails);
+            long rowId = sqLiteDatabaseHelper.insertUser(user);
 
-        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
-            if(rowId > 0){
-                Toast.makeText(getApplicationContext(), "Successfully Signed Up!",  Toast.LENGTH_SHORT).show();
+            if(rowId != -1){
                 Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
                 intent.putExtra("currentUser", email);
                 startActivity(intent);
+            } else {
+                showToast("Invalid Attempt! Try Again!");
             }
-            else{
-                Toast.makeText(getApplicationContext(), "Password Didn't Match!",  Toast.LENGTH_LONG).show();
-            }
-        }
-
-        else{
-            Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!",  Toast.LENGTH_LONG).show();
         }
     }
 
@@ -212,4 +212,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
+    public void showToast(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 }

@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.Task;
-import com.example.jarvis.UserHandling.UserDetails;
+import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -114,7 +114,7 @@ public class FirebaseDataAdd {
 
 // There must be a photo // We may have to create a class for user?
 
-    public void addUserDetails(UserDetails user){
+    public void addUserDetails(User user){
         Map<String , Object> data = new HashMap<>();
         data.put("userdetails ", user);
         refUser.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
