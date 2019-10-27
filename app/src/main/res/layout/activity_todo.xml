@@ -9,6 +9,7 @@
     tools:context=".Todo.TodoActivity">
 
     <LinearLayout
+        android:id="@+id/todo_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -48,7 +49,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:background="@drawable/bg_toggle_button"
-            android:foreground="@drawable/icon_mic_disable"
+            android:foreground="@drawable/fg_toggle_button"
             android:foregroundGravity="center"
             android:textOn=""
             android:textOff=""
