@@ -35,165 +35,157 @@
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:weightSum="27"
                     >
                     <ImageButton
                         android:id="@+id/action_undo"
                         android:layout_width="40dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/undo"
+                        android:src="@drawable/icon_undo"
                         />
 
                     <ImageButton
                         android:id="@+id/action_redo"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/redo"
+                        android:src="@drawable/icon_redo"
                         />
-                    -->
+
                     <ImageButton
                         android:id="@+id/action_bold"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/bold"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_italic"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/italic"
+                        android:src="@drawable/icon_italic"
                         />
 
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_subscript"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/subscript"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/subscript"
+                        android:textAllCaps="false"
                         />
 
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_superscript"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/superscript"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/superscript"
+                        android:textAllCaps="false"
                         />
 
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_strikethrough"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/strikethrough"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/strikethrough"
+                        android:textAllCaps="false"
                         />
+
 
                     <ImageButton
                         android:id="@+id/action_underline"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/underline"
+                        android:src="@drawable/icon_underline"
                         />
 
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading1"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:layout_marginRight="8dp"
-                        android:src="@drawable/h1"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading1"
+                        android:textAllCaps="false"
                         />
 
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading2"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:src="@drawable/h2"
-                        android:layout_marginRight="8dp"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading2"
+                        android:textAllCaps="false"
                         />
-
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading3"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:src="@drawable/h3"
-                        android:layout_marginRight="8dp"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading3"
+                        android:textAllCaps="false"
                         />
-
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading4"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:src="@drawable/h4"
-                        android:layout_marginRight="8dp"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading4"
+                        android:textAllCaps="false"
                         />
-
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading5"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:src="@drawable/h5"
-                        android:layout_marginRight="8dp"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading5"
+                        android:textAllCaps="false"
                         />
-
-                    <ImageButton
+                    <Button
                         android:id="@+id/action_heading6"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
-                        android:contentDescription="@null"
-                        android:src="@drawable/h6"
-                        android:layout_marginRight="8dp"
+                        android:background="@color/colorPrimary"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/heading6"
+                        android:textAllCaps="false"
                         />
+
 
                     <ImageButton
                         android:id="@+id/action_txt_color"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/txt_color"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_bg_color"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/bg_color"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
 
@@ -201,110 +193,99 @@
                         android:id="@+id/action_indent"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/indent"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_outdent"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/outdent"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_align_left"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/justify_left"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_align_center"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/justify_center"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_align_right"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/justify_right"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_insert_bullets"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/bullets"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_insert_numbers"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/numbers"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_blockquote"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/blockquote"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_insert_image"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/insert_image"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_insert_link"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/insert_link"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                     <ImageButton
                         android:id="@+id/action_insert_checkbox"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@null"
+                        android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@android:drawable/checkbox_on_background"
-                        android:layout_marginRight="8dp"
+                        android:src="@drawable/icon_bold"
                         />
 
                 </LinearLayout>

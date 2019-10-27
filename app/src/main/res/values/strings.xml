@@ -59,4 +59,17 @@
     <string name="sample_txt">Sample</string>
     <string name="update_txt">Update</string>
     <string name="sync_txt">Sync</string>
+
+    <string name="subscript">sub</string>
+    <string name="superscript">sup</string>
+    <string name="strikethrough">strike</string>
+
+    <string name="heading1">h1</string>
+    <string name="heading2">h2</string>
+    <string name="heading3">h3</string>
+    <string name="heading4">h4</string>
+    <string name="heading5">h5</string>
+    <string name="heading6">h6</string>
+
+
 </resources>
