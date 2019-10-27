@@ -340,7 +340,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:background="@drawable/bg_toggle_button"
-            android:foreground="@drawable/icon_mic_disable"
+            android:foreground="@drawable/fg_toggle_button"
             android:foregroundGravity="center"
             android:textOn=""
             android:textOff=""
