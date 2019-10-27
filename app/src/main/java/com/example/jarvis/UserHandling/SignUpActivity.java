@@ -52,6 +52,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     // Variable for Local Database
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
     User user;
+    // private int isSignedIN;
 
 
     @Override
@@ -123,6 +124,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             user.setEmail(email);
             user.setPassword(password);
+            // user.setIsSignedIN(1);
 
             long rowId = sqLiteDatabaseHelper.insertUser(user);
 
