@@ -21,7 +21,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     /*** Others ***/
     private Context context;
-    private static int VERSION_NUMBER = 5;
+    private static int VERSION_NUMBER = 8;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     /*** TABLE USER ***/
@@ -30,6 +30,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String USER_EMAIL = "user_email";
     private static final String USER_PASSWORD = "user_password";
     private static final String USER_CONFIRM_PASSWORD = "user_confirmPassword";
+    // private static final String isSignedIn = "is_signed_in";
 
     private static final String CREATE_TABLE_USER = "CREATE TABLE " + TABLE_USER + "(" +
             USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -97,6 +98,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_YEAR  + ", " + WALLET_MONTH + ", " + WALLET_DAY + ", " + WALLET_TYPE + ")); ";
 
 
+    /***Table Journal***/
+
+
+
     /*** Constructor ***/
     public SQLiteDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION_NUMBER);
@@ -137,13 +142,17 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         String getEmail = user.getEmail();
         String getPassword = user.getPassword();
+     //   int getisSignedIN = user.getisSignedIN();
 
         contentValues.put(USER_EMAIL, getEmail);
         contentValues.put(USER_PASSWORD, getPassword);
+       // contentValues.put(isSignedIn, getisSignedIN);
 
         long rowId = sqLiteDatabase.insert(TABLE_USER, null, contentValues);
         return rowId;
     }
+
+
 
     /*** To Find User ***/
     public Boolean findUser(String givenEmail, String givenPassword){
@@ -167,6 +176,16 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
         return result;
     }
+
+
+    /*public int isSignedIN(){
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
+        Boolean result = false;
+
+        return 0;
+    }*/
 
     /*** To Get UserId from User Email ***/
     public Integer getUserId(String givenEmail){

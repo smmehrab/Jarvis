@@ -51,6 +51,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     // Variable for Local Database
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
 
+    // User user;
+    // private int isSignedIn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +104,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void handleSignIn() {
+
+
+
         String email = emailEditTxt.getText().toString();
         String password = passEditTxt.getText().toString();
         //change a little
