@@ -4,18 +4,20 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,9 +51,10 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
-public class TodoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
+public class TodoActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener, View.OnTouchListener {
 
     /** Toolbar */
     private Toolbar toolbar;
@@ -76,7 +79,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<Task> tasks;
     TaskAdapter taskAdapter;
     RecyclerTouchListener touchListener;
-    CheckBox checkBox;
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -85,6 +87,10 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     private Intent recognizerIntent;
     private String LOG_TAG = "TodoActivity";
     private ToggleButton voiceCommandToggleButton;
+
+    private TextToSpeech mTTS;
+
+    private boolean isVcOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +106,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initializeVariables(){
         tasks = new ArrayList<Task>();
+        isVcOn = false;
     }
 
     void setUI(){
@@ -174,7 +181,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                                 break;
                         }
                     }
-                }).setLongClickable(false, new RecyclerTouchListener.OnRowLongClickListener() {
+                })
+                .setLongClickable(false, new RecyclerTouchListener.OnRowLongClickListener() {
             @Override
             public void onRowLongClicked(int position) {
 
@@ -186,7 +194,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    enableMic();
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar.setIndeterminate(true);
                     ActivityCompat.requestPermissions
@@ -194,13 +201,13 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                                     new String[]{Manifest.permission.RECORD_AUDIO},
                                     REQUEST_RECORD_PERMISSION);
                 } else {
-                    disableMic();
                     progressBar.setIndeterminate(false);
                     progressBar.setVisibility(View.INVISIBLE);
                     speech.stopListening();
                 }
             }
         });
+
     }
 
     public void initializeUI(){
@@ -278,9 +285,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-
-//        tasks = taskAdapter.getTasks();
-//        sqLiteDatabaseHelper.updateTodoDatabase(tasks);
 
         sqLiteDatabaseHelper.updateTodo(tasks.get(position), tasks.get(position).getYear(), tasks.get(position).getMonth(), tasks.get(position).getDay(), tasks.get(position).getTitle());
 
@@ -436,27 +440,33 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+
+        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = mTTS.setLanguage(Locale.ENGLISH);
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "Language not supported");
+                    } else {
+
+                    }
+                } else {
+                    Log.e("TTS", "Initialization failed");
+                }
+            }
+        });
     }
 
     public void isVoiceCommandOn(){
         if(getIntent().getExtras()!=null){
             if(getIntent().getExtras().getString("voice_command")!=null ){
                 if(Objects.equals(getIntent().getExtras().getString("voice_command"), "true")) {
-                    voiceCommandToggleButton.setChecked(true);
+                    enableVoiceCommand();
                 }
             }
-        }
-    }
-
-    public void disableMic(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            voiceCommandToggleButton.setForeground(getDrawable(R.drawable.icon_mic_disable));
-        }
-    }
-
-    public void enableMic(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            voiceCommandToggleButton.setForeground(getDrawable(R.drawable.icon_mic_enable));
         }
     }
 
@@ -501,26 +511,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onEndOfSpeech() {
-        Log.i(LOG_TAG, "onEndOfSpeech");
-        progressBar.setIndeterminate(true);
-        voiceCommandToggleButton.setChecked(true);
-    }
-
-    @Override
-    public void onError(int errorCode) {
-        String errorMessage = getErrorText(errorCode);
-
-        if (errorMessage.equals("Client side error")) {
-            voiceCommandToggleButton.setChecked(true);
-        } else {
-            Log.d(LOG_TAG, "FAILED " + errorMessage);
-            showToast(errorMessage);
-            voiceCommandToggleButton.setChecked(false);
-        }
-    }
-
-    @Override
     public void onEvent(int arg0, Bundle arg1) {
         Log.i(LOG_TAG, "onEvent");
     }
@@ -536,6 +526,12 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
+        progressBar.setProgress((int) rmsdB);
+    }
+
+    @Override
     public void onResults(Bundle results) {
         Log.i(LOG_TAG, "onResults");
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
@@ -543,8 +539,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         String text = "";
         for (String result : matches)
             text += result + "\n";
-
-        showToast(matches.get(0));
 
         if(matches.get(0).equals("go to profile")){
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
@@ -555,11 +549,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
-        } else if(matches.get(0).equals("turn off voice command")){
-            Intent intent = new Intent(getApplicationContext(), getApplicationContext().getClass());
-            intent.putExtra("voice_command", "false");
-            startActivity(intent);
-        } else if(matches.get(0).equals("go to home")){
+        }  else if(matches.get(0).equals("go to home")){
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
@@ -595,64 +585,283 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         else if(matches.get(0).equals("show activity options")){
             activityDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         } else if(matches.get(0).equals("hide activity options")){
             activityDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         } else if(matches.get(0).equals("show user options")){
             userDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         } else if(matches.get(0).equals("hide user options")){
             userDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         }
 
+
+        else if(matches.get(0).equals("add a new task")){
+
+        } else if(matches.get(0).equals("update a task")){
+
+        } else if(matches.get(0).equals("delete a task")){
+
+        } else if(matches.get(0).equals("mark a task as completed")){
+
+        }
+
+        else if(matches.get(0).equals("scroll up")){
+            disableVoiceCommand();
+            scroll(-1);
+        } else if(matches.get(0).equals("scroll down")){
+            disableVoiceCommand();
+            scroll(1);
+        } else if(matches.get(0).equals("turn off voice command")){
+            disableVoiceCommand();
+        }
+
+//        else if(matches.get(0).equals("read")){
+////            read();
+//        } else if(matches.get(0).equals("stop reading")){
+//
+//        }
         else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         }
     }
 
     @Override
-    public void onRmsChanged(float rmsdB) {
-        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
-        progressBar.setProgress((int) rmsdB);
+    public void onEndOfSpeech() {
+        Log.i(LOG_TAG, "onEndOfSpeech");
+        if(isVcOn) {
+            restartVoiceCommand();
+        }
+        else
+            disableVoiceCommand();
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+        if (errorMessage.equals("Client Side Error") || errorMessage.equals("No Such Command Found")  ||  errorMessage.equals("No Command Given")) {
+            restartVoiceCommand();
+        } else {
+            showToast(errorMessage.toUpperCase());
+            disableVoiceCommand();
+        }
+
+//        showToast(errorMessage.toUpperCase());
+//        restartVoiceCommand();
     }
 
     public static String getErrorText(int errorCode) {
         String message;
         switch (errorCode) {
             case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
+                message = "Audio Recording Error";
                 break;
             case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
+                message = "Client Side Error";
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
+                message = "Insufficient Permissions";
                 break;
             case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
+                message = "Network Error";
                 break;
             case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
+                message = "Network Found";
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
+                message = "No Such Command Found";
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
+                message = "Recognition Service Busy";
                 break;
             case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
+                message = "Server Error";
                 break;
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
+                message = "No Command Given";
                 break;
             default:
-                message = "Didn't understand, please try again.";
+                message = "Didn't Understand. Please, Try Again!";
                 break;
         }
         return message;
+    }
+
+    public void disableVoiceCommand(){
+        isVcOn = false;
+        voiceCommandToggleButton.setChecked(false);
+    }
+
+    public void enableVoiceCommand(){
+        isVcOn = true;
+        voiceCommandToggleButton.setChecked(true);
+    }
+
+    public void restartVoiceCommand(){
+        voiceCommandToggleButton.setChecked(true);
+    }
+
+    //********************************************************
+
+    public void scroll(Integer difference){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        if(difference==1) {
+            todoRecyclerView.smoothScrollBy(0, height, null);
+        }
+        else {
+            todoRecyclerView.smoothScrollBy(0, - height, null);
+        }
+//
+//        todoRecyclerView.setLayoutManager(new SpeedyLinearLayoutManager(getApplicationContext(), SpeedyLinearLayoutManager.VERTICAL, false));
+//        RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(getApplicationContext()) {
+//            @Override protected int getVerticalSnapPreference() {
+//                return LinearSmoothScroller.SNAP_TO_START;
+//            }
+//        };
+//
+//        int range;
+//        if(difference==-1)
+//            range = todoRecyclerView.getVerticalScrollbarPosition()+1;
+//        else
+//            range = todoRecyclerView.getAdapter().getItemCount()-todoRecyclerView.getVerticalScrollbarPosition()-1;
+//
+//        int interval = 700;
+//
+//        CountDownTimer scrollThread = new CountDownTimer((range)*interval, interval){
+//            int position = todoRecyclerView.getVerticalScrollbarPosition();
+//            @Override
+//            public void onTick(long l) {
+//                smoothScroller.setTargetPosition(position);
+//                todoRecyclerView.getLayoutManager().startSmoothScroll(smoothScroller);
+//                position+=difference;
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                showToast("That's All");
+//            }
+//        };
+//
+//        scrollThread.start();
+    }
+
+    // For Auto Reader
+    private final Handler readingHandler = new Handler();
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        if(view.getId() == R.id.todo_drawer_layout)
+            disableVoiceCommand();
+        return true;
+    }
+
+    public class readingRunnable implements Runnable {
+        int i=0;
+        String isCompleted, time, date, amPm, speech;
+        Task task;
+        ArrayList<Task> tasks;
+
+        public readingRunnable(ArrayList<Task> tasks) {
+            this.tasks = tasks;
+        }
+
+        @Override
+        public void run() {
+            if (task.getIsCompleted() == 1)
+                isCompleted = " is completed ";
+            else
+                isCompleted = " is to be completed ";
+
+            /** Formatting Date to set on EditText */
+            String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "Deccember"};
+            date = "on " + task.getDay() + " " + months[Integer.parseInt(task.getMonth())] + ", " + task.getYear();
+
+
+            /** Formatting Time to set on EditText */
+            if (task.getHour() != null && task.getMinute() != null) {
+                if (Integer.parseInt(task.getHour()) >= 12)
+                    amPm = " PM";
+                else
+                    amPm = " AM";
+                time = " at" + Integer.toString(Integer.parseInt(task.getHour()) % 12) + ":" + task.getMinute() + amPm;
+            } else
+                time = "";
+
+            showToast("Task " + task.getTitle() + isCompleted + time + date);
+            speech = "Task " + task.getTitle() + isCompleted + time + date;
+
+            mTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+            readingHandler.postDelayed(this, 5000);
+        }
+    }
+    private void read() {
+        mTTS.setPitch((float) 0.8);
+        mTTS.setSpeechRate((float) 0.9);
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        tasks = sqLiteDatabaseHelper.loadTodoItems();
+
+        readingRunnable readingObject = new readingRunnable(tasks);
+        readingHandler.post(readingObject);
+
+        Runnable runnable = new readingRunnable(tasks);
+        new Thread(runnable).start();
+
+
+        CountDownTimer readingThread = new CountDownTimer(5000*tasks.size(), 5000){
+            int i=0;
+            String isCompleted, time, date, amPm, speech;
+            Task task;
+
+            @Override
+            public void onTick(long l) {
+                task = tasks.get(i);
+                if(task.getIsCompleted()==1)
+                    isCompleted = " is completed ";
+                else
+                    isCompleted = " is to be completed ";
+
+                /** Formatting Date to set on EditText */
+                String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "Deccember"};
+                date = "on " + task.getDay() + " " + months[Integer.parseInt(task.getMonth())] + ", " + task.getYear();
+
+
+                /** Formatting Time to set on EditText */
+                if(task.getHour()!=null && task.getMinute()!=null){
+                    if(Integer.parseInt(task.getHour())>=12)
+                        amPm = " PM";
+                    else
+                        amPm = " AM";
+                    time = " at" + Integer.toString(Integer.parseInt(task.getHour()) % 12) + ":" + task.getMinute() + amPm;
+                }
+                else
+                    time = "";
+
+                showToast("Task " + task.getTitle() + isCompleted + time + date);
+                speech = "Task " + task.getTitle() + isCompleted + time + date;
+
+                mTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+
+                i++;
+            }
+
+            @Override
+            public void onFinish() {
+//                showToast("That's all for now.");
+                speech = "That's all for now.";
+
+                mTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        };
+
+        readingThread.start();
     }
 }

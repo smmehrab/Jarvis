@@ -345,8 +345,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Task> tasks = new ArrayList<Task>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_TODO +
                 " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
+
         cursor.moveToPosition(0);
 
         if(cursor.getCount() == 0){

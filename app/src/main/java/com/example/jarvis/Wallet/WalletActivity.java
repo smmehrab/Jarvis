@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
@@ -179,7 +178,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    enableMic();
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar.setIndeterminate(true);
                     ActivityCompat.requestPermissions
@@ -187,7 +185,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
                                     new String[]{Manifest.permission.RECORD_AUDIO},
                                     REQUEST_RECORD_PERMISSION);
                 } else {
-                    disableMic();
                     progressBar.setIndeterminate(false);
                     progressBar.setVisibility(View.INVISIBLE);
                     speech.stopListening();
@@ -421,18 +418,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
                     voiceCommandToggleButton.setChecked(true);
                 }
             }
-        }
-    }
-
-    public void disableMic(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            voiceCommandToggleButton.setForeground(getDrawable(R.drawable.icon_mic_disable));
-        }
-    }
-
-    public void enableMic(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            voiceCommandToggleButton.setForeground(getDrawable(R.drawable.icon_mic_enable));
         }
     }
 
