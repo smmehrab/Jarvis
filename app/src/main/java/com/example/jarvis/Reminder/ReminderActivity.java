@@ -26,6 +26,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
@@ -34,6 +36,9 @@ import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.RecyclerTouchListener;
+import com.example.jarvis.Wallet.Record;
+import com.example.jarvis.Wallet.RecordAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -61,6 +66,19 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
 
     /** FAB */
     private FloatingActionButton fab;
+
+    /*******/
+
+    /** RecyclerView Variables */
+    RecyclerView reminderRecyclerView;
+    ArrayList<Record> records;
+    RecordAdapter recordAdapter;
+
+    RecyclerTouchListener touchListener;
+
+    /********/
+
+
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -97,6 +115,8 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         activityNavigationView = (NavigationView) findViewById(R.id.reminder_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
 
+        // reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
+
         progressBar = (ProgressBar) findViewById(R.id.reminder_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.reminder_voice_command_toggle_btn);
     }
@@ -119,6 +139,40 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
+
+        // Recycler View
+       // walletRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        // Swipe Options
+        touchListener = new RecyclerTouchListener(this,reminderRecyclerView);
+        touchListener
+                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+                    @Override
+                    public void onRowClicked(int position) {
+                        Toast.makeText(getApplicationContext(),records.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onIndependentViewClicked(int independentViewID, int position) {
+
+                    }
+                })
+                .setSwipeOptionViews(R.id.wallet_item_delete_rl,R.id.wallet_item_edit_rl)
+                .setSwipeable(R.id.wallet_item_fg, R.id.wallet_item_bg, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+                    @Override
+                    public void onSwipeOptionClicked(int viewID, int position) {
+                        switch (viewID){
+                            case R.id.wallet_item_delete_rl:
+                            //    handleDeleteAction(position);
+                                break;
+                            case R.id.wallet_item_edit_rl:
+                             //   handleEditAction(position);
+                                break;
+                        }
+                    }
+                });
+        /****************/
 
         // Voice Command On/Off
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
