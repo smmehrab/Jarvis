@@ -100,8 +100,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         mEditor = (RichEditor) findViewById(R.id.editor);
 
         mEditor.setEditorHeight(200);
-        mEditor.setEditorFontSize(22);
-        mEditor.setEditorFontColor(Color.RED);
+        mEditor.setEditorFontSize(16);
+        mEditor.setEditorFontColor(Color.BLACK);
+
         //mEditor.setEditorBackgroundColor(Color.BLUE); //
         //mEditor.setBackgroundColor(Color.BLUE);
         //mEditor.setBackgroundResource(R.drawable.bg); //
@@ -109,7 +110,8 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg"); //
         mEditor.setPlaceholder("Insert text here...");
         //mEditor.setInputEnabled(false);
-
+      //  mEditor.clearFocusEditor();
+        //mEditor.setO
         /******/
 
         //mPreview = (TextView) findViewById(R.id.preview);
@@ -119,7 +121,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
             }
         });*/
 
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+       mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
             @Override
             public void onTextChange(String text) {
                 writeToFile(text);
@@ -228,7 +230,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
             private boolean isChanged;
 
             @Override public void onClick(View v) {
-                mEditor.setTextBackgroundColor(isChanged ? Color.TRANSPARENT : Color.YELLOW);
+                mEditor.setTextBackgroundColor(isChanged ? Color.WHITE : Color.YELLOW);
                 isChanged = !isChanged;
             }
         });
@@ -312,6 +314,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void writeToFile(String text){
+
         try {
             FileOutputStream fileOutputStream = openFileOutput("journal.txt", Context.MODE_PRIVATE);
             fileOutputStream.write(text.getBytes());

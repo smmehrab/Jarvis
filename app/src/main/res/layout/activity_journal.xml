@@ -176,7 +176,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_txt_color"
                         />
 
                     <ImageButton
@@ -185,7 +185,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_bg_color"
                         />
 
 
@@ -195,7 +195,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_indent"
                         />
 
                     <ImageButton
@@ -204,7 +204,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_outdent"
                         />
 
                     <ImageButton
@@ -213,7 +213,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_align_left"
                         />
 
                     <ImageButton
@@ -222,7 +222,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_align_center"
                         />
 
                     <ImageButton
@@ -231,7 +231,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_align_right"
                         />
 
                     <ImageButton
@@ -240,7 +240,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_insert_bullets"
                         />
 
                     <ImageButton
@@ -249,7 +249,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_insert_numbers"
                         />
 
                     <ImageButton
@@ -258,7 +258,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_blockquote"
                         />
 
                     <ImageButton
@@ -267,7 +267,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_insert_image"
                         />
 
                     <ImageButton
@@ -276,7 +276,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_insert_link"
                         />
 
                     <ImageButton
@@ -285,7 +285,7 @@
                         android:layout_height="48dp"
                         android:background="@color/colorPrimary"
                         android:contentDescription="@null"
-                        android:src="@drawable/icon_bold"
+                        android:src="@drawable/icon_insert_checkbox"
                         />
 
                 </LinearLayout>
@@ -295,7 +295,9 @@
                 android:id="@+id/editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 />
+
             <!--
             <TextView
                 android:id="@+id/preview"
