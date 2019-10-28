@@ -69,6 +69,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
 
     /*******/
 
+
     /** RecyclerView Variables */
     RecyclerView reminderRecyclerView;
     ArrayList<Record> records;
@@ -338,7 +339,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         return true;
     }
 
-    /** VOICE COMMAND HANDLING */
+    /** VOICE COMMAND HANDLING **/
 
     public void setVoiceCommandFeature(){
         speech = SpeechRecognizer.createSpeechRecognizer(this);
