@@ -223,7 +223,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-        sqLiteDatabaseHelper.deleteRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),
+        sqLiteDatabaseHelper.deleteRecord(
                 records.get(position).getYear(), records.get(position).getMonth(), records.get(position).getDay(),
                 records.get(position).getTitle(),
                 records.get(position).getType());
@@ -237,13 +237,14 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-        Record record = sqLiteDatabaseHelper.findRecord(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),
+        Record record = sqLiteDatabaseHelper.findRecord(
                 records.get(position).getYear(),records.get(position).getMonth(),records.get(position).getDay(),
                 records.get(position).getTitle(),
-                records.get(position).getType());
+                records.get(position).getType()
+        );
 
         Intent intent = new Intent(getApplicationContext(), UpdateRecordActivity.class);
-        intent.putExtra("user_id", record.getUserId().toString());
+
         intent.putExtra("wallet_title", record.getTitle());
         intent.putExtra("wallet_description", record.getDescription());
 
@@ -254,7 +255,11 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         intent.putExtra("wallet_type", record.getType().toString());
         intent.putExtra("wallet_amount", record.getAmount());
 
-        showToast("Edit Action");
+        intent.putExtra("wallet_isDeleted", record.getIsDeleted().toString());
+        intent.putExtra("wallet_isIgnored", record.getIsIgnored().toString());
+
+        intent.putExtra("wallet_updateTimestamp", record.getUpdateTimestamp());
+
         startActivity(intent);
     }
 

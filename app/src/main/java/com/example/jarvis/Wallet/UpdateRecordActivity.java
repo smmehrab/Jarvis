@@ -18,7 +18,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.CustomSpinnerAdapter;
@@ -46,7 +45,6 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     private EditText amountEditText;
 
     /** Record Variables (Current) */
-    private Integer userId;
     private String title;
     private String description;
 
@@ -57,7 +55,11 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     // Type 1 - Earning - Green
 
     private String amount;
-    private String date;
+
+    private Integer isDeleted = 0;
+    private Integer isIgnored = 0;
+
+    private String updateTimestamp=null;
 
     /** Record Variables (Old) */
     private String oldTitle;
@@ -68,6 +70,12 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
     private Integer oldType=0;
     private String oldAmount;
 
+    private Integer oldIsDeleted = 0;
+    private Integer oldIsIgnored = 0;
+
+    private String oldUpdateTimestamp=null;
+
+    private String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,8 +185,7 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
 
     public void getDataFromWalletActivity(){
         if(getIntent().getExtras() != null) {
-            /** Getting Old Data from Wallet Activity */
-            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+            // Getting Old Data from Wallet Activity
             oldTitle = getIntent().getExtras().getString("wallet_title");
             oldDescription = getIntent().getExtras().getString("wallet_description");
 
@@ -188,11 +195,17 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
 
             oldType = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_type")));
             oldAmount = getIntent().getExtras().getString("wallet_amount");
+
+            oldIsDeleted = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_isDeleted")));
+            oldIsIgnored = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("wallet_isIgnored")));
+
+            oldUpdateTimestamp = getIntent().getExtras().getString("wallet_updateTimestamp");
+
         }
     }
 
     public void initializeUI(){
-        /** Initializing Current Data as Old Data */
+        // Initializing Current Data as Old Data
         title = oldTitle;
         description = oldDescription;
 
@@ -203,11 +216,16 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
         type = oldType;
         amount = oldAmount;
 
-        /** Formatting Date to set on EditText */
+        isDeleted = oldIsDeleted;
+        isIgnored = oldIsIgnored;
+
+        updateTimestamp = oldUpdateTimestamp;
+
+        // Formatting Date to set on EditText
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         date = day + " " + months[Integer.parseInt(month)] + ", " + year;
 
-        /** Initialize UI with the old(received) data */
+        // Initialize UI with the old(received) data
         titleEditText.setText(oldTitle);
         descriptionEditText.setText(oldDescription);
 
@@ -245,17 +263,32 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
-            String currentUser = HomeActivity.getCurrentUser();
-            userId = sqLiteDatabaseHelper.getUserId(currentUser);
-
-            description = descriptionEditText.getText().toString();
             title = titleEditText.getText().toString();
+            description = descriptionEditText.getText().toString();
             amount = amountEditText.getText().toString();
 
-            Record record = new Record(userId, title, description, year, month, day, type, amount);
+            // Getting Current Timestamp
+            Long tsLong = System.currentTimeMillis()/1000;
+            String ts = tsLong.toString();
+            updateTimestamp = ts;
+            oldUpdateTimestamp = updateTimestamp;
 
-            sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
-            showToast("Updated");
+            if(!(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay) && title.equals(oldTitle) && type.equals(oldType))){
+                // Primary Key Field Violated
+                oldIsIgnored = 1;
+
+                // Ignore Existing Record
+                Record record = new Record(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldType, oldAmount, isDeleted, isIgnored, oldUpdateTimestamp);
+                sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
+
+                // Add New Record
+                record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp);
+                sqLiteDatabaseHelper.insertRecord(record);
+            } else {
+                Record record = new Record(title, description, year, month, day, type, amount);
+                sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
+            }
+
             onBackPressed();
         }
         else if(view == cancelBtn){
@@ -265,28 +298,42 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
 
     @Override
     public void onDateSet(DatePicker datePicker, int y, int m, int d) {
-        /** Formatting Selected Date so that we can set the date on EditText */
+        // Formatting Selected Date so that we can set the date on EditText
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m);
         calendar.set(Calendar.DAY_OF_MONTH, d);
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        /** Setting Selected Date to the EditText */
+        // Setting Selected Date to the EditText
         dateEditText.setText(currentDate);
 
-        /** Assigning Selected Date to the following variables
-         * so that we can use these variables to create task object */
+        // Assigning Selected Date to the following variables
+        // so that we can use these variables to create task object
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
 
-        /** Checking if date has been updated or not */
+        // Checking if date has been updated or not
         if(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))
             disableButton(updateBtn);
         else
             enableButton(updateBtn);
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
 
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
@@ -306,16 +353,4 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
         button.setClickable(true);
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
 }

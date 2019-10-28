@@ -1,7 +1,6 @@
 package com.example.jarvis.Wallet;
 
 public class Record {
-    private Integer userId;
     private String title;
     private String description;
 
@@ -13,12 +12,22 @@ public class Record {
 
     private String amount;
 
-    public Integer getUserId() {
-        return userId;
-    }
+    private Integer isDeleted;
+    private Integer isIgnored;
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    private String updateTimestamp;
+
+    public Record(String title, String description, String year, String month, String day, Integer type, String amount, Integer isDeleted, Integer isIgnored, String updateTimestamp) {
+        this.title = title;
+        this.description = description;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.type = type;
+        this.amount = amount;
+        this.isDeleted = isDeleted;
+        this.isIgnored = isIgnored;
+        this.updateTimestamp = updateTimestamp;
     }
 
     public String getTitle() {
@@ -77,8 +86,31 @@ public class Record {
         this.amount = amount;
     }
 
-    public Record(Integer userId, String title, String description, String year, String month, String day, Integer type, String amount) {
-        this.userId = userId;
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Integer getIsIgnored() {
+        return isIgnored;
+    }
+
+    public void setIsIgnored(Integer isIgnored) {
+        this.isIgnored = isIgnored;
+    }
+
+    public String getUpdateTimestamp() {
+        return updateTimestamp;
+    }
+
+    public void setUpdateTimestamp(String updateTimestamp) {
+        this.updateTimestamp = updateTimestamp;
+    }
+
+    public Record(String title, String description, String year, String month, String day, Integer type, String amount) {
         this.title = title;
         this.description = description;
         this.year = year;
@@ -86,5 +118,12 @@ public class Record {
         this.day = day;
         this.type = type;
         this.amount = amount;
+        this.isDeleted = 0;
+        this.isIgnored = 0;
+
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+
+        this.updateTimestamp = ts;
     }
 }

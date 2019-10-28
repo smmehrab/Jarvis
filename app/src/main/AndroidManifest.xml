@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Wallet.UpdateRecordActivity"></activity>
+        <activity android:name=".Journal.AddJournalActivity"></activity>
+        <activity android:name=".Wallet.UpdateRecordActivity" />
         <activity android:name=".Todo.UpdateTaskActivity" />
         <activity android:name=".Reminder.AddReminderActivity" />
         <activity android:name=".Wallet.AddRecordActivity" />
@@ -23,8 +24,9 @@
         <activity android:name=".Settings.SettingsActivity" />
         <activity android:name=".Reminder.ReminderActivity" />
         <activity android:name=".Wallet.WalletActivity" />
-        <activity android:name=".Journal.JournalActivity" android:windowSoftInputMode = "adjustPan|stateVisible" />
-
+        <activity
+            android:name=".Journal.JournalActivity"
+            android:windowSoftInputMode="adjustPan|stateVisible" />
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
         <activity android:name=".UserHandling.ResetPassActivity" />

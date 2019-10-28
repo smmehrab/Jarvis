@@ -20,7 +20,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
@@ -45,14 +44,18 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
     private EditText timeEditText;
 
     /** Task Variables */
-    private Integer userId;
+    private Integer uid;
     private String title;
     private String description;
 
     private String day, month, year;
     private String hour, minute;
     private Integer reminderState;
+    private Integer isCompleted;
+    private Integer isDeleted;
+    private Integer isIgnored;
 
+    private String updateTimestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +133,15 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
         minute = null;
         reminderState = 0;
 
+        isCompleted = 0;
+        isDeleted = 0;
+        isIgnored = 0;
+
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+
+        updateTimestamp = ts;
+
         /** Formatting Present Date so that we can set the date on EditText */
         Calendar calendar = Calendar.getInstance();
         year = Integer.toString(calendar.get(Calendar.YEAR));
@@ -149,16 +161,16 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
-            /** Getting the email of the current user */
-            String currentUser = HomeActivity.getCurrentUser();
-
-            /** Getting the id of the current user */
-            userId = sqLiteDatabaseHelper.getUserId(currentUser);
-
+            // Getting Current Title & Description
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
 
-            Task task = new Task(userId, title, description, year, month, day, hour, minute, reminderState);
+            // Getting Current Timestamp
+            Long tsLong = System.currentTimeMillis()/1000;
+            String ts = tsLong.toString();
+            updateTimestamp = ts;
+
+            Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
 
             sqLiteDatabaseHelper.insertTodo(task);
             onBackPressed();

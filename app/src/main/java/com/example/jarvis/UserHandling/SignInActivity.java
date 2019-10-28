@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +28,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -60,21 +60,24 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        settingUpXmlElements();
+        setUI();
 
         handleLocalDatabase();
         handleRemoteDatabase();
     }
 
-    void settingUpXmlElements(){
+    void setUI(){
+        findXmlElements();
+        setListeners();
+    }
+
+    void findXmlElements(){
         signInBtn = (Button) findViewById(R.id.sign_in_btn);
         signInWithGoogleBtn = (Button) findViewById(R.id.sign_in_with_google_btn);
         forgotPassBtn = (Button) findViewById(R.id.forgot_pass_btn);
 
         emailEditTxt = (EditText) findViewById(R.id.sign_in_email_edit_txt);
         passEditTxt = (EditText) findViewById(R.id.sign_in_pass_edit_txt);
-
-        setListeners();
     }
 
     void setListeners(){
@@ -95,7 +98,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private void initializeGoogleVariable() {
         mAuth = FirebaseAuth.getInstance();
 
-        // Configure Google sign in
+        // Configuring Google Sign In
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -104,29 +107,27 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
 
-    void handleSignIn() {
+//    void handleSignIn() {
+//        String email = emailEditTxt.getText().toString();
+//        String password = passEditTxt.getText().toString();
+//        //change a little
+//        Boolean result;
+//        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+//            result = sqLiteDatabaseHelper.findUser(email, password);
+//
+//            if (result) {
+//                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+//                intent.putExtra("currentUser", email);
+//                startActivity(intent);
+//            } else {
+//                Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//        else
+//            Toast.makeText(getApplicationContext(), "Text Field can't be empty!!!", Toast.LENGTH_SHORT).show();
+//
+//    }
 
-
-
-        String email = emailEditTxt.getText().toString();
-        String password = passEditTxt.getText().toString();
-        //change a little
-        Boolean result;
-        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-            result = sqLiteDatabaseHelper.findUser(email, password);
-
-            if (result) {
-                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                intent.putExtra("currentUser", email);
-                startActivity(intent);
-            } else {
-                Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else
-            Toast.makeText(getApplicationContext(), "Text Field can't be empty!!!", Toast.LENGTH_SHORT).show();
-
-    }
     void handleSignInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -141,7 +142,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         if(view == signInBtn){
-            handleSignIn();
+//            handleSignIn();
         }
 
         else if(view == signInWithGoogleBtn){
@@ -185,47 +186,37 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-       // Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
-
-        // Ekhan theke ekta progressbar diye dis vala hoibo
-        ///showProgressDialog();
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                           // Log.d(TAG, "signInWithCredential:success");
+
                             String deviceId = findDeviceId();
                             FirebaseUser user = mAuth.getCurrentUser();
+
                             Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
 
+                            intent.putExtra("uid", mAuth.getUid());
+                            intent.putExtra("email", acct.getEmail());
+                            intent.putExtra("name", acct.getDisplayName());
+                            intent.putExtra("photo", Objects.requireNonNull(acct.getPhotoUrl()).toString());
                             intent.putExtra("deviceId", deviceId);
+
 
                             startActivity(intent);
                             finish();
-                            //updateUI(user);
+
                         } else {
-                            // If sign in fails, display a message to the user.
-                           // Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            // updateUI(null);
                         }
-
-
-                        // Eikhane progress bar tare shesh korbi Ok?
-
-                        // ...
                     }
                 });
     }
 
     public String findDeviceId(){
-        String id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
-                Settings.Secure.ANDROID_ID);
+        String id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         return id;
     }
 }

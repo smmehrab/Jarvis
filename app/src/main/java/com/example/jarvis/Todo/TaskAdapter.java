@@ -40,9 +40,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder taskViewHolder, int position) {
+        // Set Title & Description
         taskViewHolder.title.setText(tasks.get(position).getTitle());
         taskViewHolder.description.setText(tasks.get(position).getDescription());
 
+        // Set Date
         String date = null;
         String[] month = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         date = tasks.get(position).getDay() + " " +
@@ -50,6 +52,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 tasks.get(position).getYear();
         taskViewHolder.date.setText(date);
 
+        // Set Time
         String time = null;
         if(tasks.get(position).getHour()!=null && tasks.get(position).getMinute()!=null) {
             Integer hour = Integer.parseInt(tasks.get(position).getHour());
@@ -62,25 +65,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
         taskViewHolder.time.setText(time);
 
+        // Set Checkbox
         taskViewHolder.checkBox.setOnCheckedChangeListener(null);
-
         if(tasks.get(position).getIsCompleted() == 0)
             taskViewHolder.checkBox.setChecked(false);
         else
             taskViewHolder.checkBox.setChecked(true);
-
-//        taskViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if(isChecked) {
-//                    tasks.get(taskViewHolder.getAdapterPosition()).setIsCompleted(1);
-//                }
-//                else {
-//                    tasks.get(taskViewHolder.getAdapterPosition()).setIsCompleted(0);
-//                }
-//            }
-//        });
-
     }
 
     @Override

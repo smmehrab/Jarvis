@@ -1,18 +1,28 @@
 package com.example.jarvis.UserHandling;
 
 public class User {
+    private String uid;
     private String email;
-    private String password;
-    // private int isSignedIN;
+    private String name;
+    private String photo;
+    private String device;
+    private String syncTime;
 
-    public User(){
-
+    public User(String uid, String email, String name, String photo, String device, String syncTime) {
+        this.uid = uid;
+        this.email = email;
+        this.name = name;
+        this.photo = photo;
+        this.device = device;
+        this.syncTime = syncTime;
     }
 
-    public User(String email, String password, int isSignedIN) {
-        this.email = email;
-        this.password = password;
-        // this.isSignedIN = isSignedIN;
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getEmail() {
@@ -23,19 +33,35 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getName() {
+        return name;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    /*public int getisSignedIN() {
-        return isSignedIN;
-    }*/
+    public String getPhoto() {
+        return photo;
+    }
 
-    /*public void setIsSignedIN (int isSignedIN) {
-        this.isSignedIN = isSignedIN;
-    }*/
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
+    public String getSyncTime() {
+        return syncTime;
+    }
+
+    public void setSyncTime(String syncTime) {
+        this.syncTime = syncTime;
+    }
 }

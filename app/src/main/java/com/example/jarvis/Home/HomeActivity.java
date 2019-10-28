@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -50,38 +49,38 @@ import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
 
-    //  Variables for Remote Database
+    /** Firebase Variables */
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
     GoogleSignInOptions googleSignInOptions;
 
+    /** Navigation Drawer Variables */
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
     private NavigationView userNavigationView;
     private NavigationView activityNavigationView;
 
-    private Toolbar toolbar;
 
+    /** Toolbar Variables */
+    private Toolbar toolbar;
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
 
+    /** Buttons */
     private Button todoActivityBtn;
     private Button journalActivityBtn;
     private Button walletActivityBtn;
     private Button reminderActivityBtn;
 
-    private boolean doubleBackToExitPressedOnce = false;
-
-    private static String currentUser = null;
+    /** currentUser Information Variables */
     private static String deviceId = null;
-
-
-    private LinearLayout vcLinearLayout;
-    private boolean vcState=false;
-    private Button vcBtn;
+    private static String currentUid = null;
+    private static String currentUser = null;
+    private static String currentUserName = null;
+    private static String currentUserPhoto = null;
 
     /** Speech to Text Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -90,6 +89,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Intent recognizerIntent;
     private String LOG_TAG = "HomeActivity";
     private ToggleButton voiceCommandToggleButton;
+
+    /** Others */
+    private boolean doubleBackToExitPressedOnce = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +107,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setWelcomeMessage(){
         if(getIntent().getExtras() != null) {
-            currentUser = getIntent().getExtras().getString("currentUser");
-//            if(currentUser!=null)
-//                showToast("Signed Up As " + currentUser);
             deviceId = getIntent().getExtras().getString("deviceId");
-            if(deviceId!=null)
-                showToast(deviceId);
+            currentUid = getIntent().getExtras().getString("uid");
+            currentUser = getIntent().getExtras().getString("email");
+            currentUserName = getIntent().getExtras().getString("name");
+            currentUserPhoto = getIntent().getExtras().getString("photo");
         }
     }
 
@@ -191,27 +193,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public void setVoiceCommandFeature(){
-        speech = SpeechRecognizer.createSpeechRecognizer(this);
-        Log.i(LOG_TAG, "isRecognitionAvailable: " + SpeechRecognizer.isRecognitionAvailable(this));
-        speech.setRecognitionListener(this);
-
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-    }
-
-    public void isVoiceCommandOn(){
-        if(getIntent().getExtras()!=null){
-            if(getIntent().getExtras().getString("voice_command")!=null ){
-                if(Objects.equals(getIntent().getExtras().getString("voice_command"), "true")) {
-                    voiceCommandToggleButton.setChecked(true);
-                }
-            }
-        }
-    }
-
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
@@ -244,6 +225,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
+    /** ON CLICK HANDLING */
 
     @Override
     public void onClick(View view) {
@@ -331,15 +314,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(HomeActivity.this, ReminderActivity.class);
             startActivity(intent);
         }
-
-//        else if(view == vcBtn){
-//            if(!vcState){
-//                enableMic();
-//                getSpeechInput();
-//            } else{
-//                disableMic();
-//            }
-//        }
     }
 
     @Override
@@ -373,22 +347,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
-            //FirebaseAuth.getInstance().signOut();
-            //new SignInActivity().signOut();
             signOut();
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-            startActivity(intent);
-            finish();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    /** FIREBASE AUTHENTICATION HANDLING */
+
     private void initializeGoogleVariable() {
         mAuth = FirebaseAuth.getInstance();
 
-        // Configure Google sign in
+        // Configuring Google Sign In
         googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -399,21 +370,42 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void signOut() {
         initializeGoogleVariable();
-        // Firebase sign out
         mAuth.signOut();
 
-        // Google sign out
+        // Google Sign Out
         mGoogleSignInClient.signOut().addOnCompleteListener(this,
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // updateUI(null);
+                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 });
     }
 
-    public static String getCurrentUser() {
-        return currentUser;
+
+    /** VOICE COMMAND HANDLING */
+
+    public void setVoiceCommandFeature(){
+        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        Log.i(LOG_TAG, "isRecognitionAvailable: " + SpeechRecognizer.isRecognitionAvailable(this));
+        speech.setRecognitionListener(this);
+
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+    }
+
+    public void isVoiceCommandOn(){
+        if(getIntent().getExtras()!=null){
+            if(getIntent().getExtras().getString("voice_command")!=null ){
+                if(Objects.equals(getIntent().getExtras().getString("voice_command"), "true")) {
+                    voiceCommandToggleButton.setChecked(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -585,36 +577,59 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String message;
         switch (errorCode) {
             case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
+                message = "Audio Recording Error";
                 break;
             case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
+                message = "Client Side Error";
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
+                message = "Insufficient Permissions";
                 break;
             case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
+                message = "Network Error";
                 break;
             case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
+                message = "Network Timeout";
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
+                message = "No Match";
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
+                message = "Recognition Service Busy";
                 break;
             case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
+                message = "Error From Server";
                 break;
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
+                message = "No Speech Input";
                 break;
             default:
-                message = "Didn't understand, please try again.";
+                message = "Didn't Understand. Please, Try Again.";
                 break;
         }
         return message;
     }
+
+
+    /** Get Static Variables From Anywhere Anytime */
+    public static String getDeviceId() {
+        return deviceId;
+    }
+
+    public static String getCurrentUid() {
+        return currentUid;
+    }
+
+    public static String getCurrentUser() {
+        return currentUser;
+    }
+
+    public static String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public static String getCurrentUserPhoto() {
+        return currentUserPhoto;
+    }
+
 }
