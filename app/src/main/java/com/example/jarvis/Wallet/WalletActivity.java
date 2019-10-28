@@ -230,7 +230,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
         loadData(sqLiteDatabaseHelper);
         sqLiteDatabase.close();
-        showToast("Delete Action");
     }
 
     void handleEditAction(int position){

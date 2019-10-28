@@ -21,7 +21,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     /*** Others ***/
     private Context context;
-    private static int VERSION_NUMBER = 1;
+    private static int VERSION_NUMBER = 10;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     /*** TABLE USER ***/
@@ -315,7 +315,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[] {oldYear, oldMonth, oldDay, oldTitle});
     }
 
-    public Task findTodo(Integer userId, String year, String month, String day, String title){
+    public Task findTodo(String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_TODO,
@@ -348,9 +348,24 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    public void deleteTodo(Integer userId, String year, String month, String day, String title){
+    public void deleteTodo(String year, String month, String day, String title){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
+        // Finding the task
+        // Setting isDelete = 1
+        // Updating that on database
+        // Temporarily Delete Done
+        Task task = findTodo(year, month, day, title);
+        task.setIsDeleted(1);
+        this.updateTodo(task, year, month, day, title);
+
+        sqLiteDatabase.close();
+    }
+
+    public void permanentlyDeleteTodo(String year, String month, String day, String title){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // Permanently Delete Done
         int i = sqLiteDatabase.delete(TABLE_TODO,
                 TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
                 new String[] {year, month, day, title});
@@ -379,6 +394,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 + TODO_UPDATE_TIMESTAMP +
 
                 " FROM " + TABLE_TODO +
+                " WHERE " + TODO_IS_DELETED + " == 0 AND " + TODO_IS_IGNORED + " == 0" +
                 " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
 
         cursor.moveToPosition(0);
@@ -387,7 +403,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
         else{
             do{
-                Integer userId = Integer.parseInt(cursor.getString(cursor.getColumnIndex(USER_ID)));
                 String title = cursor.getString(cursor.getColumnIndex(TODO_TITLE));
                 String description = cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION));
 
@@ -527,9 +542,24 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public void deleteRecord(String title, String year, String month, String day, Integer type){
+    public void deleteRecord(String year, String month, String day, String title, Integer type){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
+        // Finding the record
+        // Setting isDelete = 1
+        // Updating that on database
+        // Temporarily Delete Done
+        Record record = findRecord(year, month, day, title, type);
+        record.setIsDeleted(1);
+        this.updateRecord(record, year, month, day, title, type);
+
+        sqLiteDatabase.close();
+    }
+
+    public void permanentlyDeleteRecord(String year, String month, String day, String title, Integer type){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // Permanently Delete Done
         int i = sqLiteDatabase.delete(TABLE_WALLET,
                 WALLET_YEAR + " = ? AND " + WALLET_MONTH + " = ? AND " + WALLET_DAY + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
                 new String[]{year, month, day, title, type + ""});
@@ -542,11 +572,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
+                " WHERE " + WALLET_IS_DELETED + " == 0 AND " + WALLET_IS_IGNORED + " == 0" +
                 " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
 
-        sqLiteDatabase.close();
         cursor.moveToPosition(0);
-
         if(cursor.getCount() == 0){
             showToast("No Data Found");
         }

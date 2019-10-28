@@ -278,14 +278,14 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
                 oldIsIgnored = 1;
 
                 // Ignore Existing Record
-                Record record = new Record(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldType, oldAmount, isDeleted, isIgnored, oldUpdateTimestamp);
+                Record record = new Record(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldType, oldAmount, oldIsDeleted, oldIsIgnored, oldUpdateTimestamp);
                 sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
 
                 // Add New Record
                 record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp);
                 sqLiteDatabaseHelper.insertRecord(record);
             } else {
-                Record record = new Record(title, description, year, month, day, type, amount);
+                Record record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp);
                 sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
             }
 
