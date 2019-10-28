@@ -76,6 +76,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean doubleBackToExitPressedOnce = false;
 
     private static String currentUser = null;
+    private static String deviceId = null;
+
 
     private LinearLayout vcLinearLayout;
     private boolean vcState=false;
@@ -103,8 +105,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void setWelcomeMessage(){
         if(getIntent().getExtras() != null) {
             currentUser = getIntent().getExtras().getString("currentUser");
-            if(currentUser!=null)
-                showToast("Signed Up As " + currentUser);
+//            if(currentUser!=null)
+//                showToast("Signed Up As " + currentUser);
+            deviceId = getIntent().getExtras().getString("deviceId");
+            if(deviceId!=null)
+                showToast(deviceId);
         }
     }
 

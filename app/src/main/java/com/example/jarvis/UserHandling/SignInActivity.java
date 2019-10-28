@@ -3,6 +3,7 @@ package com.example.jarvis.UserHandling;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -198,8 +199,13 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                            // Log.d(TAG, "signInWithCredential:success");
+                            String deviceId = findDeviceId();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            startActivity(new Intent(SignInActivity.this, HomeActivity.class));
+                            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+
+                            intent.putExtra("deviceId", deviceId);
+
+                            startActivity(intent);
                             finish();
                             //updateUI(user);
                         } else {
@@ -215,5 +221,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                         // ...
                     }
                 });
+    }
+
+    public String findDeviceId(){
+        String id = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        return id;
     }
 }
