@@ -23,7 +23,8 @@
         <activity android:name=".Settings.SettingsActivity" />
         <activity android:name=".Reminder.ReminderActivity" />
         <activity android:name=".Wallet.WalletActivity" />
-        <activity android:name=".Journal.JournalActivity" />
+        <activity android:name=".Journal.JournalActivity" android:windowSoftInputMode = "adjustPan|stateVisible" />
+
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
         <activity android:name=".UserHandling.ResetPassActivity" />
