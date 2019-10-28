@@ -167,8 +167,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
     public void getDataFromTodoActivity(){
         if(getIntent().getExtras() != null) {
-            /** Getting Old Data from Todo Activity */
-            userId = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("user_id")));
+            // Getting Old Data from Todo Activity
             oldTitle = getIntent().getExtras().getString("todo_title");
             oldDescription = getIntent().getExtras().getString("todo_description");
 
@@ -181,11 +180,16 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
             oldReminderState = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_reminderState")));
             oldIsCompleted = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_isCompleted")));
+
+            oldIsDeleted = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_isDeleted")));
+            oldIsIgnored = Integer.parseInt(Objects.requireNonNull(getIntent().getExtras().getString("todo_isIgnored")));
+
+            updateTimestamp = getIntent().getExtras().getString("todo_updateTimestamp");
         }
     }
 
     public void initializeUI(){
-        /** Initializing Current Data as Old Data */
+        // Initializing Current Data as Old Data
         title = oldTitle;
         description = oldDescription;
 
@@ -196,12 +200,12 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         reminderState = oldReminderState;
         isCompleted = oldIsCompleted;
 
-        /** Formatting Date to set on EditText */
+        // Formatting Date to set on EditText
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         date = day + " " + months[Integer.parseInt(month)] + ", " + year;
 
 
-        /** Formatting Time to set on EditText */
+        // Formatting Time to set on EditText
         if(oldHour!=null && oldMinute!=null){
             if(Integer.parseInt(oldHour)>=12){
                 oldAmPm = " PM";
@@ -213,7 +217,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         else
             time = "Set Time";
 
-        /** Initialize UI with the old(received) data */
+        // Initialize UI with the old(received) data
         titleEditText.setText(title);
         descriptionEditText.setText(description);
         dateEditText.setText(date);

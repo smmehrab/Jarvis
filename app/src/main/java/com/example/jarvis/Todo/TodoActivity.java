@@ -241,32 +241,30 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-        sqLiteDatabaseHelper.deleteTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()),  tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
+        sqLiteDatabaseHelper.deleteTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
 
         loadData(sqLiteDatabaseHelper);
     }
 
     void handleEditAction(int position){
-        showToast("Edit Action");
-
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-        Task todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(),tasks.get(position).getTitle());
+        Task task = sqLiteDatabaseHelper.findTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(),tasks.get(position).getTitle());
 
         Intent intent = new Intent(getApplicationContext(), UpdateTaskActivity.class);
-        intent.putExtra("todo_title", todoItem.getTitle());
-        intent.putExtra("todo_description", todoItem.getDescription());
-        intent.putExtra("todo_year", todoItem.getYear());
-        intent.putExtra("todo_month", todoItem.getMonth());
-        intent.putExtra("todo_day", todoItem.getDay());
-        intent.putExtra("todo_hour", todoItem.getHour());
-        intent.putExtra("todo_minute", todoItem.getMinute());
-        intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());
-        intent.putExtra("todo_isCompleted", todoItem.getIsCompleted().toString());
-        intent.putExtra("todo_isDeleted", todoItem.getIsDeleted().toString());
-        intent.putExtra("todo_isIgnored", todoItem.getIsIgnored().toString());
-        intent.putExtra("todo_updateTimestamp", todoItem.getUpdateTimestamp());
+        intent.putExtra("todo_title", task.getTitle());
+        intent.putExtra("todo_description", task.getDescription());
+        intent.putExtra("todo_year", task.getYear());
+        intent.putExtra("todo_month", task.getMonth());
+        intent.putExtra("todo_day", task.getDay());
+        intent.putExtra("todo_hour", task.getHour());
+        intent.putExtra("todo_minute", task.getMinute());
+        intent.putExtra("todo_reminderState", task.getReminderState().toString());
+        intent.putExtra("todo_isCompleted", task.getIsCompleted().toString());
+        intent.putExtra("todo_isDeleted", task.getIsDeleted().toString());
+        intent.putExtra("todo_isIgnored", task.getIsIgnored().toString());
+        intent.putExtra("todo_updateTimestamp", task.getUpdateTimestamp());
 
         startActivity(intent);
     }
