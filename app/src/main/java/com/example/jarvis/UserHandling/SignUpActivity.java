@@ -1,9 +1,7 @@
 package com.example.jarvis.UserHandling;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -62,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         settingUpXmlElements();
 
-        handleLocalDatabase();
+//        handleLocalDatabase();
         handleRemoteDatabase();
     }
 
@@ -82,11 +80,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         signUpWithGoogleBtn.setOnClickListener(this);
     }
 
-    void handleLocalDatabase(){
-        sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
-        user = new User();
-        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
-    }
+//    void handleLocalDatabase(){
+//        sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+//        user = new User();
+//        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+//    }
 
     void handleRemoteDatabase(){
         initializeGoogleVariable();
@@ -110,38 +108,38 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         //startActivityForResult();
     }
 
-    void handleSignUp(){
-        String email = emailEditTxt.getText().toString();
-        String password = passEditTxt.getText().toString();
-        String confirmPassword = confirmPassEditTxt.getText().toString();
-
-        if(TextUtils.isEmpty(email)){
-            showToast("Please, Enter a Valid Email Address!");
-        } else if(TextUtils.isEmpty(password)){
-            showToast("Please, Enter a Valid Password!");
-        } else if(!password.equals(confirmPassword)){
-            showToast("Password Didn't Match! Try Again!");
-        } else {
-            user.setEmail(email);
-            user.setPassword(password);
-            // user.setIsSignedIN(1);
-
-            long rowId = sqLiteDatabaseHelper.insertUser(user);
-
-            if(rowId != -1){
-                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
-                intent.putExtra("currentUser", email);
-                startActivity(intent);
-            } else {
-                showToast("Invalid Attempt! Try Again!");
-            }
-        }
-    }
+//    void handleSignUp(){
+//        String email = emailEditTxt.getText().toString();
+//        String password = passEditTxt.getText().toString();
+//        String confirmPassword = confirmPassEditTxt.getText().toString();
+//
+//        if(TextUtils.isEmpty(email)){
+//            showToast("Please, Enter a Valid Email Address!");
+//        } else if(TextUtils.isEmpty(password)){
+//            showToast("Please, Enter a Valid Password!");
+//        } else if(!password.equals(confirmPassword)){
+//            showToast("Password Didn't Match! Try Again!");
+//        } else {
+//            user.setEmail(email);
+//            user.setPassword(password);
+//            // user.setIsSignedIN(1);
+//
+//            long rowId = sqLiteDatabaseHelper.insertUser(user);
+//
+//            if(rowId != -1){
+//                Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+//                intent.putExtra("currentUser", email);
+//                startActivity(intent);
+//            } else {
+//                showToast("Invalid Attempt! Try Again!");
+//            }
+//        }
+//    }
 
     @Override
     public void onClick(View view) {
         if(view == signUpBtn){
-            handleSignUp();
+//            handleSignUp();
         }
 
         else if(view == signUpWithGoogleBtn){

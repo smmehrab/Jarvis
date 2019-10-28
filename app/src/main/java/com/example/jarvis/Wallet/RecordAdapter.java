@@ -36,10 +36,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder recordViewHolder, int position) {
+        // Setting Values to the Title, Description & Amount
         recordViewHolder.title.setText(records.get(position).getTitle());
         recordViewHolder.description.setText(records.get(position).getDescription());
         recordViewHolder.amount.setText(records.get(position).getAmount());
 
+        // Setting Color of the Record Type
         if(records.get(position).getType() == 0) {
             recordViewHolder.amount.setTextColor(Color.parseColor("#F15B40"));
         }
@@ -54,9 +56,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
     }
 
     class RecordViewHolder extends RecyclerView.ViewHolder{
-
         TextView title, description, amount;
-
         public RecordViewHolder(@NonNull View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.wallet_item_title);

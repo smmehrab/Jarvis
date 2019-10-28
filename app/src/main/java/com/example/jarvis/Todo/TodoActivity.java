@@ -71,7 +71,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     private Button activityDrawerBtn;
 
     /** FAB */
-    private FloatingActionButton fab;
+    private FloatingActionButton addTodoBtn;
 
 
     /** RecyclerView Variables */
@@ -121,7 +121,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = (Toolbar) findViewById(R.id.todo_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        fab = (FloatingActionButton) findViewById(R.id.todo_fab);
+        addTodoBtn = (FloatingActionButton) findViewById(R.id.todo_add_todo_btn);
         activityTitle = (TextView) findViewById(R.id.activity_title);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.todo_navigation_view);
@@ -144,7 +144,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         // Buttons
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        fab.setOnClickListener(this);
+        addTodoBtn.setOnClickListener(this);
 
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
@@ -255,7 +255,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         Task todoItem = sqLiteDatabaseHelper.findTodo(sqLiteDatabaseHelper.getUserId(HomeActivity.getCurrentUser()), tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(),tasks.get(position).getTitle());
 
         Intent intent = new Intent(getApplicationContext(), UpdateTaskActivity.class);
-        intent.putExtra("user_id", todoItem.getUserId().toString());
         intent.putExtra("todo_title", todoItem.getTitle());
         intent.putExtra("todo_description", todoItem.getDescription());
         intent.putExtra("todo_year", todoItem.getYear());
@@ -265,11 +264,15 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("todo_minute", todoItem.getMinute());
         intent.putExtra("todo_reminderState", todoItem.getReminderState().toString());
         intent.putExtra("todo_isCompleted", todoItem.getIsCompleted().toString());
+        intent.putExtra("todo_isDeleted", todoItem.getIsDeleted().toString());
+        intent.putExtra("todo_isIgnored", todoItem.getIsIgnored().toString());
+        intent.putExtra("todo_updateTimestamp", todoItem.getUpdateTimestamp());
+
         startActivity(intent);
     }
 
     void handleCheckAction(int position){
-
+        // Change Checkbox State & Show Toast
         if(tasks.get(position).getIsCompleted()==0) {
             tasks.get(position).setIsCompleted(1);
             showToast("Marked as Completed");
@@ -279,28 +282,29 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             showToast("Marked as Incomplete");
         }
 
+        // Refresh RecyclerView
         taskAdapter = new TaskAdapter(TodoActivity.this, tasks);
         todoRecyclerView.setAdapter(taskAdapter);
         taskAdapter.notifyDataSetChanged();
 
+        // Update Local Database
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
         sqLiteDatabaseHelper.updateTodo(tasks.get(position), tasks.get(position).getYear(), tasks.get(position).getMonth(), tasks.get(position).getDay(), tasks.get(position).getTitle());
-
         sqLiteDatabase.close();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        todoRecyclerView.addOnItemTouchListener(touchListener);
     }
 
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        todoRecyclerView.addOnItemTouchListener(touchListener);
     }
 
     @Override
@@ -315,6 +319,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         super.finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
+    /** ON CLICK HANDLING */
 
     @Override
     public void onClick(View view) {
@@ -382,7 +388,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }.start();
         }
-        else if(view == fab){
+        else if(view == addTodoBtn){
             Intent intent = new Intent(getApplicationContext(), AddTaskActivity.class);
             startActivity(intent);
         }
@@ -801,6 +807,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             readingHandler.postDelayed(this, 5000);
         }
     }
+
     private void read() {
         mTTS.setPitch((float) 0.8);
         mTTS.setSpeechRate((float) 0.9);

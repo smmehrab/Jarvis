@@ -68,7 +68,7 @@
         android:paddingBottom="30dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/todo_fab"
+            android:id="@+id/todo_add_todo_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"

@@ -20,7 +20,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
@@ -52,7 +51,10 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
     private String oldYear, oldMonth, oldDay;
     private String oldHour=null, oldMinute=null,  oldAmPm = " AM";
     private Integer oldReminderState=0;
-    private Integer oldIsCompleted;
+    private Integer oldIsCompleted=0;
+    private Integer oldIsDeleted=0;
+    private Integer oldIsIgnored=0;
+    private String oldUpdateTimestamp;
 
     /** Task Variables (Current) */
     private Integer userId;
@@ -63,6 +65,9 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
     private String hour=null, minute=null, amPm = " AM";
     private Integer reminderState;
     private Integer isCompleted;
+    private Integer isDeleted=0;
+    private Integer isIgnored=0;
+    private String updateTimestamp;
 
     private String date, time="Set Time";
 
@@ -228,24 +233,39 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
-            /** Getting the email of the current user */
-            String currentUser = HomeActivity.getCurrentUser();
-
-            /** Getting the id of the current user */
-            userId = sqLiteDatabaseHelper.getUserId(currentUser);
-
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
 
-            /** Checking if time hasn't been updated */
+            // Checking if time hasn't been updated
             if(hour==null || minute == null){
                 hour = oldHour;
                 minute = oldMinute;
             }
 
-            Task task = new Task(userId, title, description, year, month, day, hour, minute, reminderState, isCompleted);
+            // Getting Current Timestamp
+            Long tsLong = System.currentTimeMillis()/1000;
+            String ts = tsLong.toString();
+            updateTimestamp = ts;
+            oldUpdateTimestamp = updateTimestamp;
 
-            sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
+            if(!(title.equals(oldTitle) && year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))){
+                // Primary Key Field Violated
+                oldIsIgnored = 1;
+
+                // Ignore Existing Task
+                Task task = new Task(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldReminderState, oldIsCompleted, oldIsDeleted, oldIsIgnored, oldUpdateTimestamp);
+                sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
+
+                // Add New Task
+                task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
+                sqLiteDatabaseHelper.insertTodo(task);
+            } else {
+                // Primary Key Field Not Violated
+                // Update Existing Task
+                Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
+                sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
+            }
+
             onBackPressed();
         }
         else if(view == cancelBtn){
@@ -276,23 +296,23 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onDateSet(DatePicker datePicker, int y, int m, int d) {
-        /** Formatting Selected Date so that we can set the date on EditText */
+        // Formatting Selected Date so that we can set the date on EditText
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m);
         calendar.set(Calendar.DAY_OF_MONTH, d);
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        /** Setting Selected Date to the EditText */
+        // Setting Selected Date to the EditText
         dateEditText.setText(currentDate);
 
-        /** Assigning Selected Date to the following variables
-         * so that we can use these variables to create task object */
+        // Assigning Selected Date to the following variables
+        // so that we can use these variables to create task object
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
 
-        /** Checking if date has been updated or not */
+        // Checking if date has been updated or not
         if(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))
             disableButton(updateBtn);
         else
@@ -301,12 +321,12 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onTimeSet(TimePicker timePicker, int h, int m) {
-        /** Assigning Selected Time to the following variables
-         * so that we can use these variables to create task object */
+        // Assigning Selected Time to the following variables
+        // so that we can use these variables to create task object
         hour = Integer.toString(h);
         minute = Integer.toString(m);
 
-        /** Formatting Selected Time so that we can set the time on EditText */
+        // Formatting Selected Time so that we can set the time on EditText
         String amPm = " AM";
         if (h >= 12) {
             amPm = " PM";
@@ -314,14 +334,27 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         }
         String selectedTime = String.format("%02d:%02d", h, m) + amPm;
 
-        /** Setting Selected Time to the EditText */
+        // Setting Selected Time to the EditText
         timeEditText.setText(selectedTime);
 
-        /** Checking if time has been updated or not */
+        // Checking if time has been updated or not
         if(Integer.toString(h).equals(oldHour) && Integer.toString(m).equals(oldMinute))
             disableButton(updateBtn);
         else
             enableButton(updateBtn);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     public void showToast(String message){
@@ -342,16 +375,4 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         button.setClickable(true);
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
 }

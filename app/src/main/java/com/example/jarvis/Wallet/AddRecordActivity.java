@@ -18,7 +18,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.CustomSpinnerAdapter;
@@ -56,6 +55,11 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     // Type 1 - Earning - Green
 
     private String amount;
+
+    private Integer isDeleted = 0;
+    private Integer isIgnored = 0;
+
+    private String updateTimestamp=null;
 
 
     @Override
@@ -164,20 +168,20 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
     }
 
     public void initializeUI(){
-        /** Formatting Present Date so that we can set the date on EditText */
+        // Formatting Present Date so that we can set the date on EditText
         Calendar calendar = Calendar.getInstance();
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
         String currentDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        /** Setting Present Date to the EditText */
+        // Setting Present Date to the EditText
         dateEditText.setText(currentDate);
 
-        /** Initializing the amount EditText */
+        // Initializing the amount EditText
         amountEditText.setText("0");
 
-        /** Disabling addBtn as default */
+        // Disabling addBtn as default
         disableButton(addBtn);
     }
 
@@ -188,7 +192,7 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        /** Handling Custom Spinner Item Selection Event */
+        // Handling Custom Spinner Item Selection Event
         CustomSpinnerItem item = (CustomSpinnerItem) adapterView.getSelectedItem();
         if(item.getSpinnerText().equals("Expense"))
             type = 0;
@@ -207,17 +211,19 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
             SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
-            /** Getting the email of the current user */
-            String currentUser = HomeActivity.getCurrentUser();
-
-            /** Getting the id of the current user */
-            userId = sqLiteDatabaseHelper.getUserId(currentUser);
-
             title = titleEditText.getText().toString();
             description = descriptionEditText.getText().toString();
             amount = amountEditText.getText().toString();
 
-            Record record = new Record(userId, title, description, year, month, day, type, amount);
+            isDeleted = 0;
+            isIgnored = 0;
+
+            Long tsLong = System.currentTimeMillis()/1000;
+            String ts = tsLong.toString();
+
+            updateTimestamp = ts;
+
+            Record record = new Record(title, description, year, month, day, type, amount);
 
             sqLiteDatabaseHelper.insertRecord(record);
             onBackPressed();
@@ -229,21 +235,34 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
 
     @Override
     public void onDateSet(DatePicker datePicker, int y, int m, int d) {
-        /** Formatting Selected Date so that we can set the date on EditText */
+        // Formatting Selected Date so that we can set the date on EditText
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, y);
         calendar.set(Calendar.MONTH, m);
         calendar.set(Calendar.DAY_OF_MONTH, d);
         String selectedDate = DateFormat.getDateInstance().format(calendar.getTime());
 
-        /** Setting Selected Date to the EditText */
+        // Setting Selected Date to the EditText
         dateEditText.setText(selectedDate);
 
-        /** Assigning Selected Date to the following variables
-         * so that we can use these variables to create task object */
+        // Assigning Selected Date to the following variables
+        // so that we can use these variables to create task object
         year = Integer.toString(calendar.get(Calendar.YEAR));
         month = Integer.toString(calendar.get(Calendar.MONTH));
         day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     public void showToast(String message){
@@ -264,16 +283,4 @@ public class AddRecordActivity extends AppCompatActivity implements AdapterView.
         button.setClickable(true);
     }
 
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), WalletActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
 }
