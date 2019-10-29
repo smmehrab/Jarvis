@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -152,23 +151,4 @@ public class FirebaseDataRetrieve {
         return list;
     }
 
-    public ArrayList<ReminderDetails> retriveReminder(){
-        ArrayList<ReminderDetails> list = new ArrayList<>();
-        refReminder.get().addOnSuccessListener((new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
-                    ReminderDetails reminder = documentSnapshot.toObject(ReminderDetails.class);
-                    list.add(reminder);
-                }
-                Log.d("Orreh dekh dekh", "Success");
-            }
-        })).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("Exception", e.getMessage());
-            }
-        });
-        return list;
-    }
 }

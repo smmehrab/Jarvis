@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -129,30 +128,6 @@ public class FirebaseDataAdd {
                 Log.d("addUserFireBase", "Failed");
             }
         });
-    }
-
-
-    public void addReminderInFireBase(ArrayList<ReminderDetails> tasks){
-       // Map<String, Object> task = new HashMap<>();
-        Iterator i = tasks.iterator();
-        int increment = 1;
-        while(i.hasNext()) {
-           // task.put(("reminder" + increment).toString(), i.next());
-
-            refReminder.document("reminder" + increment).set(i.next())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d("addReminderFireBase", "Successfull");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("addreminderFireBase", "Failed");
-                }
-            });
-            increment++;
-        }
     }
 
     public void addWalletInFirebaseCurrent(ArrayList<Record> wallets){
