@@ -25,6 +25,11 @@
             android:layout_height="0dp"
             android:layout_weight="10">
 
+            <include
+                layout="@layout/reminder_bar"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
         </LinearLayout>
 

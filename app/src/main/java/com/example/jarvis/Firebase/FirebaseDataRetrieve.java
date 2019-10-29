@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -96,6 +95,4 @@ public class FirebaseDataRetrieve {
         });
         return list;
     }
-
-
 }

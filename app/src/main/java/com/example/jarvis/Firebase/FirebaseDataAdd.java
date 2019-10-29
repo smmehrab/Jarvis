@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.jarvis.Reminder.ReminderDetails;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -54,23 +53,6 @@ public class FirebaseDataAdd {
             refTodo.document()
                     .set(i.next()).addOnSuccessListener(aVoid -> Log.d("addTodoFireBase", "Successfull"))
                     .addOnFailureListener(e -> Log.d("addTodoFireBase", "Failed"));
-        }
-    }
-
-    public void addReminderInFireBase(ArrayList<ReminderDetails> reminderDetails){
-        CollectionReference refReminder = db.collection("user").document(userID).collection("reminder");
-        Iterator<ReminderDetails> iterator = reminderDetails.iterator();
-        while(iterator.hasNext()){
-            refReminder.document()
-                    .set(iterator.next())
-                    .addOnCompleteListener(task -> {
-                        if(task.isSuccessful()){
-                            Log.d("addReminderDetails", "Successful");
-                        }
-                        else{
-                            Log.d("addReminderDetails", "Failed");
-                        }
-                    });
         }
     }
 
