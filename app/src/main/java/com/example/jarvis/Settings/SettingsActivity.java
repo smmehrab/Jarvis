@@ -30,7 +30,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
-import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.Todo.TodoActivity;
@@ -203,10 +202,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
 
-        } else if(id == R.id.user_profile_option) {
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(intent);
-            finish();
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
@@ -352,11 +347,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         showToast(matches.get(0));
 
-        if(matches.get(0).equals("go to profile")){
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            intent.putExtra("voice_command", "true");
-            startActivity(intent);
-        } else if(matches.get(0).equals("sync data")){
+        if(matches.get(0).equals("sync data")){
             showToast("Data Synced");
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");

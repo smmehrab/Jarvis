@@ -26,14 +26,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
-import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
@@ -43,8 +41,6 @@ import com.example.jarvis.Wallet.Record;
 import com.example.jarvis.Wallet.RecordAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -438,11 +434,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
 
         showToast(matches.get(0));
 
-        if(matches.get(0).equals("go to profile")){
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            intent.putExtra("voice_command", "true");
-            startActivity(intent);
-        } else if(matches.get(0).equals("sync data")){
+        if(matches.get(0).equals("sync data")){
             showToast("Data Synced");
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
