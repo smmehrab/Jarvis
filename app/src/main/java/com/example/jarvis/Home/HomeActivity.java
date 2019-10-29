@@ -28,8 +28,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jarvis.About.AboutActivity;
-import com.example.jarvis.Firebase.FirebaseDataAdd;
-import com.example.jarvis.Firebase.FirebaseDataRetrieve;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
@@ -47,7 +45,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
