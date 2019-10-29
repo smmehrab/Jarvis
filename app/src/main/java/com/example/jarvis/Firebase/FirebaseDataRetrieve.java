@@ -1,20 +1,19 @@
 package com.example.jarvis.Firebase;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -46,17 +45,22 @@ public class FirebaseDataRetrieve {
 
     }
 
-    public ArrayList<Task> retriveTodoFromFirebase(){
-        ArrayList<Task> list = new ArrayList<>();
+    public void retriveTodoFromFirebase(Context context){
+        ArrayList<Task> tasks = new ArrayList<>();
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
          db.collection("user").document(userID).collection("todo").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
                             Task todo = documentSnapshot.toObject(Task.class);
-                            list.add(todo);
+                            tasks.add(todo);
 
                         }
+                        sqLiteDatabaseHelper.insertAllTodos(tasks);
                         Log.d("Todo Data retrieve", "Success");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -65,16 +69,15 @@ public class FirebaseDataRetrieve {
                     Log.d("Exception", e.getMessage());
             }
         });
-
-        return list;
-
-
-
     }
 
 
-    public ArrayList<Record> retriveWalletFromFirebase() {
-        ArrayList<Record> list = new ArrayList<>();
+    public void retriveWalletFromFirebase(Context context) {
+        ArrayList<Record> records = new ArrayList<>();
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
         db.collection("user")
                 .document(userID).collection("wallet").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -82,9 +85,11 @@ public class FirebaseDataRetrieve {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Record wallet = documentSnapshot.toObject(Record.class);
-                            list.add(wallet);
+                            records.add(wallet);
 
                         }
+
+                        sqLiteDatabaseHelper.insertAllRecords(records);
                         Log.d("Wallet Data retrieve", "Success");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -93,6 +98,5 @@ public class FirebaseDataRetrieve {
                 Log.d("Exception", e.getMessage());
             }
         });
-        return list;
     }
 }

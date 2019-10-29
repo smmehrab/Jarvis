@@ -141,7 +141,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         try {
-            /*** To Drop & Recreate Tables ***/
+            // To Drop & Recreate Tables
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_USER);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_TODO);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
@@ -151,8 +151,20 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /*** To Insert New User ***/
-    public long insertUser(User user){
+    public void refreshDatabase(SQLiteDatabase sqLiteDatabase){
+        try {
+            sqLiteDatabase.execSQL(DROP_TABLE + TABLE_USER);
+            sqLiteDatabase.execSQL(DROP_TABLE + TABLE_TODO);
+            sqLiteDatabase.execSQL(DROP_TABLE + TABLE_WALLET);
+            onCreate(sqLiteDatabase);
+        } catch (Exception e){
+            showToast("Exception : " + e);
+        }
+    }
+
+    /*** Query on TABLE_USER ***/
+
+    public void insertUser(User user){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -170,65 +182,110 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(USER_DEVICE, device);
         contentValues.put(USER_SYNC_TIME, syncTime);
 
-        long rowId = sqLiteDatabase.insert(TABLE_USER, null, contentValues);
-        return rowId;
+        Boolean result = findUser(uid);
+        if(!result) {
+            sqLiteDatabase.insert(TABLE_USER, null, contentValues);
+        }
     }
 
-
-//    /*** To Find User ***/
-//    public Boolean findUser(String givenEmail, String givenPassword){
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-//        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
-//        Boolean result = false;
-//
-//        if(cursor.getCount() == 0){
-//            showToast("No Data Found");
-//        }
-//        else{
-//            while (cursor.moveToNext()){
-//                String email = cursor.getString(1);
-//                String password = cursor.getString(2);
-//
-//                if(email.equals(givenEmail) && password.equals(givenPassword)){
-//                    result = true;
-//                    break;
-//                }
-//            }
-//        }
-//        return result;
-//    }
-//
-//
-//    public int isSignedIN(){
-//
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-//        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
-//        Boolean result = false;
-//
-//        return 0;
-//    }
-
-    /*** Query on TABLE_USER ***/
-    public Integer getUserId(String givenEmail){
+    public Boolean findUser(String uid){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_USER, null);
-        Integer result = null;
 
-        if(cursor.getCount() == 0){
-            showToast("No Data Found");
-        }
-        else{
-            while (cursor.moveToNext()){
-                String email = cursor.getString(1);
 
-                if(email.equals(givenEmail)){
-                    result = Integer.parseInt(cursor.getString(0));
-                    break;
-                }
-            }
-        }
+        Cursor cursor = sqLiteDatabase.query(TABLE_USER,
+                null,
+                USER_ID +  " = ?",
+                new String[] {uid},
+                null,
+                null,
+                null);
+
+
+        cursor.moveToPosition(0);
+
+        if(cursor.getCount()==0)
+            return false;
+
+        return true;
+    }
+
+    public User getUser(){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT *" +
+                " FROM " + TABLE_USER + ";", null);
+
+        cursor.moveToPosition(0);
+        return new User(cursor.getString(cursor.getColumnIndex(USER_ID)),
+                cursor.getString(cursor.getColumnIndex(USER_EMAIL)),
+                cursor.getString(cursor.getColumnIndex(USER_NAME)),
+                cursor.getString(cursor.getColumnIndex(USER_PHOTO)),
+                cursor.getString(cursor.getColumnIndex(USER_DEVICE)),
+                cursor.getString(cursor.getColumnIndex(USER_SYNC_TIME))
+        );
+    }
+
+    public String getUid(){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT *" +
+                " FROM " + TABLE_USER + ";", null);
+
+        cursor.moveToPosition(0);
+        String result = cursor.getString(cursor.getColumnIndex(USER_ID));
         return result;
     }
+
+
+    public String getSyncTime(String uid){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_USER,
+                null,
+                USER_ID +  " = ?",
+                new String[] {uid},
+                null,
+                null,
+                null);
+
+        cursor.moveToPosition(0);
+
+        String result = cursor.getString(cursor.getColumnIndex(USER_SYNC_TIME));
+        return result;
+    }
+
+    public void updateSyncTime(String uid){
+        SQLiteDatabase sqLiteDatabase1 = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        Cursor cursor = sqLiteDatabase1.query(TABLE_USER,
+                null,
+                USER_ID +  " = ?",
+                new String[] {uid},
+                null,
+                null,
+                null);
+
+        cursor.moveToPosition(0);
+
+        // Getting Current Timestamp
+        Long tsLong = System.currentTimeMillis()/1000;
+        String timestamp = tsLong.toString();
+
+        contentValues.put(USER_ID, cursor.getString(0));
+        contentValues.put(USER_EMAIL, cursor.getString(1));
+        contentValues.put(USER_NAME, cursor.getString(2));
+        contentValues.put(USER_PHOTO, cursor.getString(3));
+        contentValues.put(USER_DEVICE, cursor.getString(4));
+        contentValues.put(USER_SYNC_TIME, timestamp);
+
+        sqLiteDatabase1.update(TABLE_USER, contentValues,
+                USER_ID + " = ?",
+                new String[] {uid});
+
+        sqLiteDatabase1.close();
+    }
+
 
     /*** Query on TABLE_TODO ***/
 
@@ -271,6 +328,49 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
         return rowId;
+    }
+
+    public void insertAllTodos(ArrayList<Task> tasks){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        for(Task task: tasks) {
+
+            ContentValues contentValues = new ContentValues();
+
+            String title = task.getTitle();
+            String description = task.getDescription();
+
+            String year = task.getYear();
+            String month = task.getMonth();
+            String day = task.getDay();
+
+            String hour = task.getHour();
+            String minute = task.getMinute();
+
+            Integer reminderState = task.getReminderState();
+            Integer isCompleted = task.getIsCompleted();
+            Integer isDeleted = task.getIsDeleted();
+            Integer isIgnored = task.getIsIgnored();
+
+            String updateTimestamp = task.getUpdateTimestamp();
+
+            contentValues.put(TODO_TITLE, title);
+            contentValues.put(TODO_DESCRIPTION, description);
+
+            contentValues.put(TODO_YEAR, year);
+            contentValues.put(TODO_MONTH, month);
+            contentValues.put(TODO_DAY, day);
+
+            contentValues.put(TODO_HOUR, hour);
+            contentValues.put(TODO_MINUTE, minute);
+
+            contentValues.put(TODO_REMINDER_STATE, reminderState);
+            contentValues.put(TODO_IS_COMPLETED, isCompleted);
+            contentValues.put(TODO_IS_DELETED, isDeleted);
+            contentValues.put(TODO_IS_IGNORED, isIgnored);
+            contentValues.put(TODO_UPDATE_TIMESTAMP, updateTimestamp);
+
+            long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
+        }
     }
 
     public void updateTodo(Task task, String oldYear, String oldMonth, String oldDay, String oldTitle){
@@ -394,7 +494,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 + TODO_UPDATE_TIMESTAMP +
 
                 " FROM " + TABLE_TODO +
-                " WHERE " + TODO_IS_DELETED + " == 0 AND " + TODO_IS_IGNORED + " == 0" +
+                " WHERE " + TODO_IS_DELETED + " = 0 AND " + TODO_IS_IGNORED + " = 0" +
                 " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
 
         cursor.moveToPosition(0);
@@ -518,6 +618,48 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         long rowId = sqLiteDatabase.insert(TABLE_WALLET, null, contentValues);
         return rowId;
+    }
+
+    public void insertAllRecords(ArrayList<Record> records){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        for(Record record:records) {
+
+            ContentValues contentValues = new ContentValues();
+
+            String title = record.getTitle();
+            String description = record.getDescription();
+
+            String year = record.getYear();
+            String month = record.getMonth();
+            String day = record.getDay();
+
+            Integer type = record.getType();
+            String amount = record.getAmount();
+
+            Integer isDeleted = record.getIsDeleted();
+            Integer isIgnored = record.getIsIgnored();
+
+            String updateTimestamp = record.getUpdateTimestamp();
+
+            contentValues.put(WALLET_TITLE, title);
+            contentValues.put(WALLET_DESCRIPTION, description);
+
+            contentValues.put(WALLET_YEAR, year);
+            contentValues.put(WALLET_MONTH, month);
+            contentValues.put(WALLET_DAY, day);
+
+            contentValues.put(WALLET_TYPE, type);
+            contentValues.put(WALLET_AMOUNT, amount);
+
+            contentValues.put(WALLET_IS_DELETED, isDeleted);
+            contentValues.put(WALLET_IS_IGNORED, isIgnored);
+
+            contentValues.put(WALLET_UPDATE_TIMESTAMP, updateTimestamp);
+
+            long rowId = sqLiteDatabase.insert(TABLE_WALLET, null, contentValues);
+
+        }
     }
 
     public void updateRecord(Record record, String oldYear, String oldMonth, String oldDay, String oldTitle, Integer oldType){

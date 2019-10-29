@@ -3,6 +3,7 @@ package com.example.jarvis.Home;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -114,6 +115,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             currentUser = getIntent().getExtras().getString("email");
             currentUserName = getIntent().getExtras().getString("name");
             currentUserPhoto = getIntent().getExtras().getString("photo");
+
+//            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+//            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+//
+//            showToast(sqLiteDatabaseHelper.getSyncTime(currentUid));
         }
     }
 
@@ -193,6 +199,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         userNavigationView.getMenu().findItem(R.id.user_home_option).setChecked(true);
 
         progressBar.setVisibility(View.INVISIBLE);
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
     }
 
     public void showToast(String message){
@@ -322,12 +331,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
-            SQLiteDatabaseHelper helper = new SQLiteDatabaseHelper(getApplicationContext());
-
-            FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), getCurrentUid());
-            add.queryOnMultipleTodoInput(helper.syncTodoItems());
-            add.queryOnMultipleWalletInput(helper.syncWalletItems());
-
+            sync();
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
@@ -370,23 +374,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
-
-    public void signOut() {
-        initializeGoogleVariable();
-        mAuth.signOut();
-
-        // Google Sign Out
-        mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-    }
-
 
     /** VOICE COMMAND HANDLING */
 
@@ -635,4 +622,37 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         return currentUserPhoto;
     }
 
+    /** Sync & SignOut */
+
+    public void sync(){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+        String uid = sqLiteDatabaseHelper.getUid();
+
+        FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), uid);
+        add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
+        add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
+
+        sqLiteDatabaseHelper.updateSyncTime(uid);
+    }
+
+    public void signOut() {
+        initializeGoogleVariable();
+        mAuth.signOut();
+
+        // Google Sign Out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+                        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+                        sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
+
+                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
 }
