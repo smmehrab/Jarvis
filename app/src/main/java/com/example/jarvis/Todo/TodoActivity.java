@@ -102,6 +102,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         handleDatabase();
         setVoiceCommandFeature();
         isVoiceCommandOn();
+
     }
 
     public void initializeVariables(){

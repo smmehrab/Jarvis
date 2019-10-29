@@ -427,6 +427,59 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return tasks;
     }
 
+    public ArrayList<Task> syncTodoItems(){
+        ArrayList<Task> tasks = new ArrayList<Task>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT "
+
+                + TODO_TITLE + ", "
+                + TODO_DESCRIPTION + ", "
+                + TODO_YEAR + ", "
+                + TODO_MONTH + ", "
+                + TODO_DAY + ", "
+                + TODO_HOUR + ", "
+                + TODO_MINUTE + ", "
+                + TODO_REMINDER_STATE + ", "
+                + TODO_IS_COMPLETED + ", "
+                + TODO_IS_DELETED + ", "
+                + TODO_IS_IGNORED + ", "
+                + TODO_UPDATE_TIMESTAMP +
+
+                " FROM " + TABLE_TODO +
+                " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            do{
+                String title = cursor.getString(cursor.getColumnIndex(TODO_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION));
+
+                String year = cursor.getString(cursor.getColumnIndex(TODO_YEAR));
+                String month = cursor.getString(cursor.getColumnIndex(TODO_MONTH));
+                String day = cursor.getString(cursor.getColumnIndex(TODO_DAY));
+
+                String hour = cursor.getString(cursor.getColumnIndex(TODO_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(TODO_MINUTE));
+
+                Integer reminderState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE)));
+                Integer isCompleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_COMPLETED)));
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED)));
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED)));
+
+                String updateTimestamp = cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP));
+
+                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp));
+            }while(cursor.moveToNext());
+        }
+
+        return tasks;
+    }
+
     /*** Query on TABLE_WALLET ***/
 
     public long insertRecord(Record record){
@@ -573,6 +626,41 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
                 " WHERE " + WALLET_IS_DELETED + " == 0 AND " + WALLET_IS_IGNORED + " == 0" +
+                " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            do{
+                String title = cursor.getString(cursor.getColumnIndex(WALLET_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(WALLET_DESCRIPTION));
+
+                String year = cursor.getString(cursor.getColumnIndex(WALLET_YEAR));
+                String month = cursor.getString(cursor.getColumnIndex(WALLET_MONTH));
+                String day = cursor.getString(cursor.getColumnIndex(WALLET_DAY));
+
+                Integer type = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_TYPE)));
+                String amount = cursor.getString(cursor.getColumnIndex(WALLET_AMOUNT));
+
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED)));
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED)));
+
+                String updateTimestamp = cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP));
+
+                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp));
+            }while (cursor.moveToNext());
+        }
+
+        return records;
+    }
+
+    public ArrayList<Record> syncWalletItems(){
+        ArrayList<Record> records = new ArrayList<Record>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
                 " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
 
         cursor.moveToPosition(0);

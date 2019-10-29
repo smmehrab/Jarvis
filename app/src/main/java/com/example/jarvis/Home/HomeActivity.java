@@ -28,10 +28,14 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
+import com.example.jarvis.Firebase.FirebaseDataRetrieve;
+import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Wallet.WalletActivity;
@@ -43,6 +47,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -320,6 +326,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
+            SQLiteDatabaseHelper helper = new SQLiteDatabaseHelper(getApplicationContext());
+
+            FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), getCurrentUid());
+            add.queryOnMultipleTodoInput(helper.syncTodoItems());
+            add.queryOnMultipleWalletInput(helper.syncWalletItems());
 
         } else if(id == R.id.user_profile_option) {
             Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
