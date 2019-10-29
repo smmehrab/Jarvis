@@ -4,19 +4,20 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataRetrieve;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
+import com.example.jarvis.Wallet.Record;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -33,7 +34,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
@@ -197,20 +198,13 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
                             String deviceId = findDeviceId();
-                            FirebaseUser user = mAuth.getCurrentUser();
 
-                            Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+                            retrieveDataFromFirebase();
+                            addUserToLocalDatabase(acct, deviceId);
 
-                            intent.putExtra("uid", mAuth.getUid());
-                            intent.putExtra("email", acct.getEmail());
-                            intent.putExtra("name", acct.getDisplayName());
-                            intent.putExtra("photo", Objects.requireNonNull(acct.getPhotoUrl()).toString());
-                            intent.putExtra("deviceId", deviceId);
-
-
-                            startActivity(intent);
-                            finish();
+                            enterApp(acct, deviceId);
                         } else {
                             Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                         }
@@ -218,8 +212,61 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
 
+    public void retrieveDataFromFirebase(){
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        /**  CHECK & UPDATE DEVICE ID ON FIREBASE */
+
+        // Call Firebase Sync
+        FirebaseDataRetrieve updateInstance = new FirebaseDataRetrieve(FirebaseFirestore.getInstance(),mAuth.getUid());
+
+        ArrayList<com.example.jarvis.Todo.Task> tasks = new ArrayList<>();
+        ArrayList<Record> records = new ArrayList<>();
+
+        updateInstance.retriveTodoFromFirebase(getApplicationContext());
+        updateInstance.retriveWalletFromFirebase(getApplicationContext());
+    }
+
+    public void addUserToLocalDatabase(GoogleSignInAccount acct, String deviceId){
+        // Inserting that User to TABLE_USER (Local Database)
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+        // Getting Current Timestamp
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+
+        // Creating New User
+        User currentUser = new User( mAuth.getUid(), acct.getEmail(), acct.getDisplayName(), Objects.requireNonNull(acct.getPhotoUrl()).toString(), deviceId, ts);
+
+        // Inserting to the Local Database
+        sqLiteDatabaseHelper.insertUser(currentUser);
+    }
+
+    public void enterApp(GoogleSignInAccount acct, String deviceId){
+        // Changing Activity
+        Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
+
+        // Passing New User Info to the HomeActivity
+        intent.putExtra("uid", mAuth.getUid());
+        intent.putExtra("email", acct.getEmail());
+        intent.putExtra("name", acct.getDisplayName());
+        intent.putExtra("photo", Objects.requireNonNull(acct.getPhotoUrl()).toString());
+        intent.putExtra("deviceId", deviceId);
+
+        startActivity(intent);
+        finish();
+    }
+
     public String findDeviceId(){
         String id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         return id;
     }
+
+    public void showToast(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
 }
