@@ -1,9 +1,14 @@
 package com.example.jarvis.Home;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -36,6 +41,7 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -44,6 +50,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -51,6 +58,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
+
+    /** Network Variables */
+    private BroadcastReceiver networkReceiver = null;
 
     /** Firebase Variables */
     private static final int RC_SIGN_IN = 1;
@@ -115,11 +125,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             currentUser = getIntent().getExtras().getString("email");
             currentUserName = getIntent().getExtras().getString("name");
             currentUserPhoto = getIntent().getExtras().getString("photo");
-
-//            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
-//            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-//
-//            showToast(sqLiteDatabaseHelper.getSyncTime(currentUid));
         }
     }
 
@@ -192,6 +197,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initializeUI(){
         mAuth = FirebaseAuth.getInstance();
+        networkReceiver = new NetworkReceiver();
+        broadcastIntent();
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_home);
 
@@ -331,7 +338,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
-            sync();
+            if(!isConnectedToInternet())
+                Snackbar.make(drawerLayout, "Can't Sync Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else
+                sync();
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
@@ -354,12 +364,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
-            signOut();
+            if(!isConnectedToInternet())
+                Snackbar.make(drawerLayout, "Can't Sign Out Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else
+                signOut();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     /** FIREBASE AUTHENTICATION HANDLING */
 
@@ -420,6 +434,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(networkReceiver);
     }
 
     @Override
@@ -639,7 +654,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         initializeGoogleVariable();
         mAuth.signOut();
 
-        // Google Sign Out
         mGoogleSignInClient.signOut().addOnCompleteListener(this,
                 new OnCompleteListener<Void>() {
                     @Override
@@ -654,5 +668,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         finish();
                     }
                 });
+    }
+
+    /** For Checking Network Connection */
+    public void broadcastIntent() {
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    public boolean isConnectedToInternet(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 }

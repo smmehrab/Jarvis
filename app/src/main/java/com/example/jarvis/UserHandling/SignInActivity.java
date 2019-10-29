@@ -1,7 +1,12 @@
 package com.example.jarvis.UserHandling;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
@@ -38,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
+    /** Network Variables */
+    private BroadcastReceiver networkReceiver = null;
 
     //  Variables for Remote Database
     private static final int RC_SIGN_IN = 1;
@@ -75,6 +82,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     void setUI(){
         findXmlElements();
         setListeners();
+        broadcastIntent();
     }
 
     void findXmlElements(){
@@ -147,16 +155,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        if(view == signInBtn){
-//            handleSignIn();
-        }
-
-        else if(view == signInWithGoogleBtn){
-            handleSignInWithGoogle();
-        }
-
-        else if(view == forgotPassBtn){
-            handleForgotPass();
+        if(view == signInWithGoogleBtn){
+            if(!isConnectedToInternet())
+                Snackbar.make(findViewById(R.id.sign_in_activity), "Can't Sign In Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else
+                handleSignInWithGoogle();
         }
     }
 
@@ -166,6 +169,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         startActivity(intent);
         finish();
     }
+
 
     @Override
     public void finish() {
@@ -267,6 +271,21 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
+    }
+
+    /** For Checking Network Connection */
+    public void broadcastIntent() {
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    public boolean isConnectedToInternet(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
 }

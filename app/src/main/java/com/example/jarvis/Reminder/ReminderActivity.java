@@ -1,8 +1,14 @@
 package com.example.jarvis.Reminder;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
@@ -30,25 +36,43 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Util.ViewPagerAdapter;
 import com.example.jarvis.Wallet.Record;
 import com.example.jarvis.Wallet.RecordAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class ReminderActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
+    /** Network Variables */
+    private BroadcastReceiver networkReceiver = null;
+
+    /** Firebase Variables */
+    private static final int RC_SIGN_IN = 1;
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    GoogleSignInOptions googleSignInOptions;
 
     /** Toolbar */
     private Toolbar toolbar;
@@ -173,6 +197,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void initializeUI(){
+        mAuth = FirebaseAuth.getInstance();
+        networkReceiver = new NetworkReceiver();
+        broadcastIntent();
+
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_reminder);
         activityTitle.setText(R.string.reminder_txt);
 
@@ -289,7 +317,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
-
+            if(!isConnectedToInternet())
+                Snackbar.make(drawerLayout, "Can't Sync Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else
+                sync();
         } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
@@ -315,10 +346,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
             Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
             startActivity(intent);
         }else if (id == R.id.user_sign_out_option) {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
-            startActivity(intent);
-            finish();
+            if(!isConnectedToInternet())
+                Snackbar.make(drawerLayout, "Can't Sign Out Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else
+                signOut();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -365,6 +396,8 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(networkReceiver);
+
     }
 
     @Override
@@ -540,4 +573,65 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         return message;
     }
 
+    /** Firebase Authentication Handling */
+
+    private void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+
+        // Configuring Google Sign In
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+
+    /** Sync & SignOut */
+
+    public void sync(){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+        String uid = sqLiteDatabaseHelper.getUid();
+
+        FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), uid);
+        add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
+        add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
+
+        sqLiteDatabaseHelper.updateSyncTime(uid);
+    }
+
+    public void signOut() {
+        initializeGoogleVariable();
+        mAuth.signOut();
+
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+                        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+                        sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
+
+                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+    }
+
+    /** For Checking Network Connection */
+    public void broadcastIntent() {
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    public boolean isConnectedToInternet(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
 }
