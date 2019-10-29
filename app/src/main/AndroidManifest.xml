@@ -13,10 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Journal.AddJournalActivity"></activity>
+        <activity android:name=".Reminder.FragmentEvent"></activity>
+        <activity android:name=".Reminder.FragmentAlarm" />
+        <activity android:name=".Journal.AddJournalActivity" />
         <activity android:name=".Wallet.UpdateRecordActivity" />
         <activity android:name=".Todo.UpdateTaskActivity" />
-        <activity android:name=".Reminder.AddReminderActivity" />
         <activity android:name=".Wallet.AddRecordActivity" />
         <activity android:name=".Todo.AddTaskActivity" />
         <activity android:name=".Profile.ProfileActivity" />

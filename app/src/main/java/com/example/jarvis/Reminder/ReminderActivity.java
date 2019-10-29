@@ -26,6 +26,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Home.HomeActivity;
@@ -34,10 +37,16 @@ import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.Util.RecyclerTouchListener;
+import com.example.jarvis.Util.ViewPagerAdapter;
+import com.example.jarvis.Wallet.Record;
+import com.example.jarvis.Wallet.RecordAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -59,8 +68,26 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
 
-    /** FAB */
-    private FloatingActionButton fab;
+    /** For Tab Layout */
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+    private int[] tabIcons = {
+      R.drawable.icon_alarm_white,
+      R.drawable.icon_event_white
+    };
+
+
+    /** RecyclerView Variables */
+    RecyclerView reminderRecyclerView;
+    ArrayList<Record> records;
+    RecordAdapter recordAdapter;
+
+    RecyclerTouchListener touchListener;
+
+    /********/
+
+
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -69,6 +96,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private Intent recognizerIntent;
     private String LOG_TAG = "ReminderActivity";
     private ToggleButton voiceCommandToggleButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,11 +120,18 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         toolbar = (Toolbar) findViewById(R.id.reminder_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        fab = (FloatingActionButton) findViewById(R.id.reminder_fab);
+        //fab = (FloatingActionButton) findViewById(R.id.reminder_fab);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.reminder_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
 
+        // reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
+
+        // For Tab Layout
+        tabLayout = (TabLayout) findViewById(R.id.reminder_tab);
+        viewPager = (ViewPager) findViewById(R.id.reminder_view_pager);
+
+        // For Voice Command
         progressBar = (ProgressBar) findViewById(R.id.reminder_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.reminder_voice_command_toggle_btn);
     }
@@ -114,11 +149,12 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // Buttons
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        fab.setOnClickListener(this);
+        //fab.setOnClickListener(this);
 
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
+
 
         // Voice Command On/Off
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -147,6 +183,19 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         userNavigationView.getMenu().findItem(R.id.user_reminder_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_reminder_option).setChecked(true);
 
+        // For Tab Layout
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        adapter.addFragment(new FragmentAlarm(),"Alarm");
+        adapter.addFragment(new FragmentEvent(),"Event");
+
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+
+        // For Voice Command
         progressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -235,9 +284,9 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
                 }
             }.start();
         }
-        else if(view == fab){
+       /* else if(view == fab){
             Intent intent = new Intent(getApplicationContext(), AddReminderActivity.class);
-            startActivity(intent);        }
+            startActivity(intent);        }*/
     }
 
     @Override
@@ -245,11 +294,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
 
-        } else if(id == R.id.user_profile_option) {
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(intent);
-            finish();
-        }  else if (id == R.id.user_home_option) {
+        } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
             finish();
@@ -284,7 +329,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         return true;
     }
 
-    /** VOICE COMMAND HANDLING */
+    /** VOICE COMMAND HANDLING **/
 
     public void setVoiceCommandFeature(){
         speech = SpeechRecognizer.createSpeechRecognizer(this);
