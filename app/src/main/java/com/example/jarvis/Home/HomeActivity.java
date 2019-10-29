@@ -29,7 +29,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Journal.JournalActivity;
-import com.example.jarvis.Profile.ProfileActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.Settings.SettingsActivity;
@@ -321,11 +320,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         int id = menuItem.getItemId();
         if (id == R.id.user_sync_option) {
 
-        } else if(id == R.id.user_profile_option) {
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(intent);
-            finish();
-        }  else if (id == R.id.user_home_option) {
+        } else if (id == R.id.user_home_option) {
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
         } else if (id == R.id.user_todo_option) {
@@ -464,13 +459,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onError(int errorCode) {
         String errorMessage = getErrorText(errorCode);
 
-        if (errorMessage.equals("Client side error")) {
-            voiceCommandToggleButton.setChecked(true);
-        } else {
-            Log.d(LOG_TAG, "FAILED " + errorMessage);
-            showToast(errorMessage);
-            voiceCommandToggleButton.setChecked(false);
-        }
+//        if (errorMessage.equals("Client Side Error")) {
+//            voiceCommandToggleButton.setChecked(true);
+//        } else {
+//            Log.d(LOG_TAG, "FAILED " + errorMessage);
+//            showToast(errorMessage);
+//            voiceCommandToggleButton.setChecked(true);
+//        }
+
+        showToast(errorMessage);
+        voiceCommandToggleButton.setChecked(true);
     }
 
     @Override
@@ -499,11 +497,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         showToast(matches.get(0));
 
-        if(matches.get(0).equals("go to profile")){
-            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-            intent.putExtra("voice_command", "true");
-            startActivity(intent);
-        } else if(matches.get(0).equals("sync data")){
+        if(matches.get(0).equals("sync data")){
             showToast("Data Synced");
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
@@ -612,6 +606,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /** Get Static Variables From Anywhere Anytime */
+
     public static String getDeviceId() {
         return deviceId;
     }
