@@ -13,6 +13,9 @@ public class Task {
     private Integer isIgnored;
     private String updateTimestamp;
 
+    public Task(){
+
+    }
     public Task(String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState, Integer isCompleted, Integer isDeleted, Integer isIgnored, String updateTimestamp) {
         this.title = title;
         this.description = description;

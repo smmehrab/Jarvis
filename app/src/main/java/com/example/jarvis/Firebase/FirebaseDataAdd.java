@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,156 +23,56 @@ import java.util.List;
 import java.util.Map;
 
 public class FirebaseDataAdd {
-    private FirebaseAuth mAuth;
+    private String userID;
     private FirebaseFirestore db;
-    private CollectionReference refTodo, refWallet,  refJournal, refReminder;
-    private DocumentReference refUser;
 
-    public FirebaseDataAdd(FirebaseAuth mAuth){
-        this.mAuth = mAuth;
-        setup();
-        setupCacheSize();
-        initializeRef();
+
+    public FirebaseDataAdd(FirebaseFirestore db, String userID){
+        this.userID = userID;
+        this.db = db;
     }
 
-    public void setup() {
-        // [START get_firestore_instance]
-        db = FirebaseFirestore.getInstance();
-        // [END get_firestore_instance]
-
-        // [START set_firestore_settings]
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
-        // [END set_firestore_settings]
+    public void addUserInFireBase(User user){
+        CollectionReference refUser = db.collection("user").document(userID).collection("userDetails");
+        refUser.document("RootUser").set(user)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        Log.d("addUserDetails", "Successful");
+                    }
+                    else{
+                        Log.d("addUserDetails", "Failed");
+                    }
+                });
     }
+    public void addTodoInFireBase(ArrayList <Task> tasks){
 
-    public void setupCacheSize() {
-        // [START fs_setup_cache]
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-                .build();
-        db.setFirestoreSettings(settings);
-        // [END fs_setup_cache]
-    }
-    private void initializeRef(){
-        refTodo = db.collection("user").document(mAuth.getUid().toString()).collection("todo");
-        refReminder = db.collection("user").document(mAuth.getUid().toString()).collection("reminder");
-        refJournal = db.collection("user").document(mAuth.getUid().toString()).collection("journal");
-        refWallet = db.collection("user").document(mAuth.getUid().toString()).collection("wallet");
-        refUser = db.collection("user").document(mAuth.getUid().toString());
-    }
-
-    public void addTodoInFireBaseRecent(List <Task> tasks){
-        Iterator i = tasks.iterator();
-        int increment = 1;
+        CollectionReference refTodo = db.collection("user").document(userID).collection("todo");
+        Iterator<Task> i = tasks.iterator();
         while(i.hasNext()){
-          //  Map<String, Object> task = new HashMap<>();
-            //task.put(("task" + increment).toString(), i.next());
 
-            //List<Task> task = Arrays.asList();
-            refTodo.document("recent").collection("todo")
-                    .document(("task" + increment))
-                    .set(i.next()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d("addTodoFireBase", "Successfull");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("addTodoFireBase", "Failed");
-                }
-            });
-            increment++;
+            refTodo.document()
+                    .set(i.next()).addOnSuccessListener(aVoid -> Log.d("addTodoFireBase", "Successfull"))
+                    .addOnFailureListener(e -> Log.d("addTodoFireBase", "Failed"));
         }
     }
 
-    public void addTodoInFireBaseOld(ArrayList<Task> tasks){
-        //Map<String, Object> task = new HashMap<>();
-        Iterator i = tasks.iterator();
-        int increment = 1;
-        while(i.hasNext()) {
-            //task.put(.toString(), i.next());
-            refTodo.document("old").collection("todo")
-                    .document(("task" + increment))
-                    .set(i.next()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d("addTodoFireBase", "Successfull");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("addTodoFireBase", "Failed");
-                }
-            });
-            increment++;
-        }
-    }
-
-// There must be a photo // We may have to create a class for user?
-
-    public void addUserDetails(User user){
-        Map<String , Object> data = new HashMap<>();
-        data.put("userdetails ", user);
-        refUser.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("addUserFireBase", "Successfull");
-                //
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("addUserFireBase", "Failed");
-            }
-        });
-    }
-
-    public void addWalletInFirebaseCurrent(ArrayList<Record> wallets){
-        Map<String, Object> wallet = new HashMap<>();
-        Iterator i = wallets.iterator();
-        int increment = 1;
-        while(i.hasNext()){
-            refWallet.document("current").collection("wallet").
-                    document("wallet" + increment).set(i.next())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("addWalletFireBase", "Successfull");
+    public void addWalletInFireBase(ArrayList<Record> wallets){
+        CollectionReference  refWallet = db.collection("user").document(userID).collection("wallet");
+        Iterator<Record> iterator = wallets.iterator();
+        while(iterator.hasNext()){
+            refWallet.document()
+                    .set(iterator.next())
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            Log.d("addWalletDetails", "Success");
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("addWalletFireBase", "Failed");
-                }
-            });
-            increment++;
-        }
-    }
-
-
-    public void addWalletInFirebaseOld(ArrayList<Record> wallets){
-        Map<String, Object> wallet = new HashMap<>();
-        Iterator i = wallets.iterator();
-        int increment = 1;
-        while(i.hasNext()){
-            refWallet.document("old").collection("wallet").document("wallet" + increment).set(i.next())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("addWalletFirebase", "Successfull");
+                        else{
+                            Log.d("addWalletDetails", "Failed");
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("addWalletFireBase", "Failed");
-                }
-            });
-            increment++;
+                    });
         }
+
     }
+
 
 }

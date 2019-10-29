@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.jarvis.Firebase.FirebaseDataAdd;
+import com.example.jarvis.Firebase.FirebaseDataRetrieve;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
@@ -28,7 +31,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Calendar;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
@@ -192,7 +197,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
                             String deviceId = findDeviceId();
                             FirebaseUser user = mAuth.getCurrentUser();
 
@@ -207,7 +211,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
                             startActivity(intent);
                             finish();
-
                         } else {
                             Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                         }

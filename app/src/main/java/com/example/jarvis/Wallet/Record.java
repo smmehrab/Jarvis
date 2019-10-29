@@ -17,6 +17,9 @@ public class Record {
 
     private String updateTimestamp;
 
+    public Record(){
+
+    }
     public Record(String title, String description, String year, String month, String day, Integer type, String amount, Integer isDeleted, Integer isIgnored, String updateTimestamp) {
         this.title = title;
         this.description = description;

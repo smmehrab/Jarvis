@@ -76,6 +76,9 @@ dependencies {
 
     //For RichEditor Library
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
+
+    //Picasso Image
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
 
 apply plugin: 'com.google.gms.google-services'
