@@ -100,7 +100,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
     private PieChart pieChart;
 
-    private Button daily, monthly, yearly;
+    private Button daily, weekly, monthly;
 
     /** FAB */
     private FloatingActionButton addTodoBtn;
@@ -174,8 +174,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         pieChart = (PieChart) activityNavigationViewHeaderView.findViewById(R.id.todo_piechart);
 
         daily = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_daily);
+        weekly = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_weekly);
         monthly = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_monthly);
-        yearly = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_yearly);
     }
 
     public void setToolbar(){
@@ -198,8 +198,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         activityNavigationView.setNavigationItemSelectedListener(this);
 
         daily.setOnClickListener(this);
+        weekly.setOnClickListener(this);
         monthly.setOnClickListener(this);
-        yearly.setOnClickListener(this);
 
         // RecyclerView
         todoRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -272,18 +272,25 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setChecked(true);
 
-        setPieChart();
+        // Initialize PieChart
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("weekly");
+        setPieChart(ratio);
+        pressedWeekly();
 
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public void setPieChart(){
+    public void setPieChart(double ratio){
+        float completed = (float) ((float) ratio*100.00);
+        float incomplete = (float) 100.00 - completed;
+
         pieChart.setUsePercentValues(true);
-        pieChart.animateXY(2000, 2000);
+        pieChart.animateXY(500, 1000);
 
         List<PieEntry> value = new ArrayList<>();
-        value.add(new PieEntry(40f, ""));
-        value.add(new PieEntry(60f, ""));
+        value.add(new PieEntry(completed, ""));
+        value.add(new PieEntry(incomplete, ""));
 
         PieDataSet pieDataSet = new PieDataSet(value, "");
 
@@ -301,7 +308,6 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         pieDataSet.setHighlightEnabled(true);
 
         PieData pieData = new PieData(pieDataSet);
-
         pieChart.setData(pieData);
 
         pieChart.setDrawEntryLabels(false);
@@ -342,6 +348,12 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         sqLiteDatabaseHelper.deleteTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
 
         loadData(sqLiteDatabaseHelper);
+
+        // Refresh PieChart
+        double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("weekly");
+        setPieChart(ratio);
+        pressedWeekly();
+
     }
 
     void handleEditAction(int position){
@@ -386,8 +398,13 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         // Update Local Database
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-
         sqLiteDatabaseHelper.updateTodo(tasks.get(position), tasks.get(position).getYear(), tasks.get(position).getMonth(), tasks.get(position).getDay(), tasks.get(position).getTitle());
+
+        // Refresh PieChart
+        double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("weekly");
+        setPieChart(ratio);
+        pressedWeekly();
+
         sqLiteDatabase.close();
     }
 
@@ -476,10 +493,12 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
                     else if(!drawerLayout.isDrawerOpen(activityNavigationView)){
                         drawerLayout.openDrawer(activityNavigationView);
+                        onClick(weekly);
                     }
 
                     else if(drawerLayout.isDrawerOpen(userNavigationView)){
                         drawerLayout.closeDrawer(userNavigationView);
+                        onClick(weekly);
                     }
                 }
             }.start();
@@ -490,13 +509,21 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Activity Navigation Drawer
-
         else if(view == daily){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("daily");
+            setPieChart(ratio);
             pressedDaily();
+        } else if(view == weekly){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("weekly");
+            setPieChart(ratio);
+            pressedWeekly();
         } else if(view == monthly){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getTodoFeedbackRatio("monthly");
+            setPieChart(ratio);
             pressedMonthly();
-        } else if(view == yearly){
-            pressedYearly();
         }
     }
 
@@ -505,13 +532,27 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         daily.setTextColor(getResources().getColor(R.color.colorWhite));
         daily.setElevation(0);
 
+        weekly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        weekly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        weekly.setElevation(6);
+
         monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
         monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
         monthly.setElevation(6);
+    }
 
-        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        yearly.setElevation(6);
+    public void pressedWeekly(){
+        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
+        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
+        daily.setElevation(6);
+
+        weekly.setBackground(getResources().getDrawable(R.color.colorPrimary));
+        weekly.setTextColor(getResources().getColor(R.color.colorWhite));
+        weekly.setElevation(0);
+
+        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        monthly.setElevation(6);
     }
 
     public void pressedMonthly(){
@@ -519,27 +560,13 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         daily.setTextColor(getResources().getColor(R.color.colorPrimary));
         daily.setElevation(6);
 
+        weekly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        weekly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        weekly.setElevation(6);
+
         monthly.setBackground(getResources().getDrawable(R.color.colorPrimary));
         monthly.setTextColor(getResources().getColor(R.color.colorWhite));
         monthly.setElevation(0);
-
-        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        yearly.setElevation(6);
-    }
-
-    public void pressedYearly(){
-        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
-        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
-        daily.setElevation(6);
-
-        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        monthly.setElevation(6);
-
-        yearly.setBackground(getResources().getDrawable(R.color.colorPrimary));
-        yearly.setTextColor(getResources().getColor(R.color.colorWhite));
-        yearly.setElevation(0);
     }
 
     @Override

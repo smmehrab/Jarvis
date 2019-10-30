@@ -3,6 +3,7 @@ package com.example.jarvis.SQLite;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.view.Gravity;
@@ -13,7 +14,11 @@ import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
@@ -514,6 +519,218 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+    public double getTodoFeedbackRatio(String type){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        double ratio = 1;
+
+        // Getting Current Time
+        Cursor cursorCurrent = sqLiteDatabase.rawQuery("SELECT date('now')" + ";", null);
+        cursorCurrent.moveToPosition(0);
+        String currentDate = cursorCurrent.getString(0);
+
+        // String to Calender
+        SimpleDateFormat sdf = new SimpleDateFormat("yy-M-dd");
+        Date date = null;
+        try {
+            date = sdf.parse(currentDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // Calender to String
+        String day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+        String month = Integer.toString(calendar.get(Calendar.MONTH));
+        String year = Integer.toString(calendar.get(Calendar.YEAR));
+
+        if(type.equals("daily")) {
+            long completed = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                    TODO_IS_COMPLETED + " = 1 AND " +
+                            TODO_IS_IGNORED + " = 0 AND " +
+                            TODO_IS_DELETED + " = 0 AND " +
+                            TODO_DAY + " = ? AND " +
+                            TODO_MONTH + " = ? AND " +
+                            TODO_YEAR + " = ? "
+                    , new String[] {day, month, year});
+
+            long incomplete = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                    TODO_IS_COMPLETED + " = 0 AND " +
+                            TODO_IS_IGNORED + " = 0 AND " +
+                            TODO_IS_DELETED + " = 0 AND " +
+                            TODO_DAY + " = ? AND " +
+                            TODO_MONTH + " = ? AND " +
+                            TODO_YEAR + " = ? "
+                    , new String[] {day, month, year});
+
+            ratio = (completed*1.00/(incomplete+completed));
+        }
+
+        else if(type.equals("weekly")) {
+            // Weekly Code
+            Cursor cursorWeek = sqLiteDatabase.rawQuery("SELECT date('now', 'weekday 0', '-7 days')" + ";", null);
+            cursorWeek.moveToPosition(0);
+            String currentWeek = cursorWeek.getString(0);
+
+            // String to Calender
+            Date weekDate = null;
+            try {
+                weekDate = sdf.parse(currentWeek);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Calendar weekCalender = Calendar.getInstance();
+            weekCalender.setTime(weekDate);
+
+            // Calender to String
+            Integer weekStartDay = weekCalender.get(Calendar.DAY_OF_MONTH);
+            Integer weekEndDay = weekCalender.get(Calendar.DAY_OF_MONTH)+7;
+
+            Integer weekMonth = weekCalender.get(Calendar.MONTH);
+            Integer weekYear = weekCalender.get(Calendar.YEAR);
+
+            if(weekEndDay>31 &&  (weekMonth == 0 || weekMonth == 2 || weekMonth == 4 || weekMonth == 6
+                    || weekMonth == 7 || weekMonth == 9 || weekMonth == 11) ){
+
+                Integer weekSecondMonth = weekMonth + 1;
+                Integer weekFirstStartDay = weekStartDay;
+                Integer weekFirstEndDay = 31;
+                Integer weekSecondStartDay = 1;
+                Integer weekSecondEndDay = weekSecondStartDay + (6-(weekFirstEndDay-weekFirstStartDay+1));
+
+                long completed = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 1 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                completed += DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 1 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                long incomplete = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 0 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                incomplete+= DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 0 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                ratio = (completed*1.00/(incomplete+completed));
+            }
+
+            else if(weekEndDay>30 &&  (weekMonth == 1 || weekMonth == 3 || weekMonth == 5 || weekMonth == 8
+                    || weekMonth == 10)){
+
+                Integer weekSecondMonth = weekMonth + 1;
+                Integer weekFirstStartDay = weekStartDay;
+                Integer weekFirstEndDay = 30;
+                Integer weekSecondStartDay = 1;
+                Integer weekSecondEndDay = weekSecondStartDay + (6-(weekFirstEndDay-weekFirstStartDay+1));
+
+                long completed = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 1 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                completed += DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 1 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                long incomplete = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 0 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                incomplete+= DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 0 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                ratio = (completed*1.00/(incomplete+completed));
+            } else {
+                long completed = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 1 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekStartDay+"",weekEndDay+""});
+
+                long incomplete = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                        TODO_IS_COMPLETED + " = 0 AND " +
+                                TODO_IS_IGNORED + " = 0 AND " +
+                                TODO_IS_DELETED + " = 0 AND " +
+                                TODO_MONTH + " = ? AND " +
+                                TODO_YEAR + " = ? AND " +
+                                TODO_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekStartDay+"",weekEndDay+""});
+                ratio = (completed*1.00/(incomplete+completed));
+            }
+
+        }
+
+        else if(type.equals("monthly")) {
+            long completed = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                    TODO_IS_COMPLETED + " = 1 AND " +
+                            TODO_IS_IGNORED + " = 0 AND " +
+                            TODO_IS_DELETED + " = 0 AND " +
+                            TODO_MONTH + " = ? AND " +
+                            TODO_YEAR + " = ? "
+                    , new String[] {month, year});
+
+            long incomplete = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_TODO,
+                    TODO_IS_COMPLETED + " = 0 AND " +
+                            TODO_IS_IGNORED + " = 0 AND " +
+                            TODO_IS_DELETED + " = 0 AND " +
+                            TODO_MONTH + " = ? AND " +
+                            TODO_YEAR + " = ? "
+                    , new String[] {month, year});
+
+            ratio = (completed*1.00/(incomplete+completed));
+        }
+
+        return ratio;
+    }
+
     public ArrayList<Task> loadTodoItems(){
         ArrayList<Task> tasks = new ArrayList<Task>();
 
@@ -869,6 +1086,219 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.close();
     }
+
+    public double getWalletFeedbackRatio(String type){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        double ratio = 1;
+
+        // Getting Current Time
+        Cursor cursorCurrent = sqLiteDatabase.rawQuery("SELECT date('now')" + ";", null);
+        cursorCurrent.moveToPosition(0);
+        String currentDate = cursorCurrent.getString(0);
+
+        // String to Calender
+        SimpleDateFormat sdf = new SimpleDateFormat("yy-M-dd");
+        Date date = null;
+        try {
+            date = sdf.parse(currentDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // Calender to String
+        String day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+        String month = Integer.toString(calendar.get(Calendar.MONTH));
+        String year = Integer.toString(calendar.get(Calendar.YEAR));
+
+        if(type.equals("daily")) {
+            long earning = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                    WALLET_TYPE + " = 1 AND " +
+                            WALLET_IS_IGNORED + " = 0 AND " +
+                            WALLET_IS_DELETED + " = 0 AND " +
+                            WALLET_DAY + " = ? AND " +
+                            WALLET_MONTH + " = ? AND " +
+                            WALLET_YEAR + " = ? "
+                    , new String[] {day, month, year});
+
+            long expense = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                    WALLET_TYPE + " = 0 AND " +
+                            WALLET_IS_IGNORED + " = 0 AND " +
+                            WALLET_IS_DELETED + " = 0 AND " +
+                            WALLET_DAY + " = ? AND " +
+                            WALLET_MONTH + " = ? AND " +
+                            WALLET_YEAR + " = ? "
+                    , new String[] {day, month, year});
+
+            ratio = (earning*1.00/(expense+earning));
+        }
+
+        else if(type.equals("weekly")) {
+            // Weekly Code
+            Cursor cursorWeek = sqLiteDatabase.rawQuery("SELECT date('now', 'weekday 0', '-7 days')" + ";", null);
+            cursorWeek.moveToPosition(0);
+            String currentWeek = cursorWeek.getString(0);
+
+            // String to Calender
+            Date weekDate = null;
+            try {
+                weekDate = sdf.parse(currentWeek);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Calendar weekCalender = Calendar.getInstance();
+            weekCalender.setTime(weekDate);
+
+            // Calender to String
+            Integer weekStartDay = weekCalender.get(Calendar.DAY_OF_MONTH);
+            Integer weekEndDay = weekCalender.get(Calendar.DAY_OF_MONTH)+7;
+
+            Integer weekMonth = weekCalender.get(Calendar.MONTH);
+            Integer weekYear = weekCalender.get(Calendar.YEAR);
+
+            if(weekEndDay>31 &&  (weekMonth == 0 || weekMonth == 2 || weekMonth == 4 || weekMonth == 6
+                    || weekMonth == 7 || weekMonth == 9 || weekMonth == 11) ){
+
+                Integer weekSecondMonth = weekMonth + 1;
+                Integer weekFirstStartDay = weekStartDay;
+                Integer weekFirstEndDay = 31;
+                Integer weekSecondStartDay = 1;
+                Integer weekSecondEndDay = weekSecondStartDay + (6-(weekFirstEndDay-weekFirstStartDay+1));
+
+                long earning = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 1 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                earning += DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 1 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                long expense = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 0 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                expense+= DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 0 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                ratio = (earning*1.00/(earning+expense));
+            }
+
+            else if(weekEndDay>30 &&  (weekMonth == 1 || weekMonth == 3 || weekMonth == 5 || weekMonth == 8
+                    || weekMonth == 10)){
+
+                Integer weekSecondMonth = weekMonth + 1;
+                Integer weekFirstStartDay = weekStartDay;
+                Integer weekFirstEndDay = 30;
+                Integer weekSecondStartDay = 1;
+                Integer weekSecondEndDay = weekSecondStartDay + (6-(weekFirstEndDay-weekFirstStartDay+1));
+
+                long earning = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 1 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                earning += DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 1 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                long expense = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 0 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekFirstStartDay+"",weekFirstEndDay+""});
+
+                expense+= DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 0 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekSecondMonth+"", weekYear+"", weekSecondStartDay+"",weekSecondEndDay+""});
+
+                ratio = (earning*1.00/(expense+earning));
+            } else {
+                long earning = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 1 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekStartDay+"",weekEndDay+""});
+
+                long expense = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                        WALLET_TYPE + " = 0 AND " +
+                                WALLET_IS_IGNORED + " = 0 AND " +
+                                WALLET_IS_DELETED + " = 0 AND " +
+                                WALLET_MONTH + " = ? AND " +
+                                WALLET_YEAR + " = ? AND " +
+                                WALLET_DAY + " BETWEEN ? AND ?"
+                        , new String[] {weekMonth+"", weekYear+"", weekStartDay+"",weekEndDay+""});
+                ratio = (earning*1.00/(expense+earning));
+            }
+
+        }
+
+        else if(type.equals("monthly")) {
+            long earning = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                    WALLET_TYPE + " = 1 AND " +
+                            WALLET_IS_IGNORED + " = 0 AND " +
+                            WALLET_IS_DELETED + " = 0 AND " +
+                            WALLET_MONTH + " = ? AND " +
+                            WALLET_YEAR + " = ? "
+                    , new String[] {month, year});
+
+            long expense = DatabaseUtils.queryNumEntries(sqLiteDatabase, TABLE_WALLET,
+                    WALLET_TYPE + " = 0 AND " +
+                            WALLET_IS_IGNORED + " = 0 AND " +
+                            WALLET_IS_DELETED + " = 0 AND " +
+                            WALLET_MONTH + " = ? AND " +
+                            WALLET_YEAR + " = ? "
+                    , new String[] {month, year});
+
+            ratio = (expense*1.00/(earning+expense));
+        }
+
+        return ratio;
+    }
+
 
     public ArrayList<Record> loadWalletItems(){
         ArrayList<Record> records = new ArrayList<Record>();
