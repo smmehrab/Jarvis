@@ -20,16 +20,33 @@
             android:layout_weight="1"/>
 
         <LinearLayout
+            android:id="@+id/recycler_parent"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10">
 
-            <include
-                layout="@layout/reminder_bar"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/reminder_tab"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                app:tabGravity="fill"
+                app:tabIndicatorGravity="bottom"
+                app:tabIndicatorColor="@color/colorWhite"
+                app:tabMode="fixed"
+                app:tabTextColor="@color/colorWhite"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorWhite"/>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/reminder_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -67,7 +84,7 @@
         android:paddingBottom="30dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/reminder_fab"
+            android:id="@+id/reminder_add_reminder_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"

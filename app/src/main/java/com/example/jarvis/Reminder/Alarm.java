@@ -1,23 +1,10 @@
 package com.example.jarvis.Reminder;
 
-import android.content.Intent;
-
 public class Alarm {
     private String hour;
     private String minute;
     private Integer isEveryday;
-
-    private Integer isDeleted;
-    private Integer isIgnored;
-
-
-    public Alarm(String hour, String minute, Integer isEveryday, Integer isDeleted, Integer isIgnored) {
-        this.hour = hour;
-        this.minute = minute;
-        this.isEveryday = isEveryday;
-        this.isDeleted = isDeleted;
-        this.isIgnored = isIgnored;
-    }
+    private Integer status;
 
     public String getHour() {
         return hour;
@@ -43,19 +30,18 @@ public class Alarm {
         this.isEveryday = isEveryday;
     }
 
-    public Integer getIsDeleted() {
-        return isDeleted;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setIsDeleted(Integer isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public Integer getIsIgnored() {
-        return isIgnored;
-    }
-
-    public void setIsIgnored(Integer isIgnored) {
-        this.isIgnored = isIgnored;
+    public Alarm(String hour, String minute, Integer isEveryday, Integer status) {
+        this.hour = hour;
+        this.minute = minute;
+        this.isEveryday = isEveryday;
+        this.status = status;
     }
 }

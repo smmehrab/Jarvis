@@ -1,0 +1,95 @@
+package com.example.jarvis.Todo;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.jarvis.R;
+
+import java.util.ArrayList;
+
+public class BinTaskAdapter extends RecyclerView.Adapter<BinTaskAdapter.BinTaskViewHolder> {
+
+    Context context;
+    ArrayList<Task> tasks;
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
+
+    public BinTaskAdapter(Context context, ArrayList<Task> tasks){
+        this.context = context;
+        this.tasks = tasks;
+    }
+
+    public void setTasks(ArrayList<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    @NonNull
+    @Override
+    public BinTaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new BinTaskViewHolder(LayoutInflater.from(context).inflate(R.layout.custom_todo_bin_item , parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull BinTaskViewHolder taskViewHolder, int position) {
+        // Set Title & Description
+        taskViewHolder.title.setText(tasks.get(position).getTitle());
+        taskViewHolder.description.setText(tasks.get(position).getDescription());
+
+        // Set Date
+        String date = null;
+        String[] month = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        date = tasks.get(position).getDay() + " " +
+                month[Integer.parseInt(tasks.get(position).getMonth())] + ", " +
+                tasks.get(position).getYear();
+        taskViewHolder.date.setText(date);
+
+        // Set Time
+        String time = null;
+        if(tasks.get(position).getHour()!=null && tasks.get(position).getMinute()!=null) {
+            Integer hour = Integer.parseInt(tasks.get(position).getHour());
+            String amPm = " AM";
+            if (hour >= 12) {
+                amPm = " PM";
+                hour = hour - 12;
+            }
+            time = hour.toString() + ":" + tasks.get(position).getMinute() + amPm;
+        }
+        taskViewHolder.time.setText(time);
+
+        // Set Checkbox
+        taskViewHolder.checkBox.setOnCheckedChangeListener(null);
+        if(tasks.get(position).getIsCompleted() == 0)
+            taskViewHolder.checkBox.setChecked(false);
+        else
+            taskViewHolder.checkBox.setChecked(true);
+    }
+
+    @Override
+    public int getItemCount() {
+        return tasks.size();
+    }
+
+    class BinTaskViewHolder extends RecyclerView.ViewHolder{
+
+        TextView title, description, date, time;
+        CheckBox checkBox;
+
+        public BinTaskViewHolder(@NonNull View itemView) {
+            super(itemView);
+            title = (TextView) itemView.findViewById(R.id.todo_bin_item_title);
+            description = (TextView) itemView.findViewById(R.id.todo_bin_item_description);
+            date = (TextView) itemView.findViewById(R.id.todo_bin_item_date);
+            time = (TextView) itemView.findViewById(R.id.todo_bin_item_time);
+            checkBox = (CheckBox) itemView.findViewById(R.id.todo_bin_item_checkbox);
+        }
+    }
+}

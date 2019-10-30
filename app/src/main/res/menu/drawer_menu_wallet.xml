@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:itemBackground="@color/colorWhite">
+    <item
+        android:id="@+id/wallet_bin_option"
+        android:icon="@drawable/icon_delete"
+        app:itemBackground="@color/colorPrimary"
+        android:title="Bin"/>
 </menu>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -48,6 +49,11 @@ import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -59,6 +65,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class WalletActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
@@ -85,6 +92,12 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
+
+    private PieChart pieChart;
+
+    private Button daily, monthly, yearly;
+
+    private Button binBtn;
 
     /** FAB */
     private FloatingActionButton fab;
@@ -136,11 +149,22 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         fab = (FloatingActionButton) findViewById(R.id.wallet_fab);
         activityTitle = (TextView) findViewById(R.id.activity_title);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
-        activityNavigationView = (NavigationView) findViewById(R.id.wallet_navigation_view);
+
         walletRecyclerView = findViewById(R.id.wallet_recycler_view);
 
         progressBar = (ProgressBar) findViewById(R.id.wallet_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.wallet_voice_command_toggle_btn);
+
+        // Activity Navigation Drawer
+        activityNavigationView = (NavigationView) findViewById(R.id.wallet_navigation_view);
+        View activityNavigationViewHeaderView = activityNavigationView.getHeaderView(0);
+        pieChart = (PieChart) activityNavigationViewHeaderView.findViewById(R.id.wallet_piechart);
+
+        binBtn = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_bin_option);
+
+        daily = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_daily);
+        monthly = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_monthly);
+        yearly = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_yearly);
     }
 
     public void setToolbar(){
@@ -158,9 +182,13 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         activityDrawerBtn.setOnClickListener(this);
         fab.setOnClickListener(this);
 
-        // Navigation Views
+        // Navigation Drawer
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
+
+        daily.setOnClickListener(this);
+        monthly.setOnClickListener(this);
+        yearly.setOnClickListener(this);
 
         // Recycler View
         walletRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -171,7 +199,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
                 .setClickable(new RecyclerTouchListener.OnRowClickListener() {
                     @Override
                     public void onRowClicked(int position) {
-                        Toast.makeText(getApplicationContext(),records.get(position).getTitle(),Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(),records.get(position).getTitle(),Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -225,7 +253,50 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setChecked(true);
 
+        setPieChart();
+
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public void setPieChart(){
+        pieChart.setUsePercentValues(true);
+        pieChart.animateXY(2000, 2000);
+
+        List<PieEntry> value = new ArrayList<>();
+        value.add(new PieEntry(40f, ""));
+        value.add(new PieEntry(60f, ""));
+
+        PieDataSet pieDataSet = new PieDataSet(value, "");
+
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+        final int[] ALL_COLORS = {Color.rgb(76,175,80), Color.rgb(241,91,64)};
+        for(int color: ALL_COLORS)
+            colors.add(color);
+
+        pieDataSet.setColors(colors);
+
+        pieDataSet.setSliceSpace(2);
+        pieDataSet.setDrawIcons(false);
+        pieDataSet.setValueTextColor(Color.WHITE);
+        pieDataSet.setDrawIcons(false);
+        pieDataSet.setHighlightEnabled(true);
+
+        PieData pieData = new PieData(pieDataSet);
+
+        pieChart.setData(pieData);
+
+        pieChart.setDrawEntryLabels(false);
+        pieChart.setDrawSliceText(false); // To remove slice text
+        pieChart.setDrawMarkers(false); // To remove markers when click
+        pieChart.setDrawEntryLabels(false); // To remove labels from piece of pie
+        pieChart.getDescription().setEnabled(false); // To remove description of pie
+        pieChart.setDrawMarkers(false);
+        pieChart.setEntryLabelColor(Color.WHITE);
+
+        pieChart.setDrawHoleEnabled(true);
+        pieChart.setHoleRadius(50f);
+        Legend l = pieChart.getLegend();
+        l.setEnabled(false);
     }
 
     void handleDatabase(){
@@ -382,6 +453,62 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             Intent intent = new Intent(getApplicationContext(), AddRecordActivity.class);
             startActivity(intent);
         }
+
+        else if(view == daily){
+            pressedDaily();
+        } else if(view == monthly){
+            pressedMonthly();
+        } else if(view == yearly){
+            pressedYearly();
+        }
+
+//        else if(view == binBtn){
+//            Intent intent = new Intent(getApplicationContext(), WalletBinActivity.class);
+//            startActivity(intent);
+//            drawerLayout.closeDrawer(GravityCompat.START);
+//        }
+    }
+
+    public void pressedDaily(){
+        daily.setBackground(getResources().getDrawable(R.color.colorPrimary));
+        daily.setTextColor(getResources().getColor(R.color.colorWhite));
+        daily.setElevation(0);
+
+        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        monthly.setElevation(6);
+
+        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        yearly.setElevation(6);
+    }
+
+    public void pressedMonthly(){
+        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
+        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
+        daily.setElevation(6);
+
+        monthly.setBackground(getResources().getDrawable(R.color.colorPrimary));
+        monthly.setTextColor(getResources().getColor(R.color.colorWhite));
+        monthly.setElevation(0);
+
+        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        yearly.setElevation(6);
+    }
+
+    public void pressedYearly(){
+        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
+        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
+        daily.setElevation(6);
+
+        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        monthly.setElevation(6);
+
+        yearly.setBackground(getResources().getDrawable(R.color.colorPrimary));
+        yearly.setTextColor(getResources().getColor(R.color.colorWhite));
+        yearly.setElevation(0);
     }
 
     @Override
@@ -420,6 +547,11 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
                 Snackbar.make(drawerLayout, "Can't Sign Out Without Internet Access!", Snackbar.LENGTH_SHORT).show();
             else
                 signOut();
+        }
+
+        else if (id == R.id.wallet_bin_option) {
+            Intent intent = new Intent(getApplicationContext(), WalletBinActivity.class);
+            startActivity(intent);
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
