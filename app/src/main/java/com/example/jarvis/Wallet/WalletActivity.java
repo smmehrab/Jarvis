@@ -95,7 +95,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
     private PieChart pieChart;
 
-    private Button daily, monthly, yearly;
+    private Button daily, weekly, monthly;
 
     private Button binBtn;
 
@@ -163,8 +163,8 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         binBtn = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_bin_option);
 
         daily = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_daily);
+        weekly = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_weekly);
         monthly = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_monthly);
-        yearly = (Button) activityNavigationViewHeaderView.findViewById(R.id.wallet_pie_yearly);
     }
 
     public void setToolbar(){
@@ -187,8 +187,8 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         activityNavigationView.setNavigationItemSelectedListener(this);
 
         daily.setOnClickListener(this);
+        weekly.setOnClickListener(this);
         monthly.setOnClickListener(this);
-        yearly.setOnClickListener(this);
 
         // Recycler View
         walletRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -253,18 +253,25 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setChecked(true);
 
-        setPieChart();
+        // Initialize PieChart
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        double ratio = sqLiteDatabaseHelper.getWalletFeedbackRatio("weekly");
+        setPieChart(ratio);
+        pressedWeekly();
 
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public void setPieChart(){
+    public void setPieChart(double ratio){
+        float completed = (float) ((float) ratio*100.00);
+        float incomplete = (float) 100.00 - completed;
+
         pieChart.setUsePercentValues(true);
-        pieChart.animateXY(2000, 2000);
+        pieChart.animateXY(500, 1000);
 
         List<PieEntry> value = new ArrayList<>();
-        value.add(new PieEntry(40f, ""));
-        value.add(new PieEntry(60f, ""));
+        value.add(new PieEntry(completed, ""));
+        value.add(new PieEntry(incomplete, ""));
 
         PieDataSet pieDataSet = new PieDataSet(value, "");
 
@@ -282,7 +289,6 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         pieDataSet.setHighlightEnabled(true);
 
         PieData pieData = new PieData(pieDataSet);
-
         pieChart.setData(pieData);
 
         pieChart.setDrawEntryLabels(false);
@@ -325,6 +331,12 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
                 records.get(position).getType());
 
         loadData(sqLiteDatabaseHelper);
+
+        // Refresh PieChart
+        double ratio = sqLiteDatabaseHelper.getWalletFeedbackRatio("weekly");
+        setPieChart(ratio);
+        pressedWeekly();
+
         sqLiteDatabase.close();
     }
 
@@ -441,10 +453,12 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
                     else if(!drawerLayout.isDrawerOpen(activityNavigationView)){
                         drawerLayout.openDrawer(activityNavigationView);
+                        onClick(weekly);
                     }
 
                     else if(drawerLayout.isDrawerOpen(userNavigationView)){
                         drawerLayout.closeDrawer(userNavigationView);
+                        onClick(weekly);
                     }
                 }
             }.start();
@@ -454,19 +468,23 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             startActivity(intent);
         }
 
+        // Activity Navigation Drawer
         else if(view == daily){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getWalletFeedbackRatio("daily");
+            setPieChart(ratio);
             pressedDaily();
+        } else if(view == weekly){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getWalletFeedbackRatio("weekly");
+            setPieChart(ratio);
+            pressedWeekly();
         } else if(view == monthly){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+            double ratio = sqLiteDatabaseHelper.getWalletFeedbackRatio("monthly");
+            setPieChart(ratio);
             pressedMonthly();
-        } else if(view == yearly){
-            pressedYearly();
         }
-
-//        else if(view == binBtn){
-//            Intent intent = new Intent(getApplicationContext(), WalletBinActivity.class);
-//            startActivity(intent);
-//            drawerLayout.closeDrawer(GravityCompat.START);
-//        }
     }
 
     public void pressedDaily(){
@@ -474,13 +492,27 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         daily.setTextColor(getResources().getColor(R.color.colorWhite));
         daily.setElevation(0);
 
+        weekly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        weekly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        weekly.setElevation(6);
+
         monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
         monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
         monthly.setElevation(6);
+    }
 
-        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        yearly.setElevation(6);
+    public void pressedWeekly(){
+        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
+        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
+        daily.setElevation(6);
+
+        weekly.setBackground(getResources().getDrawable(R.color.colorPrimary));
+        weekly.setTextColor(getResources().getColor(R.color.colorWhite));
+        weekly.setElevation(0);
+
+        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        monthly.setElevation(6);
     }
 
     public void pressedMonthly(){
@@ -488,27 +520,13 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         daily.setTextColor(getResources().getColor(R.color.colorPrimary));
         daily.setElevation(6);
 
+        weekly.setBackground(getResources().getDrawable(R.color.colorWhite));
+        weekly.setTextColor(getResources().getColor(R.color.colorPrimary));
+        weekly.setElevation(6);
+
         monthly.setBackground(getResources().getDrawable(R.color.colorPrimary));
         monthly.setTextColor(getResources().getColor(R.color.colorWhite));
         monthly.setElevation(0);
-
-        yearly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        yearly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        yearly.setElevation(6);
-    }
-
-    public void pressedYearly(){
-        daily.setBackground(getResources().getDrawable(R.color.colorWhite));
-        daily.setTextColor(getResources().getColor(R.color.colorPrimary));
-        daily.setElevation(6);
-
-        monthly.setBackground(getResources().getDrawable(R.color.colorWhite));
-        monthly.setTextColor(getResources().getColor(R.color.colorPrimary));
-        monthly.setElevation(6);
-
-        yearly.setBackground(getResources().getDrawable(R.color.colorPrimary));
-        yearly.setTextColor(getResources().getColor(R.color.colorWhite));
-        yearly.setElevation(0);
     }
 
     @Override
