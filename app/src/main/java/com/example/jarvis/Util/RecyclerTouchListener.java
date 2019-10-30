@@ -536,7 +536,6 @@ public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener, 
                         bgView = touchedView.findViewById(bgViewID);
 //                        bgView.getLayoutParams().height = fgView.getHeight();
                         bgView.setMinimumHeight(fgView.getHeight());
-
                         /*
                          * bgVisible is true when the options menu is opened
                          * This block is to register fgPartialViewClicked status - Partial view is the view that is still

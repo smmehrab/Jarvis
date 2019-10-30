@@ -79,6 +79,9 @@ dependencies {
 
     //Picasso Image
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // Pie Chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

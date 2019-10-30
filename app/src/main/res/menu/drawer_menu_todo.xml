@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:itemBackground="@color/colorWhite">
     <item
-        android:id="@+id/todo_time_option"
-        android:title="@string/time_txt"/>
-
-    <item
-        android:id="@+id/todo_date_option"
-        android:title="@string/date_txt"/>
+        android:id="@+id/todo_bin_option"
+        android:icon="@drawable/icon_delete"
+        android:title="Bin"
+        app:itemBackground="@color/colorPrimary"
+        />
 </menu>

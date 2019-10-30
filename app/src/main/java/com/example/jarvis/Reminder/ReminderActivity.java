@@ -46,14 +46,13 @@ import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Util.ViewPagerAdapter;
-import com.example.jarvis.Wallet.Record;
-import com.example.jarvis.Wallet.RecordAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -64,21 +63,21 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class ReminderActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
-    /** Network Variables */
+    // Network Variables
     private BroadcastReceiver networkReceiver = null;
 
-    /** Firebase Variables */
+    // Firebase Variables
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
     GoogleSignInOptions googleSignInOptions;
 
-    /** Toolbar */
+    // Toolbar
     private Toolbar toolbar;
     private TextView activityTitle;
 
-    /** Drawer Variables */
+    // Drawer Variables
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
@@ -88,7 +87,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
 
-    /** For Tab Layout */
+    // For Tab Layout
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
@@ -98,12 +97,15 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     };
 
 
-    /** RecyclerView Variables */
-    RecyclerView reminderRecyclerView;
-    ArrayList<Record> records;
-    RecordAdapter recordAdapter;
+    // RecyclerView Variables
+    RecyclerView alarmRecyclerView, eventRecyclerView;
+    ArrayList<Alarm> alarms, events;
+    AlarmAdapter alarmAdapter, eventAdapter;
 
-    RecyclerTouchListener touchListener;
+    RecyclerTouchListener alarmTouchListener, eventTouchListener;
+
+    // Fab
+    FloatingActionButton addReminderFab;
 
     /********/
 
@@ -140,12 +142,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         toolbar = (Toolbar) findViewById(R.id.reminder_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        //fab = (FloatingActionButton) findViewById(R.id.reminder_fab);
+        addReminderFab = (FloatingActionButton) findViewById(R.id.reminder_add_reminder_fab);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.reminder_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
-
-        // reminderRecyclerView = findViewById(R.id.reminder_recycler_view);
 
         // For Tab Layout
         tabLayout = (TabLayout) findViewById(R.id.reminder_tab);
@@ -174,7 +174,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
-
 
         // Voice Command On/Off
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -216,11 +215,12 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(tabIcons[0]);
+        Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(tabIcons[1]);
 
         // For Voice Command
         progressBar.setVisibility(View.INVISIBLE);
+
     }
 
     public void showToast(String message){
@@ -357,7 +357,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     }
 
     /** VOICE COMMAND HANDLING **/
-
     public void setVoiceCommandFeature(){
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         Log.i(LOG_TAG, "isRecognitionAvailable: " + SpeechRecognizer.isRecognitionAvailable(this));
@@ -397,7 +396,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     protected void onPause() {
         super.onPause();
         unregisterReceiver(networkReceiver);
-
     }
 
     @Override
@@ -574,7 +572,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     }
 
     /** Firebase Authentication Handling */
-
     private void initializeGoogleVariable() {
         mAuth = FirebaseAuth.getInstance();
 
@@ -587,9 +584,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
     }
 
-
     /** Sync & SignOut */
-
     public void sync(){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
         String uid = sqLiteDatabaseHelper.getUid();

@@ -99,8 +99,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/drawer_header_home"
-        app:menu="@menu/drawer_menu_home">
+        app:headerLayout="@layout/drawer_header_wallet"
+        app:menu="@menu/drawer_menu_wallet">
 
     </com.google.android.material.navigation.NavigationView>
 

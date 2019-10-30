@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.example.jarvis.Journal.Journal;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -115,7 +116,36 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 
     /***Table Journal***/
+    // image_link, file_name
+    private static final String TABLE_JOURNAL = "table_journal";
+    private static final String JOURNAL_TITLE = "journal_title";
+    private static final String JOURNAL_DESCRIPTION = "journal_description";
 
+    private static final String JOURNAL_YEAR = "journal_year";
+    private static final String JOURNAL_MONTH = "journal_month";
+    private static final String JOURNAL_DAY = "journal_day";
+
+    private static final String JOURNAL_HOUR = "journal_hour";
+    private static final String JOURNAL_MINUTE = "journal_minute";
+
+    private static final String JOURNAL_IMAGE_LINK = "journal_imageLink";
+    private static final String JOURNAL_FILE_LINK = "journal_fileLink";
+
+    private static final String CREATE_TABLE_JOURNAL = "CREATE TABLE " + TABLE_JOURNAL + "(" +
+            JOURNAL_TITLE + " TEXT, " +
+            JOURNAL_DESCRIPTION + " TEXT, " +
+
+            JOURNAL_YEAR + " TEXT NOT NULL, " +
+            JOURNAL_MONTH + " TEXT NOT NULL, " +
+            JOURNAL_DAY + " TEXT NOT NULL, " +
+
+            JOURNAL_HOUR + " TEXT, " +
+            JOURNAL_MINUTE + " TEXT, " +
+
+            JOURNAL_IMAGE_LINK + " TEXT NOT NULL, " +
+            JOURNAL_FILE_LINK + " TEXT NOT NULL, " +
+
+            "PRIMARY KEY(" + JOURNAL_FILE_LINK + ")); ";
 
 
     /*** Constructor ***/
@@ -145,6 +175,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_USER);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_TODO);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
             onCreate(sqLiteDatabase);
         } catch (Exception e) {
             showToast("Exception : " + e);
@@ -473,6 +504,16 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+    public void restoreTodo(String year, String month, String day, String title){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Task task = findTodo(year, month, day, title);
+        task.setIsDeleted(0);
+        this.updateTodo(task, year, month, day, title);
+
+        sqLiteDatabase.close();
+    }
+
     public ArrayList<Task> loadTodoItems(){
         ArrayList<Task> tasks = new ArrayList<Task>();
 
@@ -579,6 +620,62 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         return tasks;
     }
+
+    public ArrayList<Task> loadTodoBinItems(){
+        ArrayList<Task> tasks = new ArrayList<Task>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT "
+
+                + TODO_TITLE + ", "
+                + TODO_DESCRIPTION + ", "
+                + TODO_YEAR + ", "
+                + TODO_MONTH + ", "
+                + TODO_DAY + ", "
+                + TODO_HOUR + ", "
+                + TODO_MINUTE + ", "
+                + TODO_REMINDER_STATE + ", "
+                + TODO_IS_COMPLETED + ", "
+                + TODO_IS_DELETED + ", "
+                + TODO_IS_IGNORED + ", "
+                + TODO_UPDATE_TIMESTAMP +
+
+                " FROM " + TABLE_TODO +
+                " WHERE " + TODO_IS_DELETED + " = 1 AND " + TODO_IS_IGNORED + " = 0" +
+                " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            do{
+                String title = cursor.getString(cursor.getColumnIndex(TODO_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(TODO_DESCRIPTION));
+
+                String year = cursor.getString(cursor.getColumnIndex(TODO_YEAR));
+                String month = cursor.getString(cursor.getColumnIndex(TODO_MONTH));
+                String day = cursor.getString(cursor.getColumnIndex(TODO_DAY));
+
+                String hour = cursor.getString(cursor.getColumnIndex(TODO_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(TODO_MINUTE));
+
+                Integer reminderState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_REMINDER_STATE)));
+                Integer isCompleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_COMPLETED)));
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED)));
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED)));
+
+                String updateTimestamp = cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP));
+
+                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp));
+            }while(cursor.moveToNext());
+        }
+
+        return tasks;
+    }
+
+
 
     /*** Query on TABLE_WALLET ***/
 
@@ -751,6 +848,17 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.close();
     }
 
+    public void restoreRecord(String year, String month, String day, String title, Integer type){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+
+        Record record = findRecord(year, month, day, title, type);
+        record.setIsDeleted(0);
+        this.updateRecord(record, year, month, day, title, type);
+
+        sqLiteDatabase.close();
+    }
+
     public void permanentlyDeleteRecord(String year, String month, String day, String title, Integer type){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
@@ -832,6 +940,196 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         return records;
     }
+
+    public ArrayList<Record> loadWalletBinItems(){
+        ArrayList<Record> records = new ArrayList<Record>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
+                " WHERE " + WALLET_IS_DELETED + " = 1 AND " + WALLET_IS_IGNORED + " = 0" +
+                " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            do{
+                String title = cursor.getString(cursor.getColumnIndex(WALLET_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(WALLET_DESCRIPTION));
+
+                String year = cursor.getString(cursor.getColumnIndex(WALLET_YEAR));
+                String month = cursor.getString(cursor.getColumnIndex(WALLET_MONTH));
+                String day = cursor.getString(cursor.getColumnIndex(WALLET_DAY));
+
+                Integer type = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_TYPE)));
+                String amount = cursor.getString(cursor.getColumnIndex(WALLET_AMOUNT));
+
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED)));
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED)));
+
+                String updateTimestamp = cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP));
+
+                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp));
+            }while (cursor.moveToNext());
+        }
+
+        return records;
+    }
+
+    /*** Query on TABLE_JOURNAL ***/
+
+    public long insertJournal(Journal journal){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        String title = journal.getTitle();
+        String description = journal.getDescription();
+
+        String year = journal.getYear();
+        String month = journal.getMonth();
+        String day = journal.getDay();
+
+        String hour = journal.getHour();
+        String minute = journal.getMinute();
+
+        String imageLink = journal.getImageLink();
+        String fileLink = journal.getFileLink();
+
+        contentValues.put(JOURNAL_TITLE, title);
+        contentValues.put(JOURNAL_DESCRIPTION, description);
+
+        contentValues.put(JOURNAL_YEAR, year);
+        contentValues.put(JOURNAL_MONTH, month);
+        contentValues.put(JOURNAL_DAY, day);
+
+        contentValues.put(JOURNAL_HOUR, hour);
+        contentValues.put(JOURNAL_MINUTE, minute);
+
+        contentValues.put(JOURNAL_IMAGE_LINK, imageLink);
+        contentValues.put(JOURNAL_FILE_LINK, fileLink);
+
+
+        long rowId = sqLiteDatabase.insert(TABLE_JOURNAL, null, contentValues);
+        return rowId;
+    }
+
+    public void insertAllJournals(ArrayList<Journal> journals){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        for(Journal journal:journals) {
+
+            ContentValues contentValues = new ContentValues();
+
+            String title = journal.getTitle();
+            String description = journal.getDescription();
+
+            String year = journal.getYear();
+            String month = journal.getMonth();
+            String day = journal.getDay();
+
+            String hour = journal.getHour();
+            String minute = journal.getMinute();
+
+            String imageLink = journal.getImageLink();
+            String fileLink = journal.getFileLink();
+
+            contentValues.put(JOURNAL_TITLE, title);
+            contentValues.put(JOURNAL_DESCRIPTION, description);
+
+            contentValues.put(JOURNAL_YEAR, year);
+            contentValues.put(JOURNAL_MONTH, month);
+            contentValues.put(JOURNAL_DAY, day);
+
+            contentValues.put(JOURNAL_HOUR, hour);
+            contentValues.put(JOURNAL_MINUTE, minute);
+
+            contentValues.put(JOURNAL_IMAGE_LINK, imageLink);
+            contentValues.put(JOURNAL_FILE_LINK, fileLink);
+
+
+            long rowId = sqLiteDatabase.insert(TABLE_JOURNAL, null, contentValues);
+
+        }
+    }
+
+    public Journal findRecord(String fileLink) {
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_JOURNAL,
+                null,
+                JOURNAL_FILE_LINK + " = ?",
+                new String[]{fileLink},
+                null,
+                null,
+                JOURNAL_YEAR + " ASC, " + JOURNAL_MONTH  + " ASC, " + JOURNAL_DAY  + " ASC");
+
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
+
+        return new Journal(
+                cursor.getString(cursor.getColumnIndex(JOURNAL_TITLE)),
+                cursor.getString(cursor.getColumnIndex(JOURNAL_DESCRIPTION)),
+
+                cursor.getString(cursor.getColumnIndex(JOURNAL_YEAR)),
+                cursor.getString(cursor.getColumnIndex(JOURNAL_MONTH)),
+                cursor.getString(cursor.getColumnIndex(JOURNAL_DAY)),
+
+                cursor.getString(cursor.getColumnIndex(JOURNAL_HOUR)),
+                cursor.getString(cursor.getColumnIndex(JOURNAL_MINUTE)),
+
+                cursor.getString(cursor.getColumnIndex(JOURNAL_IMAGE_LINK)),
+                cursor.getString(cursor.getColumnIndex(JOURNAL_FILE_LINK))
+        );
+
+    }
+
+
+    public void deleteJournal(String fileLink){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // Permanently Delete Done
+        int i = sqLiteDatabase.delete(TABLE_JOURNAL,
+                JOURNAL_FILE_LINK + " = ?",
+                new String[]{fileLink});
+
+        sqLiteDatabase.close();
+    }
+
+    public ArrayList<Journal> loadAllJournalItems(){
+        ArrayList<Journal> journals = new ArrayList<Journal>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_JOURNAL +
+                " ORDER BY " + JOURNAL_YEAR + ", " + JOURNAL_MONTH + ", " + JOURNAL_DAY + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            do{
+                String title = cursor.getString(cursor.getColumnIndex(JOURNAL_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(JOURNAL_DESCRIPTION));
+
+                String year = cursor.getString(cursor.getColumnIndex(JOURNAL_YEAR));
+                String month = cursor.getString(cursor.getColumnIndex(JOURNAL_MONTH));
+                String day = cursor.getString(cursor.getColumnIndex(JOURNAL_DAY));
+
+                String hour = cursor.getString(cursor.getColumnIndex(JOURNAL_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(JOURNAL_MINUTE));
+
+                String imageLink = cursor.getString(cursor.getColumnIndex(JOURNAL_IMAGE_LINK));
+                String fileLink = cursor.getString(cursor.getColumnIndex(JOURNAL_FILE_LINK));
+
+                journals.add(new Journal(title, description, year, month, day, hour, minute, imageLink, fileLink));
+            }while (cursor.moveToNext());
+        }
+
+        return journals;
+    }
+
+
 
     /*** Additional Functions ***/
 
