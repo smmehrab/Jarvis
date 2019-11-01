@@ -45,7 +45,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         taskViewHolder.description.setText(tasks.get(position).getDescription());
 
         // Set Date
-        String date = null;
+        String date = "null";
         String[] month = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         date = tasks.get(position).getDay() + " " +
                 month[Integer.parseInt(tasks.get(position).getMonth())] + ", " +
@@ -53,7 +53,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         taskViewHolder.date.setText(date);
 
         // Set Time
-        String time = null;
+        String time = "null";
         if(tasks.get(position).getHour()!=null && tasks.get(position).getMinute()!=null) {
             Integer hour = Integer.parseInt(tasks.get(position).getHour());
             String amPm = " AM";

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Reminder.FragmentAlarm">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/alarm_parent"
@@ -13,10 +12,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+<!--            <Button-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:text="Hello Alarm"-->
+<!--                android:layout_height="wrap_content">-->
+
+<!--            </Button>-->
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/alarm_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
 
             </androidx.recyclerview.widget.RecyclerView>

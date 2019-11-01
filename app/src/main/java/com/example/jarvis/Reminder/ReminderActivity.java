@@ -21,12 +21,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -42,6 +45,8 @@ import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
+import com.example.jarvis.Todo.Task;
+import com.example.jarvis.Todo.TaskAdapter;
 import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
@@ -90,17 +95,27 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     // For Tab Layout
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private String activeTab;
 
     private int[] tabIcons = {
       R.drawable.icon_alarm_white,
       R.drawable.icon_event_white
     };
 
+    // Alarm
+    private AlertDialog alarmDialog;
+    private AlertDialog.Builder alarmDialogBuilder;
+    private View alarmDialogView;
+
+    private Switch isEverydaySwitch;
+    private TimePicker alarmTimePicker;
+    private Button addAlarmBtn;
+
 
     // RecyclerView Variables
     RecyclerView alarmRecyclerView, eventRecyclerView;
-    ArrayList<Alarm> alarms, events;
-    AlarmAdapter alarmAdapter, eventAdapter;
+    ArrayList<Task> alarms, events;
+    TaskAdapter alarmAdapter, eventAdapter;
 
     RecyclerTouchListener alarmTouchListener, eventTouchListener;
 
@@ -118,7 +133,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private Intent recognizerIntent;
     private String LOG_TAG = "ReminderActivity";
     private ToggleButton voiceCommandToggleButton;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +165,9 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         tabLayout = (TabLayout) findViewById(R.id.reminder_tab);
         viewPager = (ViewPager) findViewById(R.id.reminder_view_pager);
 
+        // For RecyclerViews
+        alarmRecyclerView = findViewById(R.id.alarm_recycler_view);
+
         // For Voice Command
         progressBar = (ProgressBar) findViewById(R.id.reminder_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.reminder_voice_command_toggle_btn);
@@ -169,7 +186,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // Buttons
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        //fab.setOnClickListener(this);
+        addReminderFab.setOnClickListener(this);
 
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
@@ -217,6 +234,26 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
 
         Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(tabIcons[0]);
         Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(tabIcons[1]);
+
+        activeTab = "Alarm";
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                activeTab = tab.getText().toString();
+                showToast(activeTab);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         // For Voice Command
         progressBar.setVisibility(View.INVISIBLE);
@@ -308,9 +345,35 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
                 }
             }.start();
         }
-       /* else if(view == fab){
-            Intent intent = new Intent(getApplicationContext(), AddReminderActivity.class);
-            startActivity(intent);        }*/
+
+        else if(view == addReminderFab){
+            if(activeTab.equals("Alarm")){
+                addAlarm();
+                showToast("Alarm Added");
+            } else if(activeTab.equals("Event")){
+                showToast("Event Added");
+            }
+        }
+    }
+
+    public void addAlarm(){
+        alarmDialogBuilder = new AlertDialog.Builder(ReminderActivity.this);
+        alarmDialogView = getLayoutInflater().inflate(R.layout.dialog_alarm, null);
+        alarmTimePicker = (TimePicker) alarmDialogView.findViewById(R.id.dialog_alarm_time_picker);
+        isEverydaySwitch = (Switch) alarmDialogView.findViewById(R.id.dialog_alarm_is_everyday_switch);
+        addAlarmBtn = (Button) alarmDialogView.findViewById(R.id.dialog_alarm_add_btn);
+
+        addAlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showToast("Added");
+                alarmDialog.cancel();
+            }
+        });
+
+        alarmDialogBuilder.setView(alarmDialogView);
+        alarmDialog = alarmDialogBuilder.create();
+        alarmDialog.show();
     }
 
     @Override

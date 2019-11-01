@@ -14,12 +14,12 @@ import com.example.jarvis.R;
 
 import java.util.ArrayList;
 
-public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>{
+public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder> {
 
     Context context;
     ArrayList<Alarm> alarms;
 
-    public ArrayList<Alarm> getAlarms() {
+    public ArrayList<Alarm> getTasks() {
         return alarms;
     }
 
@@ -28,69 +28,70 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.AlarmViewHol
         this.alarms = alarms;
     }
 
-    public void setAlarms(ArrayList<Alarm> alarms) {
+    public void setTasks(ArrayList<Alarm> alarms) {
         this.alarms = alarms;
     }
 
     @NonNull
     @Override
     public AlarmViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return  new AlarmAdapter.AlarmViewHolder(LayoutInflater.from(context).inflate(R.layout.custom_alarm_item , parent, false));
+        return new AlarmViewHolder(LayoutInflater.from(context).inflate(R.layout.custom_alarm_item , parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull AlarmViewHolder holder, int position) {
         // Set Time
-        String hour = alarms.get(position).getHour();
-        String minute = alarms.get(position).getMinute();
-        String amPm = " AM";
-
-        if(Integer.parseInt(hour)>12){
-            hour = Integer.toString(Integer.parseInt(hour)%12);
-            amPm = " PM";
+        String time = "null";
+        if(alarms.get(position).getHour()!=null && alarms.get(position).getMinute()!=null) {
+            Integer hour = Integer.parseInt(alarms.get(position).getHour());
+            String amPm = " AM";
+            if (hour >= 12) {
+                amPm = " PM";
+                hour = hour - 12;
+            }
+            time = hour.toString() + ":" + alarms.get(position).getMinute() + amPm;
         }
+        holder.time.setText(time);
 
-        holder.time.setText(hour+":"+minute+amPm);
 
-
-        // Set isEveryday
-        if(alarms.get(position).getIsEveryday()==1) {
+        // Set isEveryday & StatusGap
+        if(alarms.get(position).getIsEveryday()==1){
             holder.isEveryday.setVisibility(View.VISIBLE);
             holder.statusGap.setVisibility(View.VISIBLE);
-            holder.isEveryday.setText("Everyday");
-
-        } else {
-            holder.isEveryday.setVisibility(View.INVISIBLE);
-            holder.statusGap.setVisibility(View.INVISIBLE);
+        } else{
+            holder.isEveryday.setVisibility(View.GONE);
+            holder.statusGap.setVisibility(View.GONE);
         }
 
-        // Set Status Text & Switch
-        if(alarms.get(position).getStatus()==1) {
+        // Set Status
+        if(alarms.get(position).getStatus()==1){
+            holder.aSwitch.setChecked(true);
             holder.status.setText("On");
-            holder.statusSwitch.setChecked(true);
-        } else {
+        } else{
+            holder.aSwitch.setChecked(false);
             holder.status.setText("Off");
-            holder.statusSwitch.setChecked(false);
         }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return alarms.size();
     }
 
-    public class AlarmViewHolder extends RecyclerView.ViewHolder {
+    class AlarmViewHolder extends RecyclerView.ViewHolder{
+
         TextView time, isEveryday, status;
         View statusGap;
-        Switch statusSwitch;
+        Switch aSwitch;
 
         public AlarmViewHolder(@NonNull View itemView) {
             super(itemView);
             time = (TextView) itemView.findViewById(R.id.alarm_item_time);
             isEveryday = (TextView) itemView.findViewById(R.id.alarm_item_is_everyday);
-            statusGap = (View) itemView.findViewById(R.id.alarm_item_status_gap);
             status = (TextView) itemView.findViewById(R.id.alarm_item_status);
-            statusSwitch = (Switch) itemView.findViewById(R.id.alarm_item_switch);
+            statusGap = (View) itemView.findViewById(R.id.alarm_item_status_gap);
+
+            aSwitch = (Switch) itemView.findViewById(R.id.alarm_item_switch);
         }
     }
 }

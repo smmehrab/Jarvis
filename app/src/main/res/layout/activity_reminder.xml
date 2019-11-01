@@ -43,7 +43,7 @@
                 android:layout_height="1dp"
                 android:background="@color/colorWhite"/>
 
-            <androidx.viewpager.widget.ViewPager
+            <com.example.jarvis.Util.NonSwipeableViewPager
                 android:id="@+id/reminder_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

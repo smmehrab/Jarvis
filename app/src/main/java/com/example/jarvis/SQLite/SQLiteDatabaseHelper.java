@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import com.example.jarvis.Journal.Journal;
+import com.example.jarvis.Reminder.Alarm;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -152,6 +153,22 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
             "PRIMARY KEY(" + JOURNAL_FILE_LINK + ")); ";
 
+    /***Table Alarm***/
+    // image_link, file_name
+    private static final String TABLE_ALARM = "table_alarm";
+    private static final String ALARM_HOUR = "alarm_hour";
+    private static final String ALARM_MINUTE = "alarm_minute";
+
+    private static final String ALARM_IS_EVERYDAY = "alarm_isEveryday";
+    private static final String ALARM_STATUS = "alarm_status";
+
+    private static final String CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ALARM + "(" +
+            ALARM_HOUR + " TEXT NOT NULL, " +
+            ALARM_MINUTE + " TEXT NOT NULL, " +
+            ALARM_IS_EVERYDAY + " INT NOT NULL, " +
+            ALARM_STATUS + " INT NOT NULL, " +
+            "PRIMARY KEY(" + ALARM_HOUR + ", " + ALARM_MINUTE + ")); ";
+
 
     /*** Constructor ***/
     public SQLiteDatabaseHelper(Context context) {
@@ -167,6 +184,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(CREATE_TABLE_USER);
             sqLiteDatabase.execSQL(CREATE_TABLE_TODO);
             sqLiteDatabase.execSQL(CREATE_TABLE_WALLET);
+            sqLiteDatabase.execSQL(CREATE_TABLE_ALARM);
         }
         catch (Exception e){
             showToast("Exception : " + e);
@@ -181,6 +199,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_TODO);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
             onCreate(sqLiteDatabase);
         } catch (Exception e) {
             showToast("Exception : " + e);
@@ -192,6 +211,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE + TABLE_USER);
             sqLiteDatabase.execSQL(DROP_TABLE + TABLE_TODO);
             sqLiteDatabase.execSQL(DROP_TABLE + TABLE_WALLET);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
             onCreate(sqLiteDatabase);
         } catch (Exception e){
             showToast("Exception : " + e);
@@ -1560,6 +1581,163 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    /*** Query on TABLE_ALARM ***/
+
+    public long insertAlarm(Alarm alarm){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        String hour = alarm.getHour();
+        String minute = alarm.getMinute();
+
+        Integer isEveryday = alarm.getIsEveryday();
+        Integer status = alarm.getStatus();
+
+        contentValues.put(ALARM_HOUR, hour);
+        contentValues.put(ALARM_MINUTE, minute);
+
+        contentValues.put(ALARM_IS_EVERYDAY, isEveryday);
+        contentValues.put(ALARM_STATUS, status);
+
+        long rowId = sqLiteDatabase.insert(TABLE_ALARM, null, contentValues);
+        return rowId;
+    }
+
+    public void insertAllAlarms(ArrayList<Alarm> alarms){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        for(Alarm alarm:alarms) {
+            ContentValues contentValues = new ContentValues();
+
+            String hour = alarm.getHour();
+            String minute = alarm.getMinute();
+
+            Integer isEveryday = alarm.getIsEveryday();
+            Integer status = alarm.getStatus();
+
+            contentValues.put(ALARM_HOUR, hour);
+            contentValues.put(ALARM_MINUTE, minute);
+
+            contentValues.put(ALARM_IS_EVERYDAY, isEveryday);
+            contentValues.put(ALARM_STATUS, status);
+
+            long rowId = sqLiteDatabase.insert(TABLE_ALARM, null, contentValues);
+        }
+    }
+
+    public void updateAlarm(Alarm alarm){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        String hour = alarm.getHour();
+        String minute = alarm.getMinute();
+
+        Integer isEveryday = alarm.getIsEveryday();
+        Integer status = alarm.getStatus();
+
+        contentValues.put(ALARM_HOUR, hour);
+        contentValues.put(ALARM_MINUTE, minute);
+
+        contentValues.put(ALARM_IS_EVERYDAY, isEveryday);
+        contentValues.put(ALARM_STATUS, status);
+
+        sqLiteDatabase.update(TABLE_ALARM, contentValues,
+                ALARM_HOUR + " = ? AND " + ALARM_MINUTE + " = ? ",
+                new String[] {hour, minute});
+
+        sqLiteDatabase.close();
+    }
+
+    public Alarm findAlarm(String hour, String minute) {
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_ALARM,
+                null,
+                ALARM_HOUR + " = ? AND " + ALARM_MINUTE + " = ? ",
+                new String[]{hour, minute},
+                null,
+                null,
+                ALARM_HOUR + " ASC, " + ALARM_MINUTE  + " ASC, " + ALARM_IS_EVERYDAY  + " ASC" + ALARM_STATUS  + " ASC");
+
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
+
+        return new Alarm(
+                cursor.getString(cursor.getColumnIndex(ALARM_HOUR)),
+                cursor.getString(cursor.getColumnIndex(ALARM_MINUTE)),
+
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_IS_EVERYDAY))),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_STATUS))));
+    }
+
+
+
+
+    public void deleteAlarm(String hour, String minute){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // Permanently Delete Done
+        int i = sqLiteDatabase.delete(TABLE_ALARM,
+                ALARM_HOUR + " = ? AND " + ALARM_MINUTE + " = ?",
+                new String[]{hour, minute});
+
+        sqLiteDatabase.close();
+    }
+
+    public ArrayList<Alarm> loadAlarmItems(){
+        ArrayList<Alarm> alarms = new ArrayList<Alarm>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_ALARM +
+                " ORDER BY " + ALARM_HOUR + ", " + ALARM_MINUTE + ", " + ALARM_IS_EVERYDAY +  ", " + ALARM_STATUS + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Alarm Found");
+        }
+
+        else{
+            do{
+                String hour = cursor.getString(cursor.getColumnIndex(ALARM_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(ALARM_MINUTE));
+
+                Integer isEveryday = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_IS_EVERYDAY)));
+                Integer status = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_STATUS)));
+
+
+                alarms.add(new Alarm(hour, minute, isEveryday, status));
+            }while (cursor.moveToNext());
+        }
+
+        return alarms;
+    }
+
+    public ArrayList<Alarm> syncAlarmItems(){
+        ArrayList<Alarm> alarms = new ArrayList<Alarm>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_ALARM +
+                " ORDER BY " + ALARM_HOUR + ", " + ALARM_MINUTE + ", " + ALARM_IS_EVERYDAY +  ", " + ALARM_STATUS + ";", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Alarm Found");
+        }
+        else{
+            do{
+                String hour = cursor.getString(cursor.getColumnIndex(ALARM_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(ALARM_MINUTE));
+
+                Integer isEveryday = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_IS_EVERYDAY)));
+                Integer status = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_STATUS)));
+
+
+                alarms.add(new Alarm(hour, minute, isEveryday, status));
+            }while (cursor.moveToNext());
+        }
+
+        return alarms;
+    }
 
     /*** Additional Functions ***/
 
