@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -52,6 +53,11 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
     private Integer alarmIsEveryday=0;
     private Integer alarmStatus=1;
 
+    private String currentHour;
+    private String currentMinute;
+    private Integer currentIsEveryday;
+    private Integer currentStatus;
+
     private AlertDialog alarmDialog;
     private AlertDialog.Builder alarmDialogBuilder;
     private View alarmDialogView;
@@ -59,6 +65,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
     private Switch isEverydaySwitch;
     private TimePicker alarmTimePicker;
     private Button addAlarmBtn;
+    private TextView dialogAlarmTitle;
 
 
     public FragmentAlarm(){
@@ -77,40 +84,6 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
         return view;
     }
 
-    public void showToast(String message){
-        Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view == addAlarmFab){
-            handleAddAction();
-        } else if(view == addAlarmBtn){
-            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
-            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
-
-            sqLiteDatabaseHelper.insertAlarm(new Alarm(alarmHour, alarmMinute, alarmIsEveryday, alarmStatus));
-
-            alarmDialog.cancel();
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (Build.VERSION.SDK_INT >= 26) {
-                ft.setReorderingAllowed(false);
-            }
-            ft.detach(this).attach(this).commit();
-
-            showToast("Alarm Added");
-        }
-    }
-
-    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        return true;
-    }
-
-
     public void findXmlElements(View view){
         alarmRecyclerView = (RecyclerView) view.findViewById(R.id.alarm_recycler_view);
         aSwitch = (Switch) view.findViewById(R.id.alarm_item_switch);
@@ -125,6 +98,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
         alarmTimePicker = (TimePicker) alarmDialogView.findViewById(R.id.dialog_alarm_time_picker);
         isEverydaySwitch = (Switch) alarmDialogView.findViewById(R.id.dialog_alarm_is_everyday_switch);
         addAlarmBtn = (Button) alarmDialogView.findViewById(R.id.dialog_alarm_add_btn);
+        dialogAlarmTitle = (TextView) alarmDialogView.findViewById(R.id.dialog_alarm_title);
 
         alarmDialogBuilder.setView(alarmDialogView);
         alarmDialog = alarmDialogBuilder.create();
@@ -155,9 +129,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
                 .setClickable(new RecyclerTouchListener.OnRowClickListener() {
                     @Override
                     public void onRowClicked(int position) {
-//                        handleEditAction(position);
-                        showToast("Toggle Pressed");
-//                        aSwitch.toggle();
+                        handleToggleAction(position);
                     }
 
                     @Override
@@ -195,6 +167,10 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
                     alarmIsEveryday=1;
                 else
                     alarmIsEveryday=0;
+
+                if(!alarmIsEveryday.equals(currentIsEveryday)){
+                    enableButton(addAlarmBtn);
+                }
             }
         });
 
@@ -203,6 +179,30 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
         // Add Alarm FAB Listener
         addAlarmFab.setOnClickListener(this);
+    }
+
+    public void handleToggleAction(int position){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+        if(alarms.get(position).getStatus()==1) {
+            alarms.get(position).setStatus(0);
+            // Updating Alarm
+            sqLiteDatabaseHelper.updateAlarm(alarms.get(position), alarms.get(position).getHour(), alarms.get(position).getMinute(),alarms.get(position).getIsEveryday(),1);
+        } else if(alarms.get(position).getStatus()==0) {
+            alarms.get(position).setStatus(1);
+            // Updating Alarm
+            sqLiteDatabaseHelper.updateAlarm(alarms.get(position), alarms.get(position).getHour(), alarms.get(position).getMinute(),alarms.get(position).getIsEveryday(),0);
+        }
+
+        // Refresh Fragment
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
+        }
+        ft.detach(this).attach(this).commit();
+
+        showToast("Toggle Pressed");
     }
 
     public void handleDeleteAction(int position){
@@ -221,10 +221,31 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
     }
 
     public void handleEditAction(int position){
+        currentHour = alarms.get(position).getHour();
+        currentMinute = alarms.get(position).getMinute();
+        currentIsEveryday = alarms.get(position).getIsEveryday();
+        currentStatus = alarms.get(position).getStatus();
+
+
+        alarmTimePicker.setCurrentHour(Integer.parseInt(currentHour));
+        alarmTimePicker.setCurrentMinute(Integer.parseInt(currentMinute));
+
+        if(currentIsEveryday==1)
+            isEverydaySwitch.setChecked(true);
+        else
+            isEverydaySwitch.setChecked(false);
+
+        addAlarmBtn.setText("Update");
+        dialogAlarmTitle.setText("Edit Your Alarm");
+
+        disableButton(addAlarmBtn);
         alarmDialog.show();
     }
 
     public void handleAddAction(){
+        addAlarmBtn.setText("Add");
+        dialogAlarmTitle.setText("Add New Alarm");
+
         alarmDialog.show();
     }
 
@@ -238,8 +259,71 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 //
 //        Toast.makeText(this, then.getTime().toString(), Toast.LENGTH_SHORT)
 //                .show();
-
         alarmHour = timePicker.getCurrentHour().toString();
         alarmMinute = timePicker.getCurrentMinute().toString();
+
+        if(!alarmHour.equals(currentHour) || !alarmMinute.equals(currentMinute)){
+            enableButton(addAlarmBtn);
+        }
+    }
+
+    public void showToast(String message){
+        Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == addAlarmFab){
+            handleAddAction();
+        } else if(view == addAlarmBtn){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
+            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+            if(addAlarmBtn.getText().equals("Add")){
+                // Adding Alarm
+                sqLiteDatabaseHelper.insertAlarm(new Alarm(alarmHour, alarmMinute, alarmIsEveryday, alarmStatus));
+
+                // Closing Dialog Box
+                alarmDialog.cancel();
+
+                // Show Confirmation Toast
+                showToast("Alarm Added");
+            } else if(addAlarmBtn.getText().equals("Update")){
+                // Updating Alarm
+                sqLiteDatabaseHelper.updateAlarm(new Alarm(alarmHour, alarmMinute, alarmIsEveryday, alarmStatus), currentHour, currentMinute, currentIsEveryday, currentStatus);
+
+                // Closing Dialog Box
+                alarmDialog.cancel();
+
+                // Show Confirmation Toast
+                showToast("Alarm Updated");
+            }
+
+            // Refresh Fragment
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            ft.detach(this).attach(this).commit();
+        }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        return true;
+    }
+
+    void disableButton(Button button){
+        button.setEnabled(false);
+        button.setAlpha(.5f);
+        button.setClickable(false);
+    }
+
+    void enableButton(Button button){
+        button.setEnabled(true);
+        button.setAlpha(1f);
+        button.setClickable(true);
     }
 }

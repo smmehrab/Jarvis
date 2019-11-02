@@ -1625,7 +1625,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateAlarm(Alarm alarm){
+    public void updateAlarm(Alarm alarm, String oldHour, String oldMinute, Integer oldIsEveryday, Integer oldStatus){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -1642,8 +1642,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(ALARM_STATUS, status);
 
         sqLiteDatabase.update(TABLE_ALARM, contentValues,
-                ALARM_HOUR + " = ? AND " + ALARM_MINUTE + " = ? ",
-                new String[] {hour, minute});
+                ALARM_HOUR + " = ? AND " + ALARM_MINUTE + " = ? AND "  + ALARM_IS_EVERYDAY + " = ? AND " + ALARM_STATUS + " = ?",
+                new String[] {oldHour, oldMinute, oldIsEveryday+"", oldStatus+""});
 
         sqLiteDatabase.close();
     }
