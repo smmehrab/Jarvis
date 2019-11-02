@@ -1,6 +1,5 @@
 package com.example.jarvis.Reminder;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,23 +18,17 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.jarvis.About.AboutActivity;
@@ -45,11 +38,8 @@ import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
-import com.example.jarvis.Todo.Task;
-import com.example.jarvis.Todo.TaskAdapter;
 import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Util.NetworkReceiver;
-import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Util.ViewPagerAdapter;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
@@ -57,7 +47,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -102,25 +91,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
       R.drawable.icon_event_white
     };
 
-    // Alarm
-    private AlertDialog alarmDialog;
-    private AlertDialog.Builder alarmDialogBuilder;
-    private View alarmDialogView;
-
-    private Switch isEverydaySwitch;
-    private TimePicker alarmTimePicker;
-    private Button addAlarmBtn;
-
-
-    // RecyclerView Variables
-    RecyclerView alarmRecyclerView, eventRecyclerView;
-    ArrayList<Task> alarms, events;
-    TaskAdapter alarmAdapter, eventAdapter;
-
-    RecyclerTouchListener alarmTouchListener, eventTouchListener;
-
-    // Fab
-    FloatingActionButton addReminderFab;
 
     /********/
 
@@ -147,8 +117,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         setToolbar();
         setListeners();
         initializeUI();
-        setVoiceCommandFeature();
-        isVoiceCommandOn();
     }
 
     public void findXmlElements(){
@@ -156,7 +124,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         toolbar = (Toolbar) findViewById(R.id.reminder_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        addReminderFab = (FloatingActionButton) findViewById(R.id.reminder_add_reminder_fab);
+
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.reminder_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
@@ -164,13 +132,6 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // For Tab Layout
         tabLayout = (TabLayout) findViewById(R.id.reminder_tab);
         viewPager = (ViewPager) findViewById(R.id.reminder_view_pager);
-
-        // For RecyclerViews
-        alarmRecyclerView = findViewById(R.id.alarm_recycler_view);
-
-        // For Voice Command
-        progressBar = (ProgressBar) findViewById(R.id.reminder_progress_bar);
-        voiceCommandToggleButton = (ToggleButton) findViewById(R.id.reminder_voice_command_toggle_btn);
     }
 
     public void setToolbar(){
@@ -186,30 +147,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         // Buttons
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        addReminderFab.setOnClickListener(this);
 
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
-
-        // Voice Command On/Off
-        voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setIndeterminate(true);
-                    ActivityCompat.requestPermissions
-                            (ReminderActivity.this,
-                                    new String[]{Manifest.permission.RECORD_AUDIO},
-                                    REQUEST_RECORD_PERMISSION);
-                } else {
-                    progressBar.setIndeterminate(false);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    speech.stopListening();
-                }
-            }
-        });
     }
 
     public void initializeUI(){
@@ -255,8 +196,8 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        // For Voice Command
-        progressBar.setVisibility(View.INVISIBLE);
+//        // For Voice Command
+//        progressBar.setVisibility(View.INVISIBLE);
 
     }
 
@@ -345,35 +286,10 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
                 }
             }.start();
         }
-
-        else if(view == addReminderFab){
-            if(activeTab.equals("Alarm")){
-                addAlarm();
-                showToast("Alarm Added");
-            } else if(activeTab.equals("Event")){
-                showToast("Event Added");
-            }
-        }
     }
 
-    public void addAlarm(){
-        alarmDialogBuilder = new AlertDialog.Builder(ReminderActivity.this);
-        alarmDialogView = getLayoutInflater().inflate(R.layout.dialog_alarm, null);
-        alarmTimePicker = (TimePicker) alarmDialogView.findViewById(R.id.dialog_alarm_time_picker);
-        isEverydaySwitch = (Switch) alarmDialogView.findViewById(R.id.dialog_alarm_is_everyday_switch);
-        addAlarmBtn = (Button) alarmDialogView.findViewById(R.id.dialog_alarm_add_btn);
+    public void addEvent(){
 
-        addAlarmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showToast("Added");
-                alarmDialog.cancel();
-            }
-        });
-
-        alarmDialogBuilder.setView(alarmDialogView);
-        alarmDialog = alarmDialogBuilder.create();
-        alarmDialog.show();
     }
 
     @Override

@@ -1670,9 +1670,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_STATUS))));
     }
 
-
-
-
     public void deleteAlarm(String hour, String minute){
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
@@ -1700,10 +1697,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             do{
                 String hour = cursor.getString(cursor.getColumnIndex(ALARM_HOUR));
                 String minute = cursor.getString(cursor.getColumnIndex(ALARM_MINUTE));
-
                 Integer isEveryday = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_IS_EVERYDAY)));
                 Integer status = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ALARM_STATUS)));
-
 
                 alarms.add(new Alarm(hour, minute, isEveryday, status));
             }while (cursor.moveToNext());

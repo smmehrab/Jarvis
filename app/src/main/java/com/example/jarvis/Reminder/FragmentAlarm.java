@@ -1,26 +1,38 @@
 package com.example.jarvis.Reminder;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.RecyclerTouchListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class FragmentAlarm extends Fragment implements View.OnClickListener, View.OnTouchListener {
+public class FragmentAlarm extends Fragment implements OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener {
 
     private ArrayList<Alarm> alarms;
 
@@ -29,6 +41,25 @@ public class FragmentAlarm extends Fragment implements View.OnClickListener, Vie
 
     private AlarmAdapter alarmAdapter;
     private RecyclerTouchListener alarmTouchListener;
+
+    private ProgressBar alarmProgressBar;
+    private ToggleButton alarmVoiceCommandToggleBtn;
+    private FloatingActionButton addAlarmFab;
+
+    // Alarm Variables
+    private String alarmHour;
+    private String alarmMinute;
+    private Integer alarmIsEveryday=0;
+    private Integer alarmStatus=1;
+
+    private AlertDialog alarmDialog;
+    private AlertDialog.Builder alarmDialogBuilder;
+    private View alarmDialogView;
+
+    private Switch isEverydaySwitch;
+    private TimePicker alarmTimePicker;
+    private Button addAlarmBtn;
+
 
     public FragmentAlarm(){
 
@@ -54,7 +85,24 @@ public class FragmentAlarm extends Fragment implements View.OnClickListener, Vie
 
     @Override
     public void onClick(View view) {
+        if(view == addAlarmFab){
+            handleAddAction();
+        } else if(view == addAlarmBtn){
+            SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
+            SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
+            sqLiteDatabaseHelper.insertAlarm(new Alarm(alarmHour, alarmMinute, alarmIsEveryday, alarmStatus));
+
+            alarmDialog.cancel();
+
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (Build.VERSION.SDK_INT >= 26) {
+                ft.setReorderingAllowed(false);
+            }
+            ft.detach(this).attach(this).commit();
+
+            showToast("Alarm Added");
+        }
     }
 
     @Override
@@ -66,33 +114,28 @@ public class FragmentAlarm extends Fragment implements View.OnClickListener, Vie
     public void findXmlElements(View view){
         alarmRecyclerView = (RecyclerView) view.findViewById(R.id.alarm_recycler_view);
         aSwitch = (Switch) view.findViewById(R.id.alarm_item_switch);
+
+        alarmProgressBar = (ProgressBar) view.findViewById(R.id.alarm_progress_bar);
+        alarmVoiceCommandToggleBtn = (ToggleButton) view.findViewById(R.id.alarm_voice_command_toggle_btn);
+        addAlarmFab = (FloatingActionButton) view.findViewById(R.id.alarm_add_alarm_fab);
+
+        // Alarm Dialog
+        alarmDialogBuilder = new AlertDialog.Builder(getActivity());
+        alarmDialogView = getLayoutInflater().inflate(R.layout.dialog_alarm, null);
+        alarmTimePicker = (TimePicker) alarmDialogView.findViewById(R.id.dialog_alarm_time_picker);
+        isEverydaySwitch = (Switch) alarmDialogView.findViewById(R.id.dialog_alarm_is_everyday_switch);
+        addAlarmBtn = (Button) alarmDialogView.findViewById(R.id.dialog_alarm_add_btn);
+
+        alarmDialogBuilder.setView(alarmDialogView);
+        alarmDialog = alarmDialogBuilder.create();
     }
 
 
     public void loadData(){
-        alarms = new ArrayList<>();
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-        Alarm alarm = new Alarm("8","30",0,1);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
-        alarms.add(alarm);
+        alarms = sqLiteDatabaseHelper.loadAlarmItems();
 
         setRecyclerView(alarms);
     }
@@ -128,17 +171,75 @@ public class FragmentAlarm extends Fragment implements View.OnClickListener, Vie
                     public void onSwipeOptionClicked(int viewID, int position) {
                         switch (viewID){
                             case R.id.alarm_item_delete_rl:
-//                                handleDeleteAction(position);
-                                showToast("Delete Pressed");
+                                handleDeleteAction(position);
                                 break;
                             case R.id.alarm_item_edit_rl:
-//                                handleDeleteAction(position);
+                                handleEditAction(position);
                                 showToast("Edit Pressed");
                                 break;
                         }
                     }
                 });
 
+        // RecyclerView Touch Listener
         alarmRecyclerView.addOnItemTouchListener(alarmTouchListener);
+
+        // TimePicker Time Change Listener
+        alarmTimePicker.setOnTimeChangedListener(this);
+
+        // isEveryday Switch Checked Change Listener
+        isEverydaySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b)
+                    alarmIsEveryday=1;
+                else
+                    alarmIsEveryday=0;
+            }
+        });
+
+        // Add Alarm Button Listener
+        addAlarmBtn.setOnClickListener(this);
+
+        // Add Alarm FAB Listener
+        addAlarmFab.setOnClickListener(this);
+    }
+
+    public void handleDeleteAction(int position){
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
+        sqLiteDatabaseHelper.deleteAlarm(alarms.get(position).getHour(), alarms.get(position).getMinute());
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
+        }
+        ft.detach(this).attach(this).commit();
+
+        showToast("Alarm Deleted");
+    }
+
+    public void handleEditAction(int position){
+        alarmDialog.show();
+    }
+
+    public void handleAddAction(){
+        alarmDialog.show();
+    }
+
+    @Override
+    public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
+//        Calendar then = Calendar.getInstance();
+//
+//        then.set(Calendar.HOUR_OF_DAY, hourOfDay);
+//        then.set(Calendar.MINUTE, minute);
+//        then.set(Calendar.SECOND, 0);
+//
+//        Toast.makeText(this, then.getTime().toString(), Toast.LENGTH_SHORT)
+//                .show();
+
+        alarmHour = timePicker.getCurrentHour().toString();
+        alarmMinute = timePicker.getCurrentMinute().toString();
     }
 }
