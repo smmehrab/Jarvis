@@ -4,24 +4,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Reminder.FragmentAlarm">
+    android:tag="alarm"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/alarm_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="11">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/alarm_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
 
             </androidx.recyclerview.widget.RecyclerView>
 
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/alarm_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:visibility="invisible"/>
+
+        <ToggleButton
+            android:id="@+id/alarm_voice_command_toggle_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_toggle_button"
+            android:foreground="@drawable/fg_toggle_button"
+            android:foregroundGravity="center"
+            android:textOn=""
+            android:textOff=""
+            android:text=""
+            android:clickable="true"
+            android:focusable="true"
+            android:shadowColor="@color/colorPrimary"
+            android:elevation="4dp"/>
+
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="20dp"
+        android:layout_gravity="bottom|end"
+        android:paddingBottom="30dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/alarm_add_alarm_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/icon_plus"
+            app:elevation="4dp"
+            app:fabSize="normal"/>
+
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
