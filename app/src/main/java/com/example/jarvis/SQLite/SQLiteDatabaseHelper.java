@@ -149,7 +149,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             JOURNAL_HOUR + " TEXT, " +
             JOURNAL_MINUTE + " TEXT, " +
 
-            JOURNAL_IMAGE_LINK + " TEXT NOT NULL, " +
+            JOURNAL_IMAGE_LINK + " TEXT, " +
             JOURNAL_FILE_LINK + " TEXT NOT NULL, " +
 
             "PRIMARY KEY(" + JOURNAL_FILE_LINK + ")); ";
@@ -213,7 +213,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(CREATE_TABLE_TODO);
             sqLiteDatabase.execSQL(CREATE_TABLE_WALLET);
             sqLiteDatabase.execSQL(CREATE_TABLE_ALARM);
+
+            sqLiteDatabase.execSQL(CREATE_TABLE_JOURNAL);
+
             sqLiteDatabase.execSQL(CREATE_TABLE_EVENT);
+
         }
         catch (Exception e){
             showToast("Exception : " + e);
@@ -1967,12 +1971,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         return events;
     }
-
-
-
-
-
-
 
     /*** Additional Functions ***/
 
