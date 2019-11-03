@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.jarvis.Journal.Journal;
 import com.example.jarvis.Reminder.Alarm;
+import com.example.jarvis.Reminder.Event;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -28,7 +29,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     /*** Others ***/
     private Context context;
-    private static int VERSION_NUMBER = 10;
+    private static int VERSION_NUMBER = 11;
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     /*** TABLE USER ***/
@@ -170,6 +171,33 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             "PRIMARY KEY(" + ALARM_HOUR + ", " + ALARM_MINUTE + ")); ";
 
 
+    /***Table Event***/
+    private static final String TABLE_EVENT = "table_event";
+    private static final String EVENT_HOUR = "event_hour";
+    private static final String EVENT_MINUTE = "event_minute";
+    private static final String EVENT_DAY = "event_day";
+    private static final String EVENT_MONTH = "event_month";
+    private static final String EVENT_YEAR = "event_year";
+    private static final String EVENT_IS_DELETED = "event_isDeleted";
+    private static final String EVENT_IS_IGNORED = "event_isIgnored";
+    private static final String EVENT_TITLE = "event_title";
+    private static final String EVENT_DESCRIPTION = "event_description";
+
+    private static final String CREATE_TABLE_EVENT = "CREATE TABLE " + TABLE_EVENT+ "(" +
+            EVENT_DAY + " TEXT NOT NULL, " +
+            EVENT_MONTH + " TEXT NOT NULL, " +
+            EVENT_YEAR + " TEXT NOT NULL, " +
+            EVENT_HOUR + " TEXT NOT NULL, " +
+            EVENT_MINUTE + " TEXT NOT NULL, " +
+            EVENT_IS_DELETED + " INT NOT NULL, " +
+            EVENT_IS_IGNORED + " INT NOT NULL, " +
+            EVENT_TITLE + " TEXT NOT NULL, " +
+            EVENT_DESCRIPTION + " TEXT NOT NULL, " +
+            "PRIMARY KEY(" + EVENT_DAY + ", "+ EVENT_MONTH + ", " + EVENT_YEAR+ ", "+ EVENT_HOUR+ ", "+ EVENT_MINUTE+"));";
+
+
+
+
     /*** Constructor ***/
     public SQLiteDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION_NUMBER);
@@ -185,6 +213,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(CREATE_TABLE_TODO);
             sqLiteDatabase.execSQL(CREATE_TABLE_WALLET);
             sqLiteDatabase.execSQL(CREATE_TABLE_ALARM);
+            sqLiteDatabase.execSQL(CREATE_TABLE_EVENT);
         }
         catch (Exception e){
             showToast("Exception : " + e);
@@ -200,6 +229,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
             onCreate(sqLiteDatabase);
         } catch (Exception e) {
             showToast("Exception : " + e);
@@ -213,6 +243,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE + TABLE_WALLET);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
+            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
             onCreate(sqLiteDatabase);
         } catch (Exception e){
             showToast("Exception : " + e);
@@ -1733,6 +1764,215 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         return alarms;
     }
+
+
+    /**************************************************************/
+
+    /*** Query on TABLE_ALARM ***/
+
+    public long insertEvent(Event event){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        String year = event.getYear();
+        String month = event.getMonth();
+        String day = event.getDay();
+
+        String hour = event.getHour();
+        String minute = event.getMinute();
+
+        int isDeleted = event.getIsDeleted();
+        int isIgnored = event.getIsIgnored();
+
+        contentValues.put(EVENT_DAY, day);
+        contentValues.put(EVENT_MONTH, month);
+        contentValues.put(EVENT_YEAR, year);
+
+        contentValues.put(EVENT_HOUR, hour);
+        contentValues.put(EVENT_MINUTE, minute);
+
+        contentValues.put(EVENT_IS_DELETED, isDeleted);
+        contentValues.put(EVENT_IS_IGNORED, isIgnored);
+
+        long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
+        return rowId;
+    }
+
+    public void insertAllEvents(ArrayList<Event> events){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+
+        for(Event event:events) {
+            ContentValues contentValues = new ContentValues();
+
+            String day = event.getDay();
+            String month = event.getMonth();
+            String year = event.getYear();
+
+            String hour = event.getHour();
+            String minute = event.getMinute();
+
+            int isDeleted = event.getIsDeleted();
+            int isIgnored = event.getIsIgnored();
+
+            contentValues.put(EVENT_DAY, day);
+            contentValues.put(EVENT_MONTH, month);
+            contentValues.put(EVENT_YEAR, year);
+
+            contentValues.put(EVENT_HOUR, hour);
+            contentValues.put(EVENT_MINUTE, minute);
+
+            contentValues.put(EVENT_IS_DELETED, isDeleted);
+            contentValues.put(EVENT_IS_IGNORED, isIgnored);
+
+            long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
+        }
+    }
+
+    public void updateEvent(Event event, String oldDay, String oldMonth, String oldYear, String oldHour, String oldMinute, String oldTitle, String oldDescription){
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        String day = event.getDay();
+        String month = event.getMonth();
+        String year = event.getYear();
+
+        String hour = event.getHour();
+        String minute = event.getMinute();
+
+        int isDeleted = event.getIsDeleted();
+        int isIgnored = event.getIsIgnored();
+
+        String title = event.getTitle();
+        String description = event.getDescription();
+
+        contentValues.put(EVENT_DAY, day);
+        contentValues.put(EVENT_MONTH, month);
+        contentValues.put(EVENT_YEAR, year);
+        contentValues.put(EVENT_HOUR, hour);
+        contentValues.put(EVENT_MINUTE, minute);
+        contentValues.put(EVENT_IS_DELETED, isDeleted);
+        contentValues.put(EVENT_IS_IGNORED, isIgnored);
+        contentValues.put(EVENT_TITLE, title);
+        contentValues.put(EVENT_DESCRIPTION, description);
+
+
+        sqLiteDatabase.update(TABLE_EVENT, contentValues,
+                EVENT_DAY + " = ? AND " + EVENT_MONTH + " = ? AND "  + EVENT_YEAR + " = ? AND " + EVENT_HOUR + " = ? AND " + EVENT_MINUTE + " = ? AND " + EVENT_TITLE + " = ? AND " + EVENT_DESCRIPTION + " = ? ",
+                new String[] {oldDay, oldMonth, oldYear, oldHour, oldMinute, oldTitle, oldDescription});
+
+        sqLiteDatabase.close();
+    }
+
+    public Event findEvent(String day, String month, String year, String hour, String minute) {
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.query(TABLE_EVENT,
+                null,
+                EVENT_DAY + " = ? AND " + EVENT_MONTH + " = ? AND " + EVENT_YEAR + " = ? AND " + EVENT_HOUR + " = ? AND " + EVENT_MINUTE + " = ? ",
+                new String[]{day, month, year, hour, minute},
+                null,
+                null,
+                EVENT_DAY + " ASC, " + EVENT_MONTH  + " ASC, " + EVENT_YEAR  + " ASC" + EVENT_HOUR  + " ASC" + EVENT_MINUTE + " ASC");
+
+        cursor.moveToPosition(0);
+        sqLiteDatabase.close();
+
+        return new Event(
+                cursor.getString(cursor.getColumnIndex(EVENT_DAY)),
+                cursor.getString(cursor.getColumnIndex(EVENT_YEAR)),
+                cursor.getString(cursor.getColumnIndex(EVENT_MONTH)),
+                cursor.getString(cursor.getColumnIndex(EVENT_HOUR)),
+                cursor.getString(cursor.getColumnIndex(EVENT_MINUTE)),
+
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_DELETED))),
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_IGNORED))),
+
+                cursor.getString(cursor.getColumnIndex(EVENT_TITLE)),
+                cursor.getString(cursor.getColumnIndex(EVENT_DESCRIPTION)));
+    }
+
+    public void deleteEvent(String day, String month, String year, String hour, String minute, String title, String description){
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+
+        // Permanently Delete Done
+        int i = sqLiteDatabase.delete(TABLE_ALARM,
+                EVENT_DAY + " = ? AND " + EVENT_MONTH + " = ? AND " + EVENT_YEAR + " = ? AND " + EVENT_MINUTE + " = ? AND " + EVENT_HOUR + " = ? AND " + EVENT_TITLE + " = ? AND " + EVENT_DESCRIPTION + " = ? ",
+                new String[]{day, month, year, hour, minute, title, description});
+
+        sqLiteDatabase.close();
+    }
+
+    public ArrayList<Event> loadEventItems(){
+        ArrayList<Event> events = new ArrayList<Event>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_EVENT +
+                " ORDER BY " + EVENT_DAY + ", " + EVENT_MONTH + ", " + EVENT_YEAR +  ", " + EVENT_HOUR + ", "+ EVENT_MINUTE + ", "+ EVENT_IS_DELETED + ", "+EVENT_IS_IGNORED+", "+EVENT_TITLE+", "+EVENT_DESCRIPTION+"; ", null);
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Event Found");
+        }
+
+        else{
+            do{
+                String day = cursor.getString(cursor.getColumnIndex(EVENT_DAY));
+                String month = cursor.getString(cursor.getColumnIndex(EVENT_MONTH));
+                String year = cursor.getString(cursor.getColumnIndex(EVENT_YEAR));
+                String title = cursor.getString(cursor.getColumnIndex(EVENT_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(EVENT_DESCRIPTION));
+
+                String hour = cursor.getString(cursor.getColumnIndex(EVENT_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(EVENT_MINUTE));
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_IGNORED)));
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_DELETED)));
+
+                events.add(new Event(day, month, year, hour, minute, isDeleted, isIgnored, title, description));
+
+            }while (cursor.moveToNext());
+        }
+
+        return events;
+    }
+
+    public ArrayList<Event> syncEventItems(){
+        ArrayList<Event> events = new ArrayList<Event>();
+
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_EVENT +
+                " ORDER BY " + EVENT_DAY + ", " + EVENT_MONTH + ", " + EVENT_YEAR +  ", " + EVENT_HOUR + ", "+ EVENT_MINUTE+", "+ EVENT_IS_DELETED+", "+ EVENT_IS_IGNORED+ ", "+EVENT_TITLE+", "+EVENT_DESCRIPTION+";", null);
+
+
+        cursor.moveToPosition(0);
+        if(cursor.getCount() == 0){
+            showToast("No Event Found");
+        }
+        else{
+            do{
+                String hour = cursor.getString(cursor.getColumnIndex(EVENT_HOUR));
+                String minute = cursor.getString(cursor.getColumnIndex(EVENT_MINUTE));
+                String day = cursor.getString(cursor.getColumnIndex(EVENT_DAY));
+                String month = cursor.getString(cursor.getColumnIndex(EVENT_MONTH));
+                String year = cursor.getString(cursor.getColumnIndex(EVENT_YEAR));
+                String title = cursor.getString(cursor.getColumnIndex(EVENT_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(EVENT_DESCRIPTION));
+
+                Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_IGNORED)));
+                Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(EVENT_IS_DELETED)));
+
+
+                events.add(new Event(day, month, year, hour, minute, isDeleted, isIgnored, title, description));
+            }while (cursor.moveToNext());
+        }
+
+        return events;
+    }
+
+
+
+
+
+
 
     /*** Additional Functions ***/
 
