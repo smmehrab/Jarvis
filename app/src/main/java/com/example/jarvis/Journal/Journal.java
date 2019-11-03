@@ -89,4 +89,8 @@ public class Journal {
         this.imageLink = imageLink;
         this.fileLink = fileLink;
     }
+
+    public Journal(){
+
+    }
 }

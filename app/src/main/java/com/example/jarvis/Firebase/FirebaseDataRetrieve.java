@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.Reminder.Alarm;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
@@ -16,6 +17,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 
@@ -32,13 +35,10 @@ public class FirebaseDataRetrieve {
     public String retrieveDeviceID(){
         String[] x = {""};
         db.collection("user").document(userID).collection("RootUser").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
-                        if(task.isSuccessful()){
-                            User u = (User) task.getResult().toObjects(User.class);
-                            x[0] = u.getDevice();
-                        }
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        User u = (User) task.getResult().toObjects(User.class);
+                        x[0] = u.getDevice();
                     }
                 });
         return x[0];
@@ -98,5 +98,25 @@ public class FirebaseDataRetrieve {
                 Log.d("Exception", e.getMessage());
             }
         });
+    }
+
+    public void retriveAlarmFromFirebase(Context context){
+        ArrayList<Alarm> alarms = new ArrayList<>();
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+        db.collection("user")
+                .document(userID).collection("alarm").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Alarm wallet = documentSnapshot.toObject(Alarm.class);
+                        alarms.add(wallet);
+
+                    }
+
+                    sqLiteDatabaseHelper.insertAllAlarms(alarms);
+                    Log.d("Alarm Data retrieve", "Success");
+                }).addOnFailureListener(e -> Log.d("Exception", e.getMessage()));
     }
 }

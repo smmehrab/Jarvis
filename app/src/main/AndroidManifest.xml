@@ -15,11 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Wallet.WalletBinActivity"></activity>
+        <activity android:name=".Journal.ShowJournalActivity"
+            >
+
+        </activity>
+        <activity android:name=".Wallet.WalletBinActivity" />
         <activity android:name=".Todo.TodoBinActivity" />
         <activity android:name=".Reminder.FragmentEvent" />
         <activity android:name=".Reminder.FragmentAlarm" />
-        <activity android:name=".Journal.AddJournalActivity" />
+        <activity android:name=".Journal.AddJournalActivity"
+            android:windowSoftInputMode="adjustPan|stateVisible" />
         <activity android:name=".Wallet.UpdateRecordActivity" />
         <activity android:name=".Todo.UpdateTaskActivity" />
         <activity android:name=".Wallet.AddRecordActivity" />
@@ -29,8 +34,7 @@
         <activity android:name=".Reminder.ReminderActivity" />
         <activity android:name=".Wallet.WalletActivity" />
         <activity
-            android:name=".Journal.JournalActivity"
-            android:windowSoftInputMode="adjustPan|stateVisible" />
+            android:name=".Journal.JournalActivity" />
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
         <activity android:name=".UserHandling.ResetPassActivity" />
