@@ -21,7 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -53,6 +55,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -76,6 +79,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private NavigationView userNavigationView;
     private NavigationView activityNavigationView;
 
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
 
     /** Toolbar Variables */
     private Toolbar toolbar;
@@ -88,12 +93,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Button walletActivityBtn;
     private Button reminderActivityBtn;
 
-    /** currentUser Information Variables */
-    private static String deviceId = null;
-    private static String currentUid = null;
-    private static String currentUser = null;
-    private static String currentUserName = null;
-    private static String currentUserPhoto = null;
+    /** Active User Variable */
+    public static com.example.jarvis.UserHandling.User activeUser;
 
     /** Speech to Text Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -120,12 +121,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setWelcomeMessage(){
         if(getIntent().getExtras() != null) {
-            deviceId = getIntent().getExtras().getString("deviceId");
-            currentUid = getIntent().getExtras().getString("uid");
-            currentUser = getIntent().getExtras().getString("email");
-            currentUserName = getIntent().getExtras().getString("name");
-            currentUserPhoto = getIntent().getExtras().getString("photo");
+//            deviceId = getIntent().getExtras().getString("deviceId");
+//            currentUid = getIntent().getExtras().getString("uid");
+//            currentUser = getIntent().getExtras().getString("email");
+//            currentUserName = getIntent().getExtras().getString("name");
+//            currentUserPhoto = getIntent().getExtras().getString("photo");
         }
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
+        activeUser = sqLiteDatabaseHelper.getUser();
     }
 
     void setUI(){
@@ -145,6 +151,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.home_navigation_view);
+
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
 
         todoActivityBtn = (Button) findViewById(R.id.todo_activity_btn);
         journalActivityBtn = (Button) findViewById(R.id.journal_activity_btn);
@@ -199,6 +208,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         networkReceiver = new NetworkReceiver();
         broadcastIntent();
+
+        Picasso.get().load(activeUser.getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(activeUser.getEmail());
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_home);
 
@@ -615,27 +627,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    /** Get Static Variables From Anywhere Anytime */
+    /** Get Active User */
 
-    public static String getDeviceId() {
-        return deviceId;
+    public static com.example.jarvis.UserHandling.User getActiveUser() {
+        return activeUser;
     }
 
-    public static String getCurrentUid() {
-        return currentUid;
-    }
-
-    public static String getCurrentUser() {
-        return currentUser;
-    }
-
-    public static String getCurrentUserName() {
-        return currentUserName;
-    }
-
-    public static String getCurrentUserPhoto() {
-        return currentUserPhoto;
-    }
 
     /** Sync & SignOut */
 

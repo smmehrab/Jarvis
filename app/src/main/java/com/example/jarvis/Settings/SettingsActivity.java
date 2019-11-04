@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -76,11 +78,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
 
+
     /** Drawer Variables */
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
     private NavigationView userNavigationView;
+
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
 
     /** FAB */
     private FloatingActionButton fab;
@@ -118,6 +124,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         fab = (FloatingActionButton) findViewById(R.id.settings_fab);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
+
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
 
         progressBar = (ProgressBar) findViewById(R.id.settings_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.settings_voice_command_toggle_btn);
@@ -167,6 +176,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_settings);
         activityTitle.setText(R.string.settings_txt);
+
+        Picasso.get().load(HomeActivity.getActiveUser().getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(HomeActivity.getActiveUser().getEmail());
 
         userNavigationView.getMenu().findItem(R.id.user_settings_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_settings_option).setChecked(true);

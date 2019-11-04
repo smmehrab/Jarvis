@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -78,8 +80,13 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private NavigationView userNavigationView;
     private NavigationView activityNavigationView;
 
+
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
+
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
+
 
     // For Tab Layout
     private TabLayout tabLayout;
@@ -129,6 +136,9 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         activityNavigationView = (NavigationView) findViewById(R.id.reminder_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
 
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
+
         // For Tab Layout
         tabLayout = (TabLayout) findViewById(R.id.reminder_tab);
         viewPager = (ViewPager) findViewById(R.id.reminder_view_pager);
@@ -160,6 +170,9 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_reminder);
         activityTitle.setText(R.string.reminder_txt);
+
+        Picasso.get().load(HomeActivity.getActiveUser().getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(HomeActivity.getActiveUser().getEmail());
 
         userNavigationView.getMenu().findItem(R.id.user_reminder_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_reminder_option).setChecked(true);

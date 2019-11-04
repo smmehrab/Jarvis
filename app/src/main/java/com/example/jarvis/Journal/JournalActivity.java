@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -90,6 +92,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
+
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
 
     /** FAB */
     private FloatingActionButton addJournal;
@@ -146,6 +151,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         journalRecyclerView = (RecyclerView) findViewById(R.id.journal_recycler_view);
 
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
+      
         //Actitvity Navigation Drawer
         activityNavigationView = (NavigationView) findViewById(R.id.journal_navigation_view);
         progressBar = (ProgressBar) findViewById(R.id.journal_progress_bar);
@@ -250,6 +258,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_journal);
         activityTitle.setText(R.string.journal_txt);
+
+        Picasso.get().load(HomeActivity.getActiveUser().getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(HomeActivity.getActiveUser().getEmail());
 
         userNavigationView.getMenu().findItem(R.id.user_journal_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_journal_option).setChecked(true);
