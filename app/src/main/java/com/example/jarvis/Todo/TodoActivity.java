@@ -25,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +68,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +97,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     private NavigationView userNavigationView;
     private NavigationView activityNavigationView;
 
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
 
@@ -163,6 +167,9 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         addTodoBtn = (FloatingActionButton) findViewById(R.id.todo_add_todo_btn);
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         todoRecyclerView = (RecyclerView) findViewById(R.id.todo_recycler_view);
+
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
 
         // Voice Command
         progressBar = (ProgressBar) findViewById(R.id.todo_progress_bar);
@@ -269,8 +276,12 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_todo);
         activityTitle.setText(R.string.todo_txt);
 
+        Picasso.get().load(HomeActivity.getActiveUser().getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(HomeActivity.getActiveUser().getEmail());
+
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_todo_option).setChecked(true);
+
 
         // Initialize PieChart
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);

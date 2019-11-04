@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +64,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +91,10 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
     private NavigationView userNavigationView;
     private NavigationView activityNavigationView;
+
+
+    private ImageView profilePictureImageView;
+    private TextView profileEmailTextView;
 
     private Button userDrawerBtn;
     private Button activityDrawerBtn;
@@ -154,6 +160,9 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
         progressBar = (ProgressBar) findViewById(R.id.wallet_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.wallet_voice_command_toggle_btn);
+
+        profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
+        profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
 
         // Activity Navigation Drawer
         activityNavigationView = (NavigationView) findViewById(R.id.wallet_navigation_view);
@@ -249,6 +258,9 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_wallet);
         activityTitle.setText(R.string.wallet_txt);
+
+        Picasso.get().load(HomeActivity.getActiveUser().getPhoto()).into(profilePictureImageView);
+        profileEmailTextView.setText(HomeActivity.getActiveUser().getEmail());
 
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setCheckable(true);
         userNavigationView.getMenu().findItem(R.id.user_wallet_option).setChecked(true);
