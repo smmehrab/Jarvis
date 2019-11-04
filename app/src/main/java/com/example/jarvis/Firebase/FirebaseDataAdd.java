@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.Reminder.Alarm;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -72,6 +73,23 @@ public class FirebaseDataAdd {
                     });
         }
 
+    }
+
+    public void addAlarmInFireBase(ArrayList<Alarm> alarms){
+        CollectionReference refAlarm = db.collection("user")
+                .document(userID).collection("alarm");
+        Iterator<Alarm> iterator = alarms.iterator();
+        while(iterator.hasNext()){
+            refAlarm.document().set(iterator.next())
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            Log.d("addAlarmDetails", "Success");
+                        }
+                        else{
+                            Log.d("addAlarmDetails", "Failed");
+                        }
+                    });
+        }
     }
 
 

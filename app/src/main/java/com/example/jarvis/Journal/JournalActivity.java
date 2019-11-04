@@ -18,6 +18,7 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -35,6 +36,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
@@ -45,6 +49,7 @@ import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
 import com.example.jarvis.Util.NetworkReceiver;
+import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -63,7 +68,7 @@ import java.util.Objects;
 
 import jp.wasabeef.richeditor.RichEditor;
 
-public class JournalActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener {
+public class JournalActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener,View.OnTouchListener  {
     /** Network Variables */
     private BroadcastReceiver networkReceiver = null;
 
@@ -92,7 +97,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     private TextView profileEmailTextView;
 
     /** FAB */
-    private FloatingActionButton addJoutnal;
+    private FloatingActionButton addJournal;
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
@@ -107,6 +112,11 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     private RichEditor mEditor;
     private TextView mPreview;
 
+    /** RecyclerView Variables */
+    RecyclerView journalRecyclerView;
+    ArrayList<Journal> journals;
+    JournalAdapter journalAdapter;
+    RecyclerTouchListener touchListener;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -114,6 +124,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal);
         setUI();
+        handleDatabase();
     }
 
     void setUI(){
@@ -126,20 +137,29 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void findXmlElements(){
+        // Drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.journal_drawer_layout);
+
+        // Toolbar
         toolbar = (Toolbar) findViewById(R.id.journal_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
-        addJoutnal = (FloatingActionButton) findViewById(R.id.journal_add_journal);
-        userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
-        activityNavigationView = (NavigationView) findViewById(R.id.journal_navigation_view);
         activityTitle = (TextView) findViewById(R.id.activity_title);
+
+        //Main
+        addJournal = (FloatingActionButton) findViewById(R.id.journal_add_journal);
+        userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
+        journalRecyclerView = (RecyclerView) findViewById(R.id.journal_recycler_view);
 
         profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
         profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
-
+      
+        //Actitvity Navigation Drawer
+        activityNavigationView = (NavigationView) findViewById(R.id.journal_navigation_view);
         progressBar = (ProgressBar) findViewById(R.id.journal_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.journal_voice_command_toggle_btn);
+
+        journals = new ArrayList<Journal>();
     }
 
     public void setToolbar(){
@@ -155,11 +175,61 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         // Buttons
         userDrawerBtn.setOnClickListener(this);
         activityDrawerBtn.setOnClickListener(this);
-        addJoutnal.setOnClickListener(this);
+        addJournal.setOnClickListener(this);
+
+        //RecyclerView
+        journalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Navigation Views
         userNavigationView.setNavigationItemSelectedListener(this);
         activityNavigationView.setNavigationItemSelectedListener(this);
+
+
+        // Swipe Options
+        touchListener = new RecyclerTouchListener(this,journalRecyclerView);
+        touchListener
+                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+                    @Override
+                    public void onRowClicked(int position) {
+                        /**
+                         * Trigers when any
+                         * RecyclerButton is clicked
+                         * In this case
+                         * The journal will be
+                         * showed in reading mode
+                         */
+                        handleCheckAction(position);
+                       showToast("Double Tap on Task to Mark as Completed");
+                    }
+
+                    @Override
+                    public void onIndependentViewClicked(int independentViewID, int position) {
+
+                    }
+                })
+                .setSwipeOptionViews(R.id.journal_item_delete_rl,R.id.journal_item_edit_rl)
+                .setSwipeable(R.id.journal_item_fg, R.id.journal_item_bg_end, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+                    @Override
+                    public void onSwipeOptionClicked(int viewID, int position) {
+                        switch (viewID){
+                            case R.id.journal_item_delete_rl:
+                                // Very much Important is that
+                                // As Journal is important so
+                                // Show a confirmation window
+                                handleDeleteAction(position);
+                                break;
+                            case R.id.journal_item_edit_rl:
+                                handleEditAction(position);
+                                break;
+                        }
+                    }
+                })
+                .setLongClickable(false, new RecyclerTouchListener.OnRowLongClickListener() {
+                    @Override
+                    public void onRowLongClicked(int position) {
+
+                    }
+                });
 
         // Voice Command On/Off
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -196,7 +266,99 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         userNavigationView.getMenu().findItem(R.id.user_journal_option).setChecked(true);
 
         progressBar.setVisibility(View.INVISIBLE);
+
+        // Load Journals from database
+        journalRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        journalAdapter = new JournalAdapter(JournalActivity.this, journals);
+        journalRecyclerView.setAdapter(journalAdapter);
+        journalAdapter.notifyDataSetChanged();
     }
+
+
+
+   public void handleCheckAction(int position){
+        // This method will pass the activity to Show JOurnal
+        Intent intent = new Intent(JournalActivity.this, ShowJournalActivity.class);
+        intent.putExtra("status", "show_this_journal");
+        Journal sendJournal = journals.get(position);
+        sendJournalToActivity(sendJournal, intent);
+        startActivity(intent);
+
+   }
+
+   public void handleEditAction(int position){
+
+       Intent intent = new Intent(JournalActivity.this, AddJournalActivity.class);
+       intent.putExtra("status", "old_journal_from_journal_activity");
+       Journal sendJournal = journals.get(position);
+       sendJournalToAddActivity(sendJournal, intent);
+       startActivity(intent);
+   }
+
+   public void sendJournalToActivity(Journal j, Intent i){
+
+        i.putExtra("ja_show_title", j.getTitle());
+        i.putExtra("ja_show_description", j.getDescription());
+       i.putExtra("ja_show_year", j.getYear());
+       i.putExtra("ja_show_month", j.getMonth());
+       i.putExtra("ja_show_day", j.getDay());
+       i.putExtra("ja_show_hour", j.getHour());
+       i.putExtra("ja_show_minute", j.getMinute());
+       i.putExtra("ja_show_fileLink", j.getFileLink());
+       i.putExtra("ja_show_imageLink", j.getImageLink());
+
+
+   }
+
+
+    public void sendJournalToAddActivity(Journal j, Intent i){
+
+        i.putExtra("ja_edit_title", j.getTitle());
+        i.putExtra("ja_edit_description", j.getDescription());
+        i.putExtra("ja_edit_year", j.getYear());
+        i.putExtra("ja_edit_month", j.getMonth());
+        i.putExtra("ja_edit_day", j.getDay());
+        i.putExtra("ja_edit_hour", j.getHour());
+        i.putExtra("ja_edit_minute", j.getMinute());
+        i.putExtra("ja_edit_fileLink", j.getFileLink());
+        i.putExtra("ja_edit_imageLink", j.getImageLink());
+
+
+    }
+
+    /** Database Add **/
+    private void handleDatabase() {
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+
+        loadData(sqLiteDatabaseHelper);
+    }
+
+    private void loadData(SQLiteDatabaseHelper sqLiteDatabaseHelper) {
+        journals.clear();
+        journals = sqLiteDatabaseHelper.loadAllJournalItems();
+
+        journalRecyclerView.addItemDecoration(
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+
+        );
+
+        journalAdapter = new JournalAdapter(JournalActivity.this, journals);
+        journalRecyclerView.setAdapter(journalAdapter);
+        journalAdapter.notifyDataSetChanged();
+    }
+
+
+
+    private void handleDeleteAction(int position){
+
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        sqLiteDatabaseHelper.deleteJournal(journals.get(position).getFileLink());
+        loadData(sqLiteDatabaseHelper);
+    }
+
+
 
     public void showToast(String message){
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
@@ -209,6 +371,12 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = new Intent(JournalActivity.this, HomeActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        journalRecyclerView.addOnItemTouchListener(touchListener);
     }
 
     @Override
@@ -283,8 +451,9 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }.start();
         }
-        else if(view == addJoutnal){
-            Intent intent = new Intent(getApplicationContext(), AddJournalActivity.class);
+        else if(view == addJournal){
+            Intent intent = new Intent(JournalActivity.this, AddJournalActivity.class);
+            intent.putExtra("status", "new_journal_from_journal_activity");
             startActivity(intent);
         }
     }
@@ -607,6 +776,11 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        return false;
     }
 }
 

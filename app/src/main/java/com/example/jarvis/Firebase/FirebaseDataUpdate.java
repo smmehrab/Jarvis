@@ -4,16 +4,20 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.jarvis.Reminder.Alarm;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.Wallet.Record;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -142,6 +146,34 @@ public class FirebaseDataUpdate {
             }
             FirebaseDataAdd firebaseDataAdd = new FirebaseDataAdd(db, userID);
             firebaseDataAdd.addWalletInFireBase(newData);
+    }
+
+    /** in sync time Alarm will delete all data from firebase and then
+     * will update with local database
+     * and sign in it will all stored in local database
+     * and log out time it will remain same
+
+     */
+
+    public void deleteAlarmFromFirebase(){
+
+        db.collection("user").document(userID).collection("alarm")
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    WriteBatch batch = FirebaseFirestore.getInstance().batch();
+                    List<DocumentSnapshot> snapshotList = queryDocumentSnapshots.getDocuments();
+                    for (DocumentSnapshot snapshot : snapshotList) {
+                        batch.delete(snapshot.getReference());
+
+                    }
+                    batch.commit().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d("File", "Successfully deleted from firestore");
+
+                        } else {
+                            Log.d("File", "Error on deleting from firestore");
+                        }
+                    });
+                }).addOnFailureListener(e -> Log.d("File", "Error on deleting from firestore"));
     }
 
 
