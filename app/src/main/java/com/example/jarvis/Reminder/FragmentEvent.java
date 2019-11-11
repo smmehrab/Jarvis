@@ -1,4 +1,4 @@
-package com.example.jarvis.Reminder;
+//package com.example.jarvis.Reminder;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -34,7 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class FragmentEvent extends Fragment implements View.OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener, DatePicker.OnDateChangedListener{
+/*public class FragmentEvent extends Fragment implements View.OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener, DatePicker.OnDateChangedListener{
 
 
     private ArrayList<Event> events;
@@ -170,10 +170,10 @@ public class FragmentEvent extends Fragment implements View.OnClickListener, Vie
 
         // Add Event FAB Listener
         addEventFab.setOnClickListener(this); */
-    }
+ //   }
 
 
-    public void handleToggleAction(int position){
+/*    public void handleToggleAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
@@ -196,9 +196,9 @@ public class FragmentEvent extends Fragment implements View.OnClickListener, Vie
         ft.detach(this).attach(this).commit();
 
         showToast("Toggle Pressed"); */
-    }
+//    }
 
-    public void handleDeleteAction(int position){
+/*    public void handleDeleteAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
@@ -321,8 +321,8 @@ public class FragmentEvent extends Fragment implements View.OnClickListener, Vie
             enableButton(addEventBtn);
         }
     }
-
-    void disableButton(Button button){
+*/
+/*    void disableButton(Button button){
         button.setEnabled(false);
         button.setAlpha(.5f);
         button.setClickable(false);
@@ -334,4 +334,4 @@ public class FragmentEvent extends Fragment implements View.OnClickListener, Vie
         button.setClickable(true);
     }
 
-}
+}*/

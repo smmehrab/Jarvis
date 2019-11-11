@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.jarvis.Journal.Journal;
 import com.example.jarvis.Reminder.Alarm;
-import com.example.jarvis.Reminder.Event;
+//import com.example.jarvis.Reminder.Event;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -163,7 +163,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String ALARM_IS_EVERYDAY = "alarm_isEveryday";
     private static final String ALARM_STATUS = "alarm_status";
 
-    private static final String CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ALARM + "(" +
+    public static final String CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ALARM + "(" +
             ALARM_HOUR + " TEXT NOT NULL, " +
             ALARM_MINUTE + " TEXT NOT NULL, " +
             ALARM_IS_EVERYDAY + " INT NOT NULL, " +
@@ -172,7 +172,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 
     /***Table Event***/
-    private static final String TABLE_EVENT = "table_event";
+/*    private static final String TABLE_EVENT = "table_event";
     private static final String EVENT_HOUR = "event_hour";
     private static final String EVENT_MINUTE = "event_minute";
     private static final String EVENT_DAY = "event_day";
@@ -195,7 +195,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             EVENT_DESCRIPTION + " TEXT NOT NULL, " +
             "PRIMARY KEY(" + EVENT_DAY + ", "+ EVENT_MONTH + ", " + EVENT_YEAR+ ", "+ EVENT_HOUR+ ", "+ EVENT_MINUTE+"));";
 
-
+*/
 
 
     /*** Constructor ***/
@@ -216,7 +216,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
             sqLiteDatabase.execSQL(CREATE_TABLE_JOURNAL);
 
-            sqLiteDatabase.execSQL(CREATE_TABLE_EVENT);
+//            sqLiteDatabase.execSQL(CREATE_TABLE_EVENT);
 
         }
         catch (Exception e){
@@ -233,7 +233,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_WALLET);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
-            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
+//            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
             onCreate(sqLiteDatabase);
         } catch (Exception e) {
             showToast("Exception : " + e);
@@ -247,7 +247,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             sqLiteDatabase.execSQL(DROP_TABLE + TABLE_WALLET);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_JOURNAL);
             sqLiteDatabase.execSQL(DROP_TABLE+TABLE_ALARM);
-            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
+//            sqLiteDatabase.execSQL(DROP_TABLE+TABLE_EVENT);
             onCreate(sqLiteDatabase);
         } catch (Exception e){
             showToast("Exception : " + e);
@@ -1769,12 +1769,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return alarms;
     }
 
+    public Cursor getAllAlarms(){
+        return (getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_ALARM, null));
+    }
 
     /**************************************************************/
 
-    /*** Query on TABLE_ALARM ***/
+    /*** Query on TABLE_Event ***/
 
-    public long insertEvent(Event event){
+/*    public long insertEvent(Event event){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -1800,9 +1803,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
         return rowId;
-    }
+    }   */
 
-    public void insertAllEvents(ArrayList<Event> events){
+/*    public void insertAllEvents(ArrayList<Event> events){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
         for(Event event:events) {
@@ -1830,9 +1833,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
             long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
         }
-    }
+    }   */
 
-    public void updateEvent(Event event, String oldDay, String oldMonth, String oldYear, String oldHour, String oldMinute, String oldTitle, String oldDescription){
+/*    public void updateEvent(Event event, String oldDay, String oldMonth, String oldYear, String oldHour, String oldMinute, String oldTitle, String oldDescription){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -1865,9 +1868,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[] {oldDay, oldMonth, oldYear, oldHour, oldMinute, oldTitle, oldDescription});
 
         sqLiteDatabase.close();
-    }
+    } */
 
-    public Event findEvent(String day, String month, String year, String hour, String minute) {
+/*    public Event findEvent(String day, String month, String year, String hour, String minute) {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(TABLE_EVENT,
@@ -1904,9 +1907,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[]{day, month, year, hour, minute, title, description});
 
         sqLiteDatabase.close();
-    }
+    } */
 
-    public ArrayList<Event> loadEventItems(){
+/*    public ArrayList<Event> loadEventItems(){
         ArrayList<Event> events = new ArrayList<Event>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -1970,7 +1973,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return events;
-    }
+    } */
 
     /*** Additional Functions ***/
 

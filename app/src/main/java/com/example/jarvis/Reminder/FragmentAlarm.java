@@ -1,8 +1,14 @@
 package com.example.jarvis.Reminder;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -32,6 +38,7 @@ import com.example.jarvis.Util.RecyclerTouchListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class FragmentAlarm extends Fragment implements OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener {
 
@@ -67,6 +74,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
     private Button addAlarmBtn;
     private TextView dialogAlarmTitle;
 
+    private AlarmManager alarmManager;
 
     public FragmentAlarm(){
 
@@ -102,6 +110,8 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
         alarmDialogBuilder.setView(alarmDialogView);
         alarmDialog = alarmDialogBuilder.create();
+
+        alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
     }
 
 
@@ -265,6 +275,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
         if(!alarmHour.equals(currentHour) || !alarmMinute.equals(currentMinute)){
             enableButton(addAlarmBtn);
         }
+
     }
 
     public void showToast(String message){
@@ -284,6 +295,61 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
             if(addAlarmBtn.getText().equals("Add")){
                 // Adding Alarm
                 sqLiteDatabaseHelper.insertAlarm(new Alarm(alarmHour, alarmMinute, alarmIsEveryday, alarmStatus));
+
+
+                int notificationID;
+                /*
+                String hour = null, minute = null;
+                int isEveryday = 0, status = 0;
+                int rowIndex = 0;
+                sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+                Cursor cursor = sqLiteDatabaseHelper.getAllAlarms(); //query on alarms table
+                if(cursor.getCount() == 0){
+                    Toast.makeText(getActivity(), "No data is found", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    while (cursor.moveToNext()){
+                        rowIndex++;
+                        hour = cursor.getString(0);
+                        minute = cursor.getString(1);
+                        isEveryday = cursor.getInt(2);
+                        status = cursor.getInt(3);
+                        if(Integer.parseInt(hour) == Integer.parseInt(alarmHour) && Integer.parseInt(minute) == Integer.parseInt(alarmMinute))
+                        {
+                            break;
+                        }
+
+                    }
+                }*/
+
+                notificationID = Integer.parseInt(alarmHour+alarmMinute);
+
+                showToast("notification ID " + notificationID);
+                //showToast("index " + rowIndex + " hour " + hour + " minute " + minute);
+                //showToast(" Is everyday " + alarmIsEveryday + " status " + alarmStatus);
+
+                Intent intent = new Intent(getActivity(), AlertReceiver.class);
+                intent.putExtra("index", notificationID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
+
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(alarmHour));
+                c.set(Calendar.MINUTE, Integer.parseInt(alarmMinute));
+                c.set(Calendar.SECOND, 0);
+                if (c.before(Calendar.getInstance())) {
+                    c.add(Calendar.DATE, notificationID);
+                }
+                if(alarmIsEveryday == 1) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                                c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+                }
+                else{
+                    alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+                }
+
+
+
+                // ////////////////
 
                 // Closing Dialog Box
                 alarmDialog.cancel();
