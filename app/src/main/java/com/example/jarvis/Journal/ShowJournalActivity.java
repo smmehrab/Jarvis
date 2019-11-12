@@ -2,13 +2,16 @@ package com.example.jarvis.Journal;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,8 +35,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.jarvis.R;
+import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -101,7 +106,6 @@ public class ShowJournalActivity extends AppCompatActivity implements
         mEditor.setPadding(10, 10, 10, 10);
        // toolbarTitle.setText(journal.getTitle());
         mEditor.setInputEnabled(false);
-        toolbardeleteButtton.setClickable(false);
     }
 
     private void initializeJournal() {
@@ -228,7 +232,7 @@ public class ShowJournalActivity extends AppCompatActivity implements
         }
 
         else if(view == toolbardeleteButtton){
-
+            deleteJournal();
         }
 
         else if( view == toolbarLeftButton){
@@ -249,7 +253,7 @@ public class ShowJournalActivity extends AppCompatActivity implements
                 stringBuffer.append(line+"\n");
             }
             mEditor.setHtml(String.valueOf(stringBuffer));
-            showToast(stringBuffer.toString());
+           // showToast(stringBuffer.toString());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -310,6 +314,30 @@ public class ShowJournalActivity extends AppCompatActivity implements
         // Create a print job with name and adapter instance
         PrintJob printJob = printManager.print(jobName, printAdapter,
                 new PrintAttributes.Builder().build());
+
+    }
+
+
+    /** Delete file option */
+    public void deleteJournal(){
+        Toast.makeText(this, "This is a error", Toast.LENGTH_LONG).show();
+
+        AlertDialog.Builder alertbuilder = new AlertDialog.Builder(ShowJournalActivity.this);
+        alertbuilder.setMessage("Do you want to delete the journal ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(ShowJournalActivity.this);
+                        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+                        new File(journal.getFileLink()).deleteOnExit();
+                        sqLiteDatabaseHelper.deleteJournal(journal.getFileLink());
+                        onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", null);
+        AlertDialog alert = alertbuilder.create();
+        alert.show();
+
 
     }
 
