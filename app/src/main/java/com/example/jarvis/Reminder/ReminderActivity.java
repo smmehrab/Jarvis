@@ -189,12 +189,12 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentAlarm(),"Alarm");
-     //   adapter.addFragment(new FragmentEvent(),"Event");
+        adapter.addFragment(new FragmentEvent(),"Event");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(tabIcons[0]);
+//        Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(tabIcons[0]);
 //        Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(tabIcons[1]); //eita thakle crash kortese!!!
 
         activeTab = "Alarm";
