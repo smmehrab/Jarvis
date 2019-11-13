@@ -1,4 +1,4 @@
-//package com.example.jarvis.Reminder;
+package com.example.jarvis.Reminder;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -9,10 +9,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -32,17 +30,14 @@ import com.example.jarvis.Util.RecyclerTouchListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-/*public class FragmentEvent extends Fragment implements View.OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener, DatePicker.OnDateChangedListener{
-
+public class FragmentEvent extends Fragment implements View.OnClickListener, View.OnTouchListener, TimePicker.OnTimeChangedListener, DatePicker.OnDateChangedListener{
 
     private ArrayList<Event> events;
 
     private RecyclerView eventRecyclerView;
-    private Switch eventSwitch;
 
-//    private EventAdapter eventAdapter;
+    private EventAdapter eventAdapter;
     private RecyclerTouchListener eventTouchListener;
 
     private ProgressBar eventProgressBar;
@@ -50,17 +45,17 @@ import java.util.Calendar;
     private FloatingActionButton addEventFab;
 
     // Event Variables
-    private String eventDay, eventMonth, eventYear;
-    private String eventHour, eventMinute;
-    private String title, description;
-
+    private String title, description, type;
+    private String year, month, day;
+    private String hour, minute;
     private int isDeleted, isIgnored;
 
-    private String currentDay, currentMonth, currentYear;
+    private String currentTitle, currentDescription, currentType;
+    private String currentYear, currentMonth, currentDay;
     private String currentHour, currentMinute;
     private int currentIsDeleted, currentIsIgnored;
-    private String currentTitle, currentDescription;
 
+    // Alert Dialog Variables
     private AlertDialog eventDialog;
     private AlertDialog.Builder eventDialogBuilder;
     private View eventDialogView;
@@ -90,12 +85,11 @@ import java.util.Calendar;
     }
 
     public void findXmlElements(View view){
-//        eventRecyclerView = (RecyclerView) view.findViewById(R.id.event_recycler_view);
-//        eventSwitch = (Switch) view.findViewById(R.id.event_item_switch);
+        eventRecyclerView = (RecyclerView) view.findViewById(R.id.event_recycler_view);
 
-//        eventProgressBar = (ProgressBar) view.findViewById(R.id.event_progress_bar);
-//        eventVoiceCommandToggleBtn = (ToggleButton) view.findViewById(R.id.event_voice_command_toggle_btn);
-//        addEventFab = (FloatingActionButton) view.findViewById(R.id.event_add_event_fab);
+        eventProgressBar = (ProgressBar) view.findViewById(R.id.event_progress_bar);
+        eventVoiceCommandToggleBtn = (ToggleButton) view.findViewById(R.id.event_voice_command_toggle_btn);
+        addEventFab = (FloatingActionButton) view.findViewById(R.id.event_add_event_fab);
 
         // Event Dialog
         eventDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -123,57 +117,57 @@ import java.util.Calendar;
     public void setRecyclerView(ArrayList<Event> events){
         // Set RecyclerView
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //eventAdapter = new AlarmAdapter(getActivity(),events);
-        //eventRecyclerView.setAdapter(eventAdapter);
-        //eventAdapter.notifyDataSetChanged();
+        eventAdapter = new EventAdapter(getActivity(),events);
+        eventRecyclerView.setAdapter(eventAdapter);
+        eventAdapter.notifyDataSetChanged();
     }
 
     public void setListeners(){
         // Swipe Options
-     /*   eventTouchListener = new RecyclerTouchListener(getActivity(),eventRecyclerView);
-        eventTouchListener
-                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
-                    @Override
-                    public void onRowClicked(int position) {
-                        handleToggleAction(position);
-                    }
+//     eventTouchListener = new RecyclerTouchListener(getActivity(),eventRecyclerView);
+//        eventTouchListener
+//                .setClickable(new RecyclerTouchListener.OnRowClickListener() {
+//                    @Override
+//                    public void onRowClicked(int position) {
+//                        handleEventDetailsAction(position);
+//                    }
+//
+//                    @Override
+//                    public void onIndependentViewClicked(int independentViewID, int position) {
+//
+//                    }
+//                })
+//                .setSwipeOptionViews(R.id.event_item_delete_rl, R.id.event_item_edit_rl)
+//                .setSwipeable(R.id.event_item_fg, R.id.event_item_bg_end, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
+//                    @Override
+//                    public void onSwipeOptionClicked(int viewID, int position) {
+//                        switch (viewID){
+//                            case R.id.event_item_delete_rl:
+//                                handleDeleteAction(position);
+//                                break;
+//                            case R.id.event_item_edit_rl:
+//                                handleEditAction(position);
+//                                showToast("Edit Pressed");
+//                                break;
+//                        }
+//                    }
+//                });
+//
+//        // RecyclerView Touch Listener
+//        eventRecyclerView.addOnItemTouchListener(eventTouchListener);
+//
+////        // TimePicker Time Change Listener
+////        eventTimePicker.setOnTimeChangedListener(this);
+//
+//        // Add Event Button Listener
+//        addEventBtn.setOnClickListener(this);
+//
+//        // Add Event FAB Listener
+//        addEventFab.setOnClickListener(this);
+    }
 
-                    @Override
-                    public void onIndependentViewClicked(int independentViewID, int position) {
 
-                    }
-                })
-                .setSwipeOptionViews(R.id.event_item_delete_rl, R.id.event_item_edit_rl)
-                .setSwipeable(R.id.evet_item_fg, R.id.event_item_bg_end, new RecyclerTouchListener.OnSwipeOptionsClickListener() {
-                    @Override
-                    public void onSwipeOptionClicked(int viewID, int position) {
-                        switch (viewID){
-                            case R.id.event_item_delete_rl:
-                                handleDeleteAction(position);
-                                break;
-                            case R.id.event_item_edit_rl:
-                                handleEditAction(position);
-                                showToast("Edit Pressed");
-                                break;
-                        }
-                    }
-                });
-
-        // RecyclerView Touch Listener
-        eventRecyclerView.addOnItemTouchListener(eventTouchListener);
-
-        // TimePicker Time Change Listener
-        eventTimePicker.setOnTimeChangedListener(this);
-
-        // Add Event Button Listener
-        addEventBtn.setOnClickListener(this);
-
-        // Add Event FAB Listener
-        addEventFab.setOnClickListener(this); */
- //   }
-
-
-/*    public void handleToggleAction(int position){
+    public void handleEventDetailsAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
@@ -196,13 +190,13 @@ import java.util.Calendar;
         ft.detach(this).attach(this).commit();
 
         showToast("Toggle Pressed"); */
-//    }
+    }
 
-/*    public void handleDeleteAction(int position){
+    public void handleDeleteAction(int position){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getActivity());
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
-       sqLiteDatabaseHelper.deleteEvent(events.get(position).getDay(), events.get(position).getMonth(), events.get(position).getYear(), events.get(position).getHour(), events.get(position).getMinute(), events.get(position).getTitle(), events.get(position).getDescription());
+        sqLiteDatabaseHelper.deleteEvent(events.get(position).getTitle(), events.get(position).getYear(), events.get(position).getMonth(), events.get(position).getDay());
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (Build.VERSION.SDK_INT >= 26) {
@@ -215,9 +209,9 @@ import java.util.Calendar;
 
     public void handleEditAction(int position){
 
-        currentDay = events.get(position).getDay();
-        currentMonth = events.get(position).getMonth();
         currentYear = events.get(position).getYear();
+        currentMonth = events.get(position).getMonth();
+        currentDay = events.get(position).getDay();
 
         currentHour = events.get(position).getHour();
         currentMinute = events.get(position).getMinute();
@@ -256,7 +250,7 @@ import java.util.Calendar;
 
             if(addEventBtn.getText().equals("Add")){
                 // Adding event
-                sqLiteDatabaseHelper.insertEvent(new Event(eventDay, eventMonth, eventYear, eventHour, eventMinute, isDeleted, isIgnored, title, description));
+                sqLiteDatabaseHelper.insertEvent(new Event(title, description, type, year, month, day, hour, minute, isDeleted, isIgnored));
 
                 // Closing Dialog Box
                 eventDialog.cancel();
@@ -265,8 +259,8 @@ import java.util.Calendar;
                 showToast("Event Added");
             } else if(addEventBtn.getText().equals("Update")){
                 // Updating Event
-                sqLiteDatabaseHelper.updateEvent(new Event(eventDay, eventMonth, eventYear, eventHour, eventMinute, isDeleted, isIgnored, title, description),
-                        currentDay, currentMonth, currentYear, currentHour, currentMinute, currentTitle, currentDescription);
+                sqLiteDatabaseHelper.updateEvent(new Event(title, description, type, year, month, day, hour, minute, isDeleted, isIgnored),
+                        currentTitle, currentYear, currentMonth, currentDay);
 
                 // Closing Dialog Box
                 eventDialog.cancel();
@@ -293,11 +287,11 @@ import java.util.Calendar;
     @Override
     public void onDateChanged(DatePicker datePicker, int i, int i1, int i2) {
 
-        eventDay = Integer.toString(datePicker.getDayOfMonth());
-        eventMonth = Integer.toString(datePicker.getMonth());
-        eventYear = Integer.toString(datePicker.getYear());
+        day = Integer.toString(datePicker.getDayOfMonth());
+        month = Integer.toString(datePicker.getMonth());
+        year = Integer.toString(datePicker.getYear());
 
-        if(!eventDay.equals(currentDay) || !eventMonth.equals(currentMonth) || !eventYear.equals(currentYear)){
+        if(!day.equals(currentDay) || !month.equals(currentMonth) || !year.equals(currentYear)){
             enableButton(addEventBtn);
         }
 
@@ -314,15 +308,15 @@ import java.util.Calendar;
 //
 //        Toast.makeText(this, then.getTime().toString(), Toast.LENGTH_SHORT)
 //                .show();
-        eventHour = timePicker.getCurrentHour().toString();
-        eventMinute = timePicker.getCurrentMinute().toString();
+        hour = timePicker.getCurrentHour().toString();
+        minute = timePicker.getCurrentMinute().toString();
 
-        if(!eventHour.equals(currentHour) || !eventMinute.equals(currentMinute)){
+        if(!hour.equals(currentHour) || !minute.equals(currentMinute)){
             enableButton(addEventBtn);
         }
     }
-*/
-/*    void disableButton(Button button){
+
+    void disableButton(Button button){
         button.setEnabled(false);
         button.setAlpha(.5f);
         button.setClickable(false);
@@ -334,4 +328,4 @@ import java.util.Calendar;
         button.setClickable(true);
     }
 
-}*/
+}

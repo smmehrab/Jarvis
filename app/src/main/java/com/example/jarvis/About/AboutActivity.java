@@ -322,7 +322,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkReceiver);
+//        unregisterReceiver(networkReceiver);
     }
 
     @Override

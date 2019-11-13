@@ -2,6 +2,10 @@
 
 /*public class Event {
 
+    private String title;
+    private String description;
+    private String type;
+
     private String year;
     private String month;
     private String day;
@@ -12,20 +16,28 @@
     private int isDeleted;
     private int isIgnored;
 
-    private String title;
-    private String Description;
+    public String getTitle() {
+        return title;
+    }
 
-
-    public Event(String year, String month, String day, String hour, String minute, int isDeleted, int isIgnored, String title, String description) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        this.isDeleted = isDeleted;
-        this.isIgnored = isIgnored;
+    public void setTitle(String title) {
         this.title = title;
-        Description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getYear() {
@@ -84,19 +96,16 @@
         this.isIgnored = isIgnored;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
+    public Event(String title, String description, String type, String year, String month, String day, String hour, String minute, int isDeleted, int isIgnored) {
         this.title = title;
-    }
-
-    public String getDescription() {
-        return Description;
-    }
-
-    public void setDescription(String description) {
-        Description = description;
+        this.description = description;
+        this.type = type;
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hour = hour;
+        this.minute = minute;
+        this.isDeleted = isDeleted;
+        this.isIgnored = isIgnored;
     }
 }*/
