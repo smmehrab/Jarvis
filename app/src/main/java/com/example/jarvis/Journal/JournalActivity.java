@@ -63,6 +63,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -199,7 +200,6 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
                          * showed in reading mode
                          */
                         handleCheckAction(position);
-                       showToast("Double Tap on Task to Mark as Completed");
                     }
 
                     @Override
@@ -354,6 +354,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        new File(journals.get(position).getFileLink()).deleteOnExit();
         sqLiteDatabaseHelper.deleteJournal(journals.get(position).getFileLink());
         loadData(sqLiteDatabaseHelper);
     }
