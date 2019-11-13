@@ -1,5 +1,8 @@
 package com.example.jarvis.Reminder;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
@@ -110,12 +114,13 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     private Intent recognizerIntent;
     private String LOG_TAG = "ReminderActivity";
     private ToggleButton voiceCommandToggleButton;
+    public static final String CHANNEL_ID = "Jarvis";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder);
-
+        createNotificationChannel();
         setUI();
     }
 
@@ -181,13 +186,13 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         adapter.addFragment(new FragmentAlarm(),"Alarm");
-        adapter.addFragment(new FragmentEvent(),"Event");
+     //   adapter.addFragment(new FragmentEvent(),"Event");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
         Objects.requireNonNull(tabLayout.getTabAt(0)).setIcon(tabIcons[0]);
-        Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(tabIcons[1]);
+//        Objects.requireNonNull(tabLayout.getTabAt(1)).setIcon(tabIcons[1]); //eita thakle crash kortese!!!
 
         activeTab = "Alarm";
 
@@ -330,7 +335,9 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
             startActivity(intent);
             finish();
         } else if (id == R.id.user_reminder_option) {
-
+            //Intent intent = new Intent(getApplicationContext(), FragmentAlarm.class);
+            //startActivity(intent);
+            //finish();
         } else if (id == R.id.user_settings_option) {
             Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(intent);
@@ -621,4 +628,26 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
     }
+
+    ////////////
+    public void createNotificationChannel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "whatever", NotificationManager.IMPORTANCE_HIGH);
+            channel.enableVibration(true);
+            channel.enableLights(true);
+            channel.setLightColor(R.color.colorPrimary);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    public void deleteNotificationChannel() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.deleteNotificationChannel(CHANNEL_ID);
+        }
+    }
+
 }

@@ -1,6 +1,6 @@
-package com.example.jarvis.Reminder;
+//package com.example.jarvis.Reminder;
 
-public class Event {
+/*public class Event {
 
     private String year;
     private String month;
@@ -99,4 +99,4 @@ public class Event {
     public void setDescription(String description) {
         Description = description;
     }
-}
+}*/
