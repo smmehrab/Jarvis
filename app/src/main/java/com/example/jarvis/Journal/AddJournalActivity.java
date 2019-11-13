@@ -6,16 +6,20 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
@@ -39,6 +43,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.checkerframework.checker.units.qual.Time;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,17 +52,17 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
-
 import jp.wasabeef.richeditor.RichEditor;
-
 public class AddJournalActivity extends AppCompatActivity implements View.OnClickListener, RecognitionListener,
         DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
     /** Voice Command Variables */
     private static final int REQUEST_RECORD_PERMISSION = 100;
+    private boolean[] toogleArray = new boolean [11];
     private ProgressBar progressBar;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
@@ -74,6 +79,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
     private TextView mPreview;
     String check;
     private boolean changed = false;
+    private static final int REQUEST_GET_SINGLE_FILE = 10;
     /** For Date and Time*/
 
     private String y, d, nTitle = "", m, h, min;
@@ -96,13 +102,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         setUI();
         addFuctionalityInEditor();
 
-
-        //mPreview = (TextView) findViewById(R.id.preview);
-       /* mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            @Override public void onTextChange(String text) {
-                mPreview.setText(text);
-            }
-        });*/
        if( !check.equals("new_journal_from_journal_activity")) {
            readFromFile();
        }
@@ -111,7 +110,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
     private void addFuctionalityInEditor() {
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                findViewById(R.id.action_undo).setBackground(getResources().getDrawable(R.color.grey600));
                 mEditor.undo();
             }
         });
@@ -126,6 +124,14 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override public void onClick(View v) {
                 mEditor.setBold();
+                if(!toogleArray[0]) {
+                    findViewById(R.id.action_bold).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[0] = true;
+                }
+                else{
+                    toogleArray[0] = false;
+                    findViewById(R.id.action_bold).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
 
             }
         });
@@ -133,68 +139,124 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         findViewById(R.id.action_italic).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setItalic();
+                if(!toogleArray[1]) {
+                    findViewById(R.id.action_italic).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[1] = true;
+                }
+
+                else{
+                    toogleArray[1] = false;
+                    findViewById(R.id.action_italic).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_subscript).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setSubscript();
+                if(!toogleArray[2]) {
+                    findViewById(R.id.action_subscript).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[2] = true;
+                }
+
+                else{
+                    toogleArray[2] = false;
+                    findViewById(R.id.action_subscript).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_superscript).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setSuperscript();
+                if(!toogleArray[3]) {
+                    findViewById(R.id.action_superscript).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[3] = true;
+                }
+
+                else{
+                    toogleArray[3] = false;
+                    findViewById(R.id.action_superscript).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_strikethrough).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setStrikeThrough();
+                if(!toogleArray[4]) {
+                    findViewById(R.id.action_strikethrough).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[4] = true;
+                }
+
+                else{
+                    toogleArray[4] = false;
+                    findViewById(R.id.action_strikethrough).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_underline).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setUnderline();
+                if(!toogleArray[5]) {
+                    findViewById(R.id.action_underline).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[5] = true;
+                }
+
+                else{
+                    toogleArray[5] = false;
+                    findViewById(R.id.action_underline).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
+
                 mEditor.setHeading(1);
+                if(!toogleArray[6]) {
+
+                    findViewById(R.id.action_heading1).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[6] = true;
+                }
+
+                else{
+                    toogleArray[6] = false;
+                    findViewById(R.id.action_heading1).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setHeading(2);
+                if(!toogleArray[7]) {
+                    findViewById(R.id.action_heading2).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[7] = true;
+                }
+
+                else{
+                    toogleArray[7] = false;
+                    findViewById(R.id.action_heading2).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
 
         findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setHeading(3);
+                if(!toogleArray[8]) {
+                    findViewById(R.id.action_heading3).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
+                    toogleArray[8] = true;
+                }
+
+                else{
+                    toogleArray[8] = false;
+                    findViewById(R.id.action_heading3).setBackground(getResources().getDrawable(R.color.colorWhite));
+                }
             }
         });
-
-//        findViewById(R.id.action_heading4).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(4);
-//            }
-//        });
-
-//        findViewById(R.id.action_heading5).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(5);
-//            }
-//        });
-
-//        findViewById(R.id.action_heading6).setOnClickListener(new View.OnClickListener() {
-//            @Override public void onClick(View v) {
-//                mEditor.setHeading(6);
-//            }
-//        });
 
         findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
             private boolean isChanged;
@@ -264,25 +326,23 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
 
         findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-//                mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
-//                        "dachshund");
-                mEditor.insertImage("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRTBGGiVygHO3RkYHdz_k2GG0cOGBTy7qHlms_NmwxXflmdI0O3",
-                        "dachshund");
-//
-
+                try {
+                    if (ActivityCompat.checkSelfPermission(AddJournalActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddJournalActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_GET_SINGLE_FILE);
+                    } else {
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(galleryIntent, REQUEST_GET_SINGLE_FILE);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 //                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                intent.setType("*/*");
 //                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                startActivity(intent);
-
+//                intent.setType("image/*");
+//               startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_GET_SINGLE_FILE);
             }
         });
 
-        findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
-            }
-        });
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.insertTodo();
@@ -303,7 +363,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
     public void findXmlElements(){
 
         mEditor = (RichEditor) findViewById(R.id.editor);
-
         progressBar = (ProgressBar) findViewById(R.id.add_journal_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.add_journal_voice_command_toggle_btn);
 
@@ -342,26 +401,27 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
             @Override
             public void onTextChange(String text) {
-                if(changed == true) {
+                if(changed == false) {
                     toolbarLeftButton.setImageResource(R.drawable.icon_check);
-                }
-                else{
                     changed = true;
                 }
             }
         });
-
-
-
     }
 
     public void initializeUI() {
         progressBar.setVisibility(View.INVISIBLE);
         mEditor.setEditorFontSize(16);
         mEditor.setEditorFontColor(Color.BLACK);
+        mEditor.setEditorWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+        //mEditor.focusEditor();
         mEditor.setPadding(10, 10, 10, 10);
         toolbarTitle.setText(journal.getTitle());
+        mEditor.loadCSS("file:///android_assets/style.css");
         mEditor.setPlaceholder("Insert text here...");
+        for(int i = 0; i < toogleArray.length; ++i){
+            toogleArray[i] = false;
+        }
 
         check = intent.getStringExtra("status");
         if(check.equals("journal_from_show_activity") || check.equals("old_journal_from_journal_activity")){
@@ -447,10 +507,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
             journal.setImageLink(imageLink);
             journal.setFileLink(fileLink);
         }
-
-        else{
-            showToast("Faltu");
-        }
     }
 
     public void writeToFile(String text){
@@ -459,8 +515,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
             FileOutputStream fileOutputStream = openFileOutput(journal.getFileLink(), Context.MODE_PRIVATE);
             fileOutputStream.write(text.getBytes());
             fileOutputStream.close();
-            Toast.makeText(getApplicationContext(), "data is saved", Toast.LENGTH_SHORT).show();
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -481,7 +535,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
                 stringBuffer.append(line+"\n");
             }
             mEditor.setHtml(String.valueOf(stringBuffer));
-            showToast(stringBuffer.toString());
+          //  showToast(stringBuffer.toString());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -490,6 +544,46 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+
+    /***
+        Adding an Image
+     */
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (resultCode == RESULT_OK) {
+                if (requestCode == REQUEST_GET_SINGLE_FILE) {
+                    Uri selectedImageUri = data.getData();
+                    // Get the path from the Uri
+                    final String path = getPathFromURI(selectedImageUri);
+                    if (path != null) {
+                        Log.d("gds", path);
+                        mEditor.insertImage(path, "image");
+
+                    } else {
+                        Toast.makeText(this, "null", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("FileSelectorActivity", "File select error", e);
+        }
+    }
+
+
+    public String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
+    }
 
 
     public void showToast(String message){
@@ -520,7 +614,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
 
 
 
-        } else if(view == toolbarLeftButton){
+        } else if( (view == toolbarLeftButton) && changed ){
 
             journal.setFileLink(journal.getTitle());
             if(mEditor.getHtml().length() >= 30){
@@ -538,6 +632,9 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
             SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
 
             sqLiteDatabaseHelper.insertJournal(journal);
+            onBackPressed();
+        }
+        else if( (view == toolbarLeftButton) && !changed){
             onBackPressed();
         }
     }
@@ -636,6 +733,19 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
                     Toast.makeText(AddJournalActivity.this, "Permission Denied!", Toast
                             .LENGTH_SHORT).show();
                 }
+                break;
+            case REQUEST_GET_SINGLE_FILE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(galleryIntent, REQUEST_GET_SINGLE_FILE);
+                }
+                else {
+                    Toast.makeText(AddJournalActivity.this, "Permission Denied!", Toast
+                            .LENGTH_SHORT).show();
+                }
+                break;
+
         }
     }
 

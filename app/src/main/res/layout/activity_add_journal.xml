@@ -246,16 +246,6 @@
                         android:contentDescription="@null"
                         android:src="@drawable/icon_insert_image"
                         />
-
-                    <ImageButton
-                        android:id="@+id/action_insert_link"
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/colorWhite"
-                        android:contentDescription="@null"
-                        android:src="@drawable/icon_insert_link"
-                        />
-
                     <ImageButton
                         android:id="@+id/action_insert_checkbox"
                         android:layout_width="60dp"
