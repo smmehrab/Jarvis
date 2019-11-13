@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -106,6 +107,10 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     private Intent recognizerIntent;
     private String LOG_TAG = "JournalActivity";
     private ToggleButton voiceCommandToggleButton;
+
+    private TextToSpeech mTTS;
+
+    private boolean isVcOn;
 
 
     /** For Editors */
@@ -510,13 +515,31 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+
+//        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+//            @Override
+//            public void onInit(int status) {
+//                if (status == TextToSpeech.SUCCESS) {
+//                    int result = mTTS.setLanguage(Locale.ENGLISH);
+//
+//                    if (result == TextToSpeech.LANG_MISSING_DATA
+//                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//                        Log.e("TTS", "Language not supported");
+//                    } else {
+//
+//                    }
+//                } else {
+//                    Log.e("TTS", "Initialization failed");
+//                }
+//            }
+//        });
     }
 
     public void isVoiceCommandOn(){
         if(getIntent().getExtras()!=null){
             if(getIntent().getExtras().getString("voice_command")!=null ){
                 if(Objects.equals(getIntent().getExtras().getString("voice_command"), "true")) {
-                    voiceCommandToggleButton.setChecked(true);
+                    enableVoiceCommand();
                 }
             }
         }
@@ -539,8 +562,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkReceiver);
-
+//        unregisterReceiver(networkReceiver);
     }
 
     @Override
@@ -565,26 +587,6 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onEndOfSpeech() {
-        Log.i(LOG_TAG, "onEndOfSpeech");
-        progressBar.setIndeterminate(true);
-        voiceCommandToggleButton.setChecked(true);
-    }
-
-    @Override
-    public void onError(int errorCode) {
-        String errorMessage = getErrorText(errorCode);
-
-        if (errorMessage.equals("Client side error")) {
-            voiceCommandToggleButton.setChecked(true);
-        } else {
-            Log.d(LOG_TAG, "FAILED " + errorMessage);
-            showToast(errorMessage);
-            voiceCommandToggleButton.setChecked(false);
-        }
-    }
-
-    @Override
     public void onEvent(int arg0, Bundle arg1) {
         Log.i(LOG_TAG, "onEvent");
     }
@@ -600,6 +602,12 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
+        progressBar.setProgress((int) rmsdB);
+    }
+
+    @Override
     public void onResults(Bundle results) {
         Log.i(LOG_TAG, "onResults");
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
@@ -608,18 +616,12 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         for (String result : matches)
             text += result + "\n";
 
-        showToast(matches.get(0));
-
         if(matches.get(0).equals("sync data")){
             showToast("Data Synced");
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
-        } else if(matches.get(0).equals("turn off voice command")){
-            Intent intent = new Intent(getApplicationContext(), getApplicationContext().getClass());
-            intent.putExtra("voice_command", "false");
-            startActivity(intent);
-        } else if(matches.get(0).equals("go to home")){
+        }  else if(matches.get(0).equals("go to home")){
             Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             intent.putExtra("voice_command", "true");
             startActivity(intent);
@@ -653,68 +655,130 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
             finish();
         }
 
-        else if(matches.get(0).equals("show activity options")){
+        else if(matches.get(0).equals("open activity options")){
             activityDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
-        } else if(matches.get(0).equals("hide activity options")){
+            restartVoiceCommand();
+        } else if(matches.get(0).equals("close activity options")){
             activityDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
-        } else if(matches.get(0).equals("show user options")){
+            restartVoiceCommand();
+        } else if(matches.get(0).equals("open user options")){
             userDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
-        } else if(matches.get(0).equals("hide user options")){
+            restartVoiceCommand();
+        } else if(matches.get(0).equals("close user options")){
             userDrawerBtn.callOnClick();
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         }
 
+
+        else if(matches.get(0).equals("add a new task")){
+
+        } else if(matches.get(0).equals("update a task")){
+
+        } else if(matches.get(0).equals("delete a task")){
+
+        } else if(matches.get(0).equals("mark a task as completed")){
+
+        }
+
+//        else if(matches.get(0).equals("scroll up")){
+//            disableVoiceCommand();
+//            scroll(-1);
+//        } else if(matches.get(0).equals("scroll down")){
+//            disableVoiceCommand();
+//            scroll(1);
+//        }
+
+        else if(matches.get(0).equals("turn off voice command")){
+            disableVoiceCommand();
+        }
+
+//        else if(matches.get(0).equals("read")){
+////            read();
+//        } else if(matches.get(0).equals("stop reading")){
+//
+//        }
         else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
-            voiceCommandToggleButton.setChecked(false);
+            restartVoiceCommand();
         }
     }
 
     @Override
-    public void onRmsChanged(float rmsdB) {
-        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
-        progressBar.setProgress((int) rmsdB);
+    public void onEndOfSpeech() {
+        Log.i(LOG_TAG, "onEndOfSpeech");
+        if(isVcOn) {
+            restartVoiceCommand();
+        }
+        else
+            disableVoiceCommand();
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+//        if (errorMessage.equals("Client Side Error") || errorMessage.equals("No Such Command Found")  ||  errorMessage.equals("No Command Given")) {
+//            restartVoiceCommand();
+//        } else {
+//            showToast(errorMessage.toUpperCase());
+//            disableVoiceCommand();
+//        }
+
+        showToast(errorMessage.toUpperCase());
+        restartVoiceCommand();
     }
 
     public static String getErrorText(int errorCode) {
         String message;
         switch (errorCode) {
             case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
+                message = "Audio Recording Error";
                 break;
             case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
+                message = "Client Side Error";
                 break;
             case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
+                message = "Insufficient Permissions";
                 break;
             case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
+                message = "Network Error";
                 break;
             case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
+                message = "Network Found";
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
+                message = "No Such Command Found";
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
+                message = "Recognition Service Busy";
                 break;
             case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
+                message = "Server Error";
                 break;
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
+                message = "No Command Given";
                 break;
             default:
-                message = "Didn't understand, please try again.";
+                message = "Didn't Understand. Please, Try Again!";
                 break;
         }
         return message;
     }
+
+    public void disableVoiceCommand(){
+        isVcOn = false;
+        voiceCommandToggleButton.setChecked(false);
+    }
+
+    public void enableVoiceCommand(){
+        isVcOn = true;
+        voiceCommandToggleButton.setChecked(true);
+    }
+
+    public void restartVoiceCommand(){
+        voiceCommandToggleButton.setChecked(true);
+    }
+
+
 
     /** Firebase Authentication Handling */
 

@@ -681,8 +681,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(networkReceiver);
-
+//        unregisterReceiver(networkReceiver);
     }
 
     @Override
@@ -775,20 +774,19 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             finish();
         }
 
-        else if(matches.get(0).equals("show activity options")){
+        else if(matches.get(0).equals("open activity options")){
             activityDrawerBtn.callOnClick();
             restartVoiceCommand();
-        } else if(matches.get(0).equals("hide activity options")){
+        } else if(matches.get(0).equals("close activity options")){
             activityDrawerBtn.callOnClick();
             restartVoiceCommand();
-        } else if(matches.get(0).equals("show user options")){
+        } else if(matches.get(0).equals("open user options")){
             userDrawerBtn.callOnClick();
             restartVoiceCommand();
-        } else if(matches.get(0).equals("hide user options")){
+        } else if(matches.get(0).equals("close user options")){
             userDrawerBtn.callOnClick();
             restartVoiceCommand();
         }
-
 
         else if(matches.get(0).equals("add a new task")){
 
@@ -834,15 +832,15 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onError(int errorCode) {
         String errorMessage = getErrorText(errorCode);
-        if (errorMessage.equals("Client Side Error") || errorMessage.equals("No Such Command Found")  ||  errorMessage.equals("No Command Given")) {
-            restartVoiceCommand();
-        } else {
-            showToast(errorMessage.toUpperCase());
-            disableVoiceCommand();
-        }
+//        if (errorMessage.equals("Client Side Error") || errorMessage.equals("No Such Command Found")  ||  errorMessage.equals("No Command Given")) {
+//            restartVoiceCommand();
+//        } else {
+//            showToast(errorMessage.toUpperCase());
+//            disableVoiceCommand();
+//        }
 
-//        showToast(errorMessage.toUpperCase());
-//        restartVoiceCommand();
+        showToast(errorMessage.toUpperCase());
+        restartVoiceCommand();
     }
 
     public static String getErrorText(int errorCode) {
