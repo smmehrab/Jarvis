@@ -1,9 +1,12 @@
 package com.example.jarvis.Todo;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,16 +20,19 @@ import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.jarvis.R;
+import com.example.jarvis.Reminder.AlertReceiver;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
 import com.example.jarvis.Util.TimePickerFragment;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
@@ -56,6 +62,8 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
     private Integer isIgnored;
 
     private String updateTimestamp;
+
+    private AlarmManager alarmManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +163,7 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
         disableButton(addBtn);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View view) {
         if(view == addBtn){
@@ -171,8 +180,38 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
             updateTimestamp = ts;
 
             Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
-
             sqLiteDatabaseHelper.insertTodo(task);
+
+            //add in reminder
+//            int todoNotificationID;
+            //todoNotificationID = Long.parseLong(year+month+day+hour+minute);
+//            todoNotificationID = Integer.parseInt(hour+minute);
+//            showToast("notification ID " + todoNotificationID);
+//            Intent intent = new Intent(this, todoAlertReceiver.class);
+//            intent.putExtra("todoNotification", todoNotificationID);
+
+//            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+
+//            Calendar c = Calendar.getInstance();
+//            c.setTimeInMillis(System.currentTimeMillis());
+
+//            c.set(Calendar.YEAR, Integer.parseInt(year));
+//            c.set(Calendar.MONTH, Integer.parseInt(month));
+//            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
+//            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+//            c.set(Calendar.MINUTE, Integer.parseInt(minute));
+//           c.set(Calendar.SECOND, 0);
+            //c.set(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), Integer.parseInt(hour), Integer.parseInt(minute), 0);
+            //c.set(2019, 11, 13, 3, 18, 0);
+//            Toast.makeText(getApplicationContext(), (int) c.getTimeInMillis(), Toast.LENGTH_SHORT).show();
+ //           if (c.before(Calendar.getInstance())) {
+//                c.add(Calendar.DATE, todoNotificationID);
+//            }
+
+//            if(reminderState == 1)
+ //               alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+            // ////////////////
+
             onBackPressed();
         }
         else if(view == cancelBtn){
