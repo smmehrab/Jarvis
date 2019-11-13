@@ -1,6 +1,6 @@
-//package com.example.jarvis.Reminder;
+package com.example.jarvis.Reminder;//package com.example.jarvis.Reminder;
 
-/*public class Event {
+public class Event {
 
     private String title;
     private String description;
@@ -108,4 +108,4 @@
         this.isDeleted = isDeleted;
         this.isIgnored = isIgnored;
     }
-}*/
+}

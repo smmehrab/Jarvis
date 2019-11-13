@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.jarvis.Journal.Journal;
 import com.example.jarvis.Reminder.Alarm;
-//import com.example.jarvis.Reminder.Event;
+import com.example.jarvis.Reminder.Event;
 import com.example.jarvis.Todo.Task;
 import com.example.jarvis.UserHandling.User;
 import com.example.jarvis.Wallet.Record;
@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+//import com.example.jarvis.Reminder.Event;
 
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
@@ -206,7 +208,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
             "PRIMARY KEY(" + EVENT_TITLE + ", "+ EVENT_YEAR + ", " + EVENT_MONTH+ ", "+ EVENT_DAY+ "));";
 
-*/
+
 
 
     /*** Constructor ***/
@@ -1789,7 +1791,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     /*** Query on TABLE_EVENT ***/
 
 
-/*    public long insertEvent(Event event){
+    public long insertEvent(Event event){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -1823,9 +1825,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
         return rowId;
-    }   */
+    }
 
-/*    public void insertAllEvents(ArrayList<Event> events){
+    public void insertAllEvents(ArrayList<Event> events){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
         for(Event event:events) {
@@ -1861,7 +1863,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
             long rowId = sqLiteDatabase.insert(TABLE_EVENT, null, contentValues);
         }
-    }   */
+    }
 
     public void updateEvent(Event event, String oldTitle, String oldYear, String oldMonth, String oldDay){
 
@@ -1901,7 +1903,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[] {oldTitle, oldYear, oldMonth, oldDay});
 
         sqLiteDatabase.close();
-    } */
+    }
 
     public Event findEvent(String title, String year, String month, String day) {
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -1942,9 +1944,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 new String[]{title, year, month, day});
 
         sqLiteDatabase.close();
-    } */
+    }
 
-/*    public ArrayList<Event> loadEventItems(){
+    public ArrayList<Event> loadEventItems(){
         ArrayList<Event> events = new ArrayList<Event>();
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
@@ -2013,7 +2015,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
 
         return events;
-    } */
+    }
 
     /*** Additional Functions ***/
 
