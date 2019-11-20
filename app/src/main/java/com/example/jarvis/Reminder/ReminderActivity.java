@@ -660,6 +660,7 @@ public class ReminderActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void signOut() {
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

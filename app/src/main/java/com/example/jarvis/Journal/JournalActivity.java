@@ -3,6 +3,7 @@ package com.example.jarvis.Journal;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -32,6 +33,7 @@ import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -204,7 +206,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
                          * The journal will be
                          * showed in reading mode
                          */
-                        handleCheckAction(position);
+                        handleShowAction(position);
                     }
 
                     @Override
@@ -281,7 +283,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
 
 
-   public void handleCheckAction(int position){
+   public void handleShowAction(int position){
         // This method will pass the activity to Show JOurnal
         Intent intent = new Intent(JournalActivity.this, ShowJournalActivity.class);
         intent.putExtra("status", "show_this_journal");
@@ -357,11 +359,22 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
     private void handleDeleteAction(int position){
 
-        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
-        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-        new File(journals.get(position).getFileLink()).deleteOnExit();
-        sqLiteDatabaseHelper.deleteJournal(journals.get(position).getFileLink());
-        loadData(sqLiteDatabaseHelper);
+        AlertDialog.Builder alertbuilder = new AlertDialog.Builder(JournalActivity.this);
+        alertbuilder.setMessage("Do you want to delete the journal ?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(JournalActivity.this);
+                        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+                        new File(journals.get(position).getFileLink()).deleteOnExit();
+                        sqLiteDatabaseHelper.deleteJournal(journals.get(position).getFileLink());
+                        loadData(sqLiteDatabaseHelper);
+                    }
+                })
+                .setNegativeButton("No", null);
+        AlertDialog alert = alertbuilder.create();
+        alert.show();
+
     }
 
 
@@ -810,6 +823,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void signOut() {
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
