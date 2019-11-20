@@ -961,6 +961,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         return tasks;
     }
 
+    public Cursor getAllTodo(){
+        return (getReadableDatabase().rawQuery("SELECT * FROM " + TABLE_TODO, null));
+    }
+
 
 
     /*** Query on TABLE_WALLET ***/

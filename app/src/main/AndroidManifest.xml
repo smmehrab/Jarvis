@@ -49,6 +49,9 @@
         <receiver android:name=".Reminder.AlertReceiver"
             android:enabled="true"
             android:exported="true"/>
+        <receiver android:name=".Todo.todoAlertReceiver"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

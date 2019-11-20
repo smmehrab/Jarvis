@@ -79,7 +79,7 @@ public class FragmentEvent extends Fragment implements View.OnClickListener, Vie
 
         findXmlElements(view);
         setListeners();
-        loadData();
+//        loadData();
 
         return view;
     }

@@ -4,7 +4,9 @@ import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,8 +32,10 @@ import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
 import com.example.jarvis.Util.TimePickerFragment;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 
 public class AddTaskActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
@@ -65,6 +69,13 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
 
     private AlarmManager alarmManager;
 
+    //Constant values in millisecond
+    private static final long milMinute = 60000L;
+    private static final long milHour = 3600000L;
+    private static final long milDay = 86400000L;
+    private static final long milWeek = 604800000L;
+    private static final long milMonth = 2592000000L;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +100,9 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
         descriptionEditText = (EditText) findViewById(R.id.add_todo_description_editText);
         dateEditText = (EditText) findViewById(R.id.add_todo_date_editText);
         timeEditText = (EditText) findViewById(R.id.add_todo_time_editText);
+
+        alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
     }
 
     public void setListeners(){
@@ -182,35 +196,61 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
             Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
             sqLiteDatabaseHelper.insertTodo(task);
 
-            //add in reminder
-//            int todoNotificationID;
-            //todoNotificationID = Long.parseLong(year+month+day+hour+minute);
-//            todoNotificationID = Integer.parseInt(hour+minute);
-//            showToast("notification ID " + todoNotificationID);
-//            Intent intent = new Intent(this, todoAlertReceiver.class);
-//            intent.putExtra("todoNotification", todoNotificationID);
+            //Set remind me
+            Calendar c = Calendar.getInstance();
 
-//            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+            c.set(Calendar.YEAR, Integer.parseInt(year));
+            c.set(Calendar.MONTH, Integer.parseInt(month));
+            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            c.set(Calendar.MINUTE, Integer.parseInt(minute));
+            c.set(Calendar.SECOND, 0);
+            Integer todoNotificationID;
+            todoNotificationID = (Integer.parseInt(year)+Integer.parseInt(month)+Integer.parseInt(day)+Integer.parseInt(hour)+Integer.parseInt(minute));
+            showToast(todoNotificationID.toString());
+            if(reminderState == 1) {
+                Intent intent = new Intent(this, todoAlertReceiver.class);
+                intent.putExtra("todoNotification", todoNotificationID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+                alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+            }
+            /*sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+            Cursor cursor = sqLiteDatabaseHelper.getAllTodo();
+            int rowIndex=0;
+            String mYear, mMonth, mDay, mHour, mMinute;
+            int mReminderState, mIsComplete;
+            if(cursor.getCount() == 0){
+                showToast("No Data Found");
+            }
+            else{
+                while(cursor.moveToNext()){
+                    rowIndex++;
+                    mYear = cursor.getString(2);
+                    mMonth = cursor.getString(3);
+                    mDay = cursor.getString(4);
+                    mHour = cursor.getString(5);
+                    mMinute = cursor.getString(6);
+                    mReminderState = cursor.getInt(7);
+                    mIsComplete = cursor.getInt(8);
 
-//            Calendar c = Calendar.getInstance();
-//            c.setTimeInMillis(System.currentTimeMillis());
+                    if(mIsComplete == 0) {
+                        if(mReminderState == 1){
+                            c.set(Calendar.MONTH, Integer.parseInt(mMonth));
+                            c.set(Calendar.YEAR, Integer.parseInt(mYear));
+                            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(mDay));
+                            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(mHour));
+                            c.set(Calendar.MINUTE, Integer.parseInt(mMinute));
+                            c.set(Calendar.SECOND, 0);
 
-//            c.set(Calendar.YEAR, Integer.parseInt(year));
-//            c.set(Calendar.MONTH, Integer.parseInt(month));
-//            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
-//            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
-//            c.set(Calendar.MINUTE, Integer.parseInt(minute));
-//           c.set(Calendar.SECOND, 0);
-            //c.set(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), Integer.parseInt(hour), Integer.parseInt(minute), 0);
-            //c.set(2019, 11, 13, 3, 18, 0);
-//            Toast.makeText(getApplicationContext(), (int) c.getTimeInMillis(), Toast.LENGTH_SHORT).show();
- //           if (c.before(Calendar.getInstance())) {
-//                c.add(Calendar.DATE, todoNotificationID);
-//            }
+                            Intent intent = new Intent(this, todoAlertReceiver.class);
+                            intent.putExtra("todoNotification", rowIndex);
+                            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, rowIndex, intent, 0);
 
-//            if(reminderState == 1)
- //               alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
-            // ////////////////
+                            alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+                        }
+                    }
+                }
+            }*/
 
             onBackPressed();
         }

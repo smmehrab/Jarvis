@@ -1,6 +1,9 @@
 package com.example.jarvis.Todo;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,6 +43,7 @@ import com.example.jarvis.Wallet.WalletActivity;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class TodoBinActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, RecognitionListener, View.OnTouchListener {
@@ -64,6 +68,8 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
     private Intent recognizerIntent;
     private String LOG_TAG = "TodoBinActivity";
     private ToggleButton voiceCommandToggleButton;
+
+    private AlarmManager alarmManager;
 
     private boolean isVcOn;
 
@@ -104,6 +110,8 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         // Voice Command
         progressBar = (ProgressBar) findViewById(R.id.todo_bin_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.todo_bin_voice_command_toggle_btn);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
 
     public void setToolbar(){
@@ -205,6 +213,16 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
 
         sqLiteDatabaseHelper.permanentlyDeleteTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
 
+        //delete TodoNotification
+        Integer todoNotificationID;
+        todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
+        showToast("permanently deleted id: "+todoNotificationID.toString());
+
+        Intent intent = new Intent(this, todoAlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+        alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+
         loadData(sqLiteDatabaseHelper);
     }
 
@@ -213,6 +231,28 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
 
         sqLiteDatabaseHelper.restoreTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(),tasks.get(position).getTitle());
+
+        //Restore todo reminder
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, Integer.parseInt(tasks.get(position).getYear()));
+        c.set(Calendar.MONTH, Integer.parseInt(tasks.get(position).getMonth()));
+        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tasks.get(position).getDay()));
+        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tasks.get(position).getHour()));
+        c.set(Calendar.MINUTE, Integer.parseInt(tasks.get(position).getMinute()));
+        c.set(Calendar.SECOND, 0);
+        Integer restoreTodoNotificationID;
+        restoreTodoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+ Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
+        showToast("restored noti id: "+restoreTodoNotificationID.toString());
+
+        if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
+            Intent intent = new Intent(this, todoAlertReceiver.class);
+            intent.putExtra("todoNotification", restoreTodoNotificationID);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, restoreTodoNotificationID, intent, 0);
+            alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+        }
+
+
         loadData(sqLiteDatabaseHelper);
     }
 

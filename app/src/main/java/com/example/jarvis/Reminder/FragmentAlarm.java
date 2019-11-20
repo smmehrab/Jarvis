@@ -367,8 +367,11 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
                     }
                 }*/
+            //    Log.d("alarm hour", alarmHour);
+            //    Log.d("alarm minute", alarmMinute);
 
                 notificationID = Integer.parseInt(alarmHour+alarmMinute);
+
 
                 showToast("notification ID " + notificationID);
                 //showToast("index " + rowIndex + " hour " + hour + " minute " + minute);

@@ -14,6 +14,8 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.jarvis.R;
 
+import java.math.BigInteger;
+
 public class todoAlertReceiver extends BroadcastReceiver {
 
     MediaPlayer mediaPlayer;
@@ -24,20 +26,20 @@ public class todoAlertReceiver extends BroadcastReceiver {
         long[] pattern = {500,500,500,500,500,500,500,500,500};
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        todoNotificationId = intent.getIntExtra("todoNotification", 0);
+        todoNotificationId = (intent.getIntExtra("todoNotification", 0));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Jarvis")
                 .setSmallIcon(R.drawable.icon_activity_reminder)
-                .setContentTitle("Reminder")
-                .setContentText("Todo reminds you")
+                .setContentTitle("Jarvis")
+                .setContentText("You have a pending task!!!")
                 //.setColor(Color.rgb(100, (float) 64.8, 0))
                 .setColor(Color.BLUE)
-                .setLights(Color.BLUE, 500, 500)
-                .setVibrate(pattern)
-                .setStyle(new NotificationCompat.InboxStyle())
-                .setSound(alarmSound)
-                .setAutoCancel(true)
-                .setOnlyAlertOnce(true);
+                //.setLights(Color.BLUE, 500, 500)
+                .setVibrate(pattern);
+                //.setStyle(new NotificationCompat.InboxStyle())
+                //.setSound(alarmSound)
+                //.setAutoCancel(true)
+                //.setOnlyAlertOnce(true);
         //.setDefaults(NotificationCompat.DEFAULT_ALL);
 
             NotificationManagerCompat.from(context).notify(todoNotificationId, builder.build());
