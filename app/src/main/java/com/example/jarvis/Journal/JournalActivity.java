@@ -823,7 +823,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void signOut() {
-        sync();
+    //    sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

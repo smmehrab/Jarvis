@@ -701,7 +701,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void signOut() {
-        sync();
+    //    sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

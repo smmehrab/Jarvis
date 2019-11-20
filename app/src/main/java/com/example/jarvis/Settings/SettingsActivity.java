@@ -593,7 +593,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void signOut() {
-        sync();
+    //    sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

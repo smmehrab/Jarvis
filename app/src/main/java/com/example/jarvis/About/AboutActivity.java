@@ -521,7 +521,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void signOut() {
-        sync();
+        //sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

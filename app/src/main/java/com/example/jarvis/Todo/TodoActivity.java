@@ -2,6 +2,9 @@ package com.example.jarvis.Todo;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -133,6 +137,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean isVcOn;
 
+    public static final String CHANNEL_ID = "todoNotificationChannelId";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,7 +149,22 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         handleDatabase();
         setVoiceCommandFeature();
         isVoiceCommandOn();
+        createTodoNotificationChannel();
 
+    }
+
+    ////////////
+    public void createTodoNotificationChannel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "whatever", NotificationManager.IMPORTANCE_HIGH);
+            channel.enableVibration(true);
+            channel.enableLights(true);
+            channel.setLightColor(R.color.colorPrimary);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     public void initializeVariables(){
@@ -1135,7 +1156,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void signOut() {
-        sync();
+    //    sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
