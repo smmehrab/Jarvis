@@ -320,7 +320,6 @@ public class ShowJournalActivity extends AppCompatActivity implements
 
     /** Delete file option */
     public void deleteJournal(){
-        Toast.makeText(this, "This is a error", Toast.LENGTH_LONG).show();
 
         AlertDialog.Builder alertbuilder = new AlertDialog.Builder(ShowJournalActivity.this);
         alertbuilder.setMessage("Do you want to delete the journal ?")

@@ -1135,6 +1135,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void signOut() {
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
