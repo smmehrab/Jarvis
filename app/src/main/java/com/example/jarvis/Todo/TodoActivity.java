@@ -1,6 +1,8 @@
 package com.example.jarvis.Todo;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +49,7 @@ import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
+import com.example.jarvis.Reminder.AlertReceiver;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
@@ -71,6 +74,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -109,6 +113,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
     /** FAB */
     private FloatingActionButton addTodoBtn;
 
+    private AlarmManager alarmManager;
 
     /** RecyclerView Variables */
     RecyclerView todoRecyclerView;
@@ -183,6 +188,8 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         daily = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_daily);
         weekly = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_weekly);
         monthly = (Button) activityNavigationViewHeaderView.findViewById(R.id.todo_pie_monthly);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
 
     public void setToolbar(){
@@ -358,6 +365,16 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
         sqLiteDatabaseHelper.deleteTodo(tasks.get(position).getYear(),tasks.get(position).getMonth(),tasks.get(position).getDay(), tasks.get(position).getTitle());
 
+        //delete TodoNotification
+        Integer todoNotificationID;
+        todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
+        showToast("temporary deleted id: "+todoNotificationID.toString());
+
+        Intent intent = new Intent(this, todoAlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+        alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+
         loadData(sqLiteDatabaseHelper);
 
         // Refresh PieChart
@@ -394,10 +411,43 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         // Change Checkbox State & Show Toast
         if(tasks.get(position).getIsCompleted()==0) {
             tasks.get(position).setIsCompleted(1);
+
+            //delete reminder
+
+            Integer todoNotificationID;
+            todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
+            showToast("Task complete id: "+todoNotificationID.toString());
+
+            Intent intent = new Intent(this, todoAlertReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+            alarmManager.cancel(pendingIntent);
+            pendingIntent.cancel();
+
             showToast("Marked as Completed");
         }
         else {
             tasks.get(position).setIsCompleted(0);
+
+            //add reminder
+
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.YEAR, Integer.parseInt(tasks.get(position).getYear()));
+            c.set(Calendar.MONTH, Integer.parseInt(tasks.get(position).getMonth()));
+            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tasks.get(position).getDay()));
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tasks.get(position).getHour()));
+            c.set(Calendar.MINUTE, Integer.parseInt(tasks.get(position).getMinute()));
+            c.set(Calendar.SECOND, 0);
+            Integer unmarkTodoNotificationID;
+            unmarkTodoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+ Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
+            showToast("mark notification id: "+unmarkTodoNotificationID.toString());
+
+            if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
+                Intent intent = new Intent(this, todoAlertReceiver.class);
+                intent.putExtra("todoNotification", unmarkTodoNotificationID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, unmarkTodoNotificationID, intent, 0);
+                alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+            }
+
             showToast("Marked as Incomplete");
         }
 

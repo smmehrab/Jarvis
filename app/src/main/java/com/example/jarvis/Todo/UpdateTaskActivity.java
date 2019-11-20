@@ -1,7 +1,10 @@
 package com.example.jarvis.Todo;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -71,6 +74,8 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
     private String date, time="Set Time";
 
+    private AlarmManager alarmManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +100,9 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
         descriptionEditText = (EditText) findViewById(R.id.update_todo_description_editText);
         dateEditText = (EditText) findViewById(R.id.update_todo_date_editText);
         timeEditText = (EditText) findViewById(R.id.update_todo_time_editText);
+
+        alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
     }
 
     public void setListeners(){
@@ -269,6 +277,28 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
                 Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
                 sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
             }
+
+            //Update remind me
+            Integer oldNotificationId = (Integer.parseInt(oldYear)+Integer.parseInt(oldMonth)+Integer.parseInt(oldDay)+Integer.parseInt(oldHour)+Integer.parseInt(oldMinute));
+            showToast("old Noti id: " + oldNotificationId.toString());
+
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.YEAR, Integer.parseInt(year));
+            c.set(Calendar.MONTH, Integer.parseInt(month));
+            c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(day));
+            c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            c.set(Calendar.MINUTE, Integer.parseInt(minute));
+            c.set(Calendar.SECOND, 0);
+            Integer todoNotificationID;
+            todoNotificationID = (Integer.parseInt(year)+Integer.parseInt(month)+Integer.parseInt(day)+Integer.parseInt(hour)+Integer.parseInt(minute));
+            showToast("updated noti id: "+todoNotificationID.toString());
+            if(reminderState == 1 && isCompleted == 0) {
+                Intent intent = new Intent(this, todoAlertReceiver.class);
+                intent.putExtra("todoNotification", todoNotificationID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+                alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+            }
+
 
             onBackPressed();
         }
