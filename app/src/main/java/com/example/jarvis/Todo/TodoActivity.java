@@ -59,6 +59,7 @@ import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
+import com.example.jarvis.Util.TodoAlertReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -390,7 +391,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
         showToast("temporary deleted id: "+todoNotificationID.toString());
 
-        Intent intent = new Intent(this, todoAlertReceiver.class);
+        Intent intent = new Intent(this, TodoAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
@@ -438,7 +439,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
             showToast("Task complete id: "+todoNotificationID.toString());
 
-            Intent intent = new Intent(this, todoAlertReceiver.class);
+            Intent intent = new Intent(this, TodoAlertReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
@@ -462,7 +463,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             showToast("mark notification id: "+unmarkTodoNotificationID.toString());
 
             if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
-                Intent intent = new Intent(this, todoAlertReceiver.class);
+                Intent intent = new Intent(this, TodoAlertReceiver.class);
                 intent.putExtra("todoNotification", unmarkTodoNotificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, unmarkTodoNotificationID, intent, 0);
                 alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);

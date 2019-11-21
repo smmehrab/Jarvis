@@ -27,6 +27,7 @@ import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
 import com.example.jarvis.Util.TimePickerFragment;
+import com.example.jarvis.Util.TodoAlertReceiver;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -287,7 +288,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
             todoNotificationID = (Integer.parseInt(year)+Integer.parseInt(month)+Integer.parseInt(day)+Integer.parseInt(hour)+Integer.parseInt(minute));
             showToast("updated noti id: "+todoNotificationID.toString());
             if(reminderState == 1 && isCompleted == 0) {
-                Intent intent = new Intent(this, todoAlertReceiver.class);
+                Intent intent = new Intent(this, TodoAlertReceiver.class);
                 intent.putExtra("todoNotification", todoNotificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
                 alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);

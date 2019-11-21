@@ -39,6 +39,7 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Util.RecyclerTouchListener;
+import com.example.jarvis.Util.TodoAlertReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
 import com.google.android.material.navigation.NavigationView;
 
@@ -218,7 +219,7 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
         showToast("permanently deleted id: "+todoNotificationID.toString());
 
-        Intent intent = new Intent(this, todoAlertReceiver.class);
+        Intent intent = new Intent(this, TodoAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
@@ -246,7 +247,7 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         showToast("restored noti id: "+restoreTodoNotificationID.toString());
 
         if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
-            Intent intent = new Intent(this, todoAlertReceiver.class);
+            Intent intent = new Intent(this, TodoAlertReceiver.class);
             intent.putExtra("todoNotification", restoreTodoNotificationID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, restoreTodoNotificationID, intent, 0);
             alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);

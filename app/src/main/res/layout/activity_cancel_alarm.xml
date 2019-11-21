@@ -5,23 +5,50 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
+    android:padding="50dp"
     tools:context=".Reminder.CancelAlarm">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"/>
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="543dp"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:src="@drawable/icon_activity_reminder" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/ringing_txt"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textColor="@color/colorPrimary" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"/>
 
     <Button
         android:id="@+id/cancel_alarm_button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:background="@drawable/shape_rounded_rectangle"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/btn_background"
         android:text="Cancel"
-        android:textSize="30sp"
+        android:textSize="16sp"
         android:elevation="4dp"
-        android:textColor="@color/colorWhite"
+        android:textColor="@drawable/btn_text_color"
         />
 
 </LinearLayout>

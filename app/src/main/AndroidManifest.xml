@@ -48,11 +48,11 @@
         </activity>
 
         <receiver
-            android:name=".Reminder.AlertReceiver"
+            android:name=".Util.AlarmAlertReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name=".Todo.todoAlertReceiver"
+            android:name=".Util.TodoAlertReceiver"
             android:enabled="true"
             android:exported="true" />
     </application>
