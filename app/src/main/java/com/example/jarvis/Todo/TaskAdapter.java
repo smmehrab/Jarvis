@@ -53,7 +53,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         taskViewHolder.date.setText(date);
 
         // Set Time
-        String time = "null";
+        String time = "";
         if(tasks.get(position).getHour()!=null && tasks.get(position).getMinute()!=null) {
             Integer hour = Integer.parseInt(tasks.get(position).getHour());
             String amPm = " AM";

@@ -73,12 +73,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:background="@drawable/sign_in_btn_background"
+            android:background="@drawable/btn_background"
             android:drawableLeft="@drawable/google_icon"
             android:padding="5dp"
             android:elevation="4dp"
             android:text="@string/sign_in_with_google_btn_txt"
-            android:textColor="@drawable/sign_in_btn_text_color"
+            android:textColor="@drawable/btn_text_color"
             android:textSize="16sp" />
 
     </LinearLayout>

@@ -51,7 +51,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             USER_DEVICE + " TEXT NOT NULL, " +
             USER_SYNC_TIME + " TEXT NOT NULL); ";
 
-
     /*** TABLE TODO ***/
     private static final String TABLE_TODO = "table_todo";
     private static final String TODO_TITLE = "todo_title";
@@ -68,7 +67,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     private static final String TODO_IS_COMPLETED = "todo_isCompleted";
     private static final String TODO_IS_DELETED = "todo_isDeleted";
     private static final String TODO_IS_IGNORED = "todo_isIgnored";
-    private static final String TODO_UPDATE_TIMESTAMP ="todo_updateTimestamp";
+    private static final String TODO_SYNC_STATE ="todo_syncState";
 
 
     private static final String CREATE_TABLE_TODO = "CREATE TABLE " + TABLE_TODO + "(" +
@@ -86,7 +85,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             TODO_IS_COMPLETED + " INTEGER, " +
             TODO_IS_DELETED + " INTEGER, " +
             TODO_IS_IGNORED + " INTEGER, " +
-            TODO_UPDATE_TIMESTAMP + " TEXT, " +
+            TODO_SYNC_STATE + " INTEGER, " +
             "PRIMARY KEY(" + TODO_TITLE + ", " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY +  ")); ";
 
 
@@ -104,7 +103,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String WALLET_IS_DELETED = "wallet_isDeleted";
     private static final String WALLET_IS_IGNORED = "wallet_isIgnored";
-    private static final String WALLET_UPDATE_TIMESTAMP = "wallet_updateTimestamp";
+    private static final String WALLET_SYNC_STATE = "wallet_syncState";
 
 
     private static final String CREATE_TABLE_WALLET = "CREATE TABLE " + TABLE_WALLET + "(" +
@@ -119,7 +118,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             WALLET_AMOUNT + " TEXT, " +
             WALLET_IS_DELETED + " INTEGER, " +
             WALLET_IS_IGNORED + " INTEGER, " +
-            WALLET_UPDATE_TIMESTAMP + " TEXT, " +
+            WALLET_SYNC_STATE + " INTEGER, " +
 
             "PRIMARY KEY(" + WALLET_TITLE + ", " + WALLET_YEAR  + ", " + WALLET_MONTH + ", " + WALLET_DAY + ", " + WALLET_TYPE + ")); ";
 
@@ -413,7 +412,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         Integer isDeleted =  task.getIsDeleted();
         Integer isIgnored =  task.getIsIgnored();
 
-        String updateTimestamp = task.getUpdateTimestamp();
+        Integer syncState = task.getSyncState();
 
         contentValues.put(TODO_TITLE, title);
         contentValues.put(TODO_DESCRIPTION, description);
@@ -429,7 +428,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TODO_IS_COMPLETED, isCompleted);
         contentValues.put(TODO_IS_DELETED, isDeleted);
         contentValues.put(TODO_IS_IGNORED, isIgnored);
-        contentValues.put(TODO_UPDATE_TIMESTAMP, updateTimestamp);
+        contentValues.put(TODO_SYNC_STATE, syncState);
 
         long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
         return rowId;
@@ -456,7 +455,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             Integer isDeleted = task.getIsDeleted();
             Integer isIgnored = task.getIsIgnored();
 
-            String updateTimestamp = task.getUpdateTimestamp();
+            Integer syncState = task.getSyncState();
 
             contentValues.put(TODO_TITLE, title);
             contentValues.put(TODO_DESCRIPTION, description);
@@ -472,7 +471,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(TODO_IS_COMPLETED, isCompleted);
             contentValues.put(TODO_IS_DELETED, isDeleted);
             contentValues.put(TODO_IS_IGNORED, isIgnored);
-            contentValues.put(TODO_UPDATE_TIMESTAMP, updateTimestamp);
+            contentValues.put(TODO_SYNC_STATE, syncState);
 
             long rowId = sqLiteDatabase.insert(TABLE_TODO, null, contentValues);
         }
@@ -497,7 +496,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         Integer isDeleted =  task.getIsDeleted();
         Integer isIgnored =  task.getIsIgnored();
 
-        String updateTimestamp = task.getUpdateTimestamp();
+        Integer syncState = task.getSyncState();
 
         contentValues.put(TODO_TITLE, title);
         contentValues.put(TODO_DESCRIPTION, description);
@@ -513,7 +512,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TODO_IS_COMPLETED, isCompleted);
         contentValues.put(TODO_IS_DELETED, isDeleted);
         contentValues.put(TODO_IS_IGNORED, isIgnored);
-        contentValues.put(TODO_UPDATE_TIMESTAMP, updateTimestamp);
+        contentValues.put(TODO_SYNC_STATE, syncState);
 
         sqLiteDatabase.update(TABLE_TODO, contentValues,
                 TODO_YEAR + " = ? AND " + TODO_MONTH + " = ? AND " + TODO_DAY + " = ? AND " + TODO_TITLE + " = ?",
@@ -549,7 +548,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_COMPLETED))),
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED))),
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED))),
-                cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP))
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_SYNC_STATE)))
         );
     }
 
@@ -818,7 +817,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 + TODO_IS_COMPLETED + ", "
                 + TODO_IS_DELETED + ", "
                 + TODO_IS_IGNORED + ", "
-                + TODO_UPDATE_TIMESTAMP +
+                + TODO_SYNC_STATE +
 
                 " FROM " + TABLE_TODO +
                 " WHERE " + TODO_IS_DELETED + " = 0 AND " + TODO_IS_IGNORED + " = 0" +
@@ -845,9 +844,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP));
+                Integer syncState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_SYNC_STATE)));
 
-                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp));
+                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, syncState));
             }while(cursor.moveToNext());
         }
 
@@ -872,9 +871,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 + TODO_IS_COMPLETED + ", "
                 + TODO_IS_DELETED + ", "
                 + TODO_IS_IGNORED + ", "
-                + TODO_UPDATE_TIMESTAMP +
+                + TODO_SYNC_STATE +
 
                 " FROM " + TABLE_TODO +
+                " WHERE " + TODO_SYNC_STATE + " = 0 "  +
                 " ORDER BY " + TODO_YEAR + ", " + TODO_MONTH + ", " + TODO_DAY + ", " + TODO_IS_COMPLETED + ", " + TODO_TITLE + ";", null);
 
         cursor.moveToPosition(0);
@@ -898,9 +898,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP));
+                Integer syncState = 1;
 
-                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp));
+                updateTodo(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, syncState), year, month, day, title);
+                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, syncState));
             }while(cursor.moveToNext());
         }
 
@@ -925,7 +926,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 + TODO_IS_COMPLETED + ", "
                 + TODO_IS_DELETED + ", "
                 + TODO_IS_IGNORED + ", "
-                + TODO_UPDATE_TIMESTAMP +
+                + TODO_SYNC_STATE +
 
                 " FROM " + TABLE_TODO +
                 " WHERE " + TODO_IS_DELETED + " = 1 AND " + TODO_IS_IGNORED + " = 0" +
@@ -952,9 +953,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(TODO_UPDATE_TIMESTAMP));
+                Integer syncState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(TODO_SYNC_STATE)));
 
-                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp));
+                tasks.add(new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, syncState));
             }while(cursor.moveToNext());
         }
 
@@ -986,7 +987,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         Integer isDeleted = record.getIsDeleted();
         Integer isIgnored = record.getIsIgnored();
 
-        String updateTimestamp = record.getUpdateTimestamp();
+        Integer syncState = record.getSyncState();
 
         contentValues.put(WALLET_TITLE, title);
         contentValues.put(WALLET_DESCRIPTION, description);
@@ -1001,7 +1002,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(WALLET_IS_DELETED, isDeleted);
         contentValues.put(WALLET_IS_IGNORED, isIgnored);
 
-        contentValues.put(WALLET_UPDATE_TIMESTAMP, updateTimestamp);
+        contentValues.put(WALLET_SYNC_STATE, syncState);
 
         long rowId = sqLiteDatabase.insert(TABLE_WALLET, null, contentValues);
         return rowId;
@@ -1027,7 +1028,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             Integer isDeleted = record.getIsDeleted();
             Integer isIgnored = record.getIsIgnored();
 
-            String updateTimestamp = record.getUpdateTimestamp();
+            Integer syncState = record.getSyncState();
 
             contentValues.put(WALLET_TITLE, title);
             contentValues.put(WALLET_DESCRIPTION, description);
@@ -1042,7 +1043,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
             contentValues.put(WALLET_IS_DELETED, isDeleted);
             contentValues.put(WALLET_IS_IGNORED, isIgnored);
 
-            contentValues.put(WALLET_UPDATE_TIMESTAMP, updateTimestamp);
+            contentValues.put(WALLET_SYNC_STATE, syncState);
 
             long rowId = sqLiteDatabase.insert(TABLE_WALLET, null, contentValues);
 
@@ -1066,7 +1067,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         Integer isDeleted = record.getIsDeleted();
         Integer isIgnored = record.getIsIgnored();
 
-        String updateTimestamp = record.getUpdateTimestamp();
+        Integer syncState = record.getSyncState();
 
         contentValues.put(WALLET_TITLE, title);
         contentValues.put(WALLET_DESCRIPTION, description);
@@ -1081,7 +1082,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(WALLET_IS_DELETED, isDeleted);
         contentValues.put(WALLET_IS_IGNORED, isIgnored);
 
-        contentValues.put(WALLET_UPDATE_TIMESTAMP, updateTimestamp);
+        contentValues.put(WALLET_SYNC_STATE, syncState);
 
         sqLiteDatabase.update(TABLE_WALLET, contentValues,
                 WALLET_YEAR + " = ? AND " + WALLET_MONTH + " = ? AND " + WALLET_DAY + " = ? AND " + WALLET_TITLE + " = ? AND " + WALLET_TYPE + " = ?",
@@ -1119,7 +1120,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED))),
                 Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED))),
 
-                cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP))
+                Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_SYNC_STATE)))
         );
 
     }
@@ -1400,9 +1401,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP));
+                Integer syncState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_SYNC_STATE)));
 
-                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp));
+                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, syncState));
             }while (cursor.moveToNext());
         }
 
@@ -1414,6 +1415,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + TABLE_WALLET +
+                " WHERE " + WALLET_SYNC_STATE + " = 0 " +
                 " ORDER BY " + WALLET_YEAR + ", " + WALLET_MONTH + ", " + WALLET_DAY + ";", null);
 
         cursor.moveToPosition(0);
@@ -1435,9 +1437,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP));
+                Integer syncState = 1;
 
-                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp));
+                updateRecord(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, syncState), year, month, day, title, type);
+                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, syncState));
             }while (cursor.moveToNext());
         }
 
@@ -1471,9 +1474,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
                 Integer isDeleted = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_DELETED)));
                 Integer isIgnored = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_IS_IGNORED)));
 
-                String updateTimestamp = cursor.getString(cursor.getColumnIndex(WALLET_UPDATE_TIMESTAMP));
+                Integer syncState = Integer.parseInt(cursor.getString(cursor.getColumnIndex(WALLET_SYNC_STATE)));
 
-                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp));
+                records.add(new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, syncState));
             }while (cursor.moveToNext());
         }
 

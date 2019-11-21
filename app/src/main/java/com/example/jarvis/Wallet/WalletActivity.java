@@ -381,7 +381,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         intent.putExtra("wallet_isDeleted", record.getIsDeleted().toString());
         intent.putExtra("wallet_isIgnored", record.getIsIgnored().toString());
 
-        intent.putExtra("wallet_updateTimestamp", record.getUpdateTimestamp());
+        intent.putExtra("wallet_syncState", record.getSyncState());
 
         startActivity(intent);
     }

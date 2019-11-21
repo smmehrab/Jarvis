@@ -38,10 +38,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="20dp"
-                android:background="@drawable/shape_rounded_rectangle"
+                android:background="@drawable/btn_background"
                 android:text="@string/todo_txt"
                 android:elevation="4dp"
-                android:textColor="@color/colorWhite" />
+                android:textColor="@drawable/btn_text_color" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,10 +54,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="20dp"
-                android:background="@drawable/shape_rounded_rectangle"
+                android:background="@drawable/btn_background"
                 android:text="@string/journal_txt"
                 android:elevation="4dp"
-                android:textColor="@color/colorWhite" />
+                android:textColor="@drawable/btn_text_color" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -70,10 +70,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="20dp"
-                android:background="@drawable/shape_rounded_rectangle"
+                android:background="@drawable/btn_background"
                 android:text="@string/wallet_txt"
                 android:elevation="4dp"
-                android:textColor="@color/colorWhite" />
+                android:textColor="@drawable/btn_text_color" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -86,10 +86,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="20dp"
-                android:background="@drawable/shape_rounded_rectangle"
+                android:background="@drawable/btn_background"
                 android:text="@string/reminder_txt"
                 android:elevation="4dp"
-                android:textColor="@color/colorWhite" />
+                android:textColor="@drawable/btn_text_color" />
 
             <LinearLayout
                 android:layout_width="match_parent"

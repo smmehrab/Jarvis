@@ -524,9 +524,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
-        }
-
-        else if(matches.get(0).equals("open activity options")){
+        } else if(matches.get(0).equals("open activity options")){
             activityDrawerBtn.callOnClick();
             restartVoiceCommand();
         } else if(matches.get(0).equals("close activity options")){
@@ -540,8 +538,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             restartVoiceCommand();
         } else if(matches.get(0).equals("turn off voice command")){
             disableVoiceCommand();
-        }
-        else {
+        } else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
             restartVoiceCommand();
         }

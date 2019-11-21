@@ -422,7 +422,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("todo_isCompleted", task.getIsCompleted().toString());
         intent.putExtra("todo_isDeleted", task.getIsDeleted().toString());
         intent.putExtra("todo_isIgnored", task.getIsIgnored().toString());
-        intent.putExtra("todo_updateTimestamp", task.getUpdateTimestamp());
+        intent.putExtra("todo_syncState", task.getSyncState());
 
         startActivity(intent);
     }

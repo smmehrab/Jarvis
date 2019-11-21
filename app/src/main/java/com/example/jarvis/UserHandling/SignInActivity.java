@@ -45,25 +45,23 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     /** Network Variables */
     private BroadcastReceiver networkReceiver = null;
 
-    //  Variables for Remote Database
+    /** Firebase Variables */
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
     GoogleSignInOptions googleSignInOptions;
 
-    // Buttons
+    /** Button */
     private Button signInWithGoogleBtn;
 
 
-    // Variable for Local Database
+    /** SQLite Variable */
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
-
-    // User user;
-    // private int isSignedIn;
 
     /** Others */
     private boolean doubleBackToExitPressedOnce = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,13 +173,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
+                // Google Sign In Successful | Authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-               // Log.w(TAG, "Google sign in failed", e);
-                // ...
+
             }
         }
     }
@@ -193,7 +189,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
                             String deviceId = findDeviceId();
 
                             retrieveDataFromFirebase();
@@ -201,7 +196,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
                             enterApp();
                         } else {
-                            Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed! Try Again!", Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -238,7 +233,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void enterApp(){
-        // Changing Activity
         Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
         startActivity(intent);
     }
