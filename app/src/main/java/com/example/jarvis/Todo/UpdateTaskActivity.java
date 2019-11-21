@@ -280,7 +280,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
 
             //Update remind me
             Integer oldNotificationId = (Integer.parseInt(oldYear)+Integer.parseInt(oldMonth)+Integer.parseInt(oldDay)+Integer.parseInt(oldHour)+Integer.parseInt(oldMinute));
-            showToast("old Noti id: " + oldNotificationId.toString());
+        //    showToast("old Noti id: " + oldNotificationId.toString());
 
             Calendar c = Calendar.getInstance();
             c.set(Calendar.YEAR, Integer.parseInt(year));
@@ -291,7 +291,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
             c.set(Calendar.SECOND, 0);
             Integer todoNotificationID;
             todoNotificationID = (Integer.parseInt(year)+Integer.parseInt(month)+Integer.parseInt(day)+Integer.parseInt(hour)+Integer.parseInt(minute));
-            showToast("updated noti id: "+todoNotificationID.toString());
+        //    showToast("updated noti id: "+todoNotificationID.toString());
             if(reminderState == 1 && isCompleted == 0) {
                 Intent intent = new Intent(this, todoAlertReceiver.class);
                 intent.putExtra("todoNotification", todoNotificationID);

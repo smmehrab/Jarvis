@@ -29,6 +29,7 @@ public class AlertReceiver extends BroadcastReceiver {
 //        notificationHelper.getManager().notify(1, nb.build());
 
         Intent cancelAlarm = new Intent(context, CancelAlarm.class);
+
         cancelAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, cancelAlarm, PendingIntent.FLAG_ONE_SHOT);
 
@@ -55,6 +56,8 @@ public class AlertReceiver extends BroadcastReceiver {
 
         //builder.addAction(R.drawable.icon_activity_reminder, "cancel");
         builder.setContentIntent(pendingIntent);
+
+
 
         NotificationManagerCompat.from(context).notify(notificationID, builder.build());
         mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_ALARM_ALERT_URI);

@@ -42,14 +42,13 @@ public class todoAlertReceiver extends BroadcastReceiver {
                 //.setColor(Color.rgb(100, (float) 64.8, 0))
                 .setColor(Color.BLUE)
                 //.setLights(Color.BLUE, 500, 500)
-                .setVibrate(pattern);
+                .setVibrate(pattern)
                 //.setStyle(new NotificationCompat.InboxStyle())
                 //.setSound(alarmSound)
-                //.setAutoCancel(true)
+                .setAutoCancel(true);
                 //.setOnlyAlertOnce(true);
         //.setDefaults(NotificationCompat.DEFAULT_ALL);
-
-        builder.setContentIntent(pendingIntent);
+        //   builder.setContentIntent(pendingIntent);
         NotificationManagerCompat.from(context).notify(todoNotificationId, builder.build());
         mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_NOTIFICATION_URI);
         mediaPlayer.start();

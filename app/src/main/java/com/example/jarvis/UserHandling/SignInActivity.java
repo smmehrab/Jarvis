@@ -1,9 +1,12 @@
 package com.example.jarvis.UserHandling;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,6 +25,7 @@ import com.example.jarvis.Firebase.FirebaseDataRetrieve;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
+import com.example.jarvis.Todo.todoAlertReceiver;
 import com.example.jarvis.Wallet.Record;
 import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -40,6 +44,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
@@ -64,6 +69,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     // Variable for Local Database
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
+
+    private AlarmManager alarmManager;
 
     // User user;
     // private int isSignedIn;
@@ -92,6 +99,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         emailEditTxt = (EditText) findViewById(R.id.sign_in_email_edit_txt);
         passEditTxt = (EditText) findViewById(R.id.sign_in_pass_edit_txt);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
 
     void setListeners(){
@@ -103,6 +112,9 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     void handleLocalDatabase(){
         sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+        /**here should call the alarmManager**/
+        setAlarm();
     }
 
     void handleRemoteDatabase(){
@@ -245,6 +257,60 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         // Inserting to the Local Database
         sqLiteDatabaseHelper.insertUser(currentUser);
+    }
+
+    public void setAlarm(){
+
+        ///////////////////////////////////////////////////////////////////////
+        Calendar c = Calendar.getInstance();
+        SQLiteDatabase sqLiteDatabase;
+        sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
+        Cursor cursor = sqLiteDatabaseHelper.getAllTodo();
+        int rowIndex=0;
+        Integer todoNotificationID;
+
+        String mYear, mMonth, mDay, mHour, mMinute;
+        int mReminderState, mIsComplete;
+        if(cursor.getCount() == 0){
+            showToast("No Data Found");
+        }
+        else{
+            while(cursor.moveToNext()){
+                mYear = cursor.getString(2);
+                mMonth = cursor.getString(3);
+                mDay = cursor.getString(4);
+                mHour = cursor.getString(5);
+                mMinute = cursor.getString(6);
+                mReminderState = cursor.getInt(7);
+                mIsComplete = cursor.getInt(8);
+
+                if(mIsComplete == 0) {
+                    if(mReminderState == 1){
+                        c.set(Calendar.MONTH, Integer.parseInt(mMonth));
+                        c.set(Calendar.YEAR, Integer.parseInt(mYear));
+                        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(mDay));
+                        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(mHour));
+                        c.set(Calendar.MINUTE, Integer.parseInt(mMinute));
+                        c.set(Calendar.SECOND, 0);
+
+                        todoNotificationID = (Integer.parseInt(mYear)+Integer.parseInt(mMonth)+Integer.parseInt(mDay)+Integer.parseInt(mHour)+Integer.parseInt(mMinute));
+                        showToast(todoNotificationID.toString());
+
+                        long reminderTime = c.getTimeInMillis();
+                        long currentTime= System.currentTimeMillis();
+
+                        if(reminderTime > currentTime){
+                            Intent intent = new Intent(this, todoAlertReceiver.class);
+                            intent.putExtra("todoNotification", todoNotificationID);
+                            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
+                            alarmManager.setExact(AlarmManager.RTC, reminderTime, pendingIntent);
+                        }
+                    }
+                }
+            }
+        }
+        /////////////////////////////////////////////////////////
+
     }
 
     public void enterApp(GoogleSignInAccount acct, String deviceId){

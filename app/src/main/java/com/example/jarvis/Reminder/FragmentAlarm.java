@@ -202,7 +202,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
             int notificationID;
             notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
-            showToast("notification ID " + notificationID);
+         //   showToast("notification ID " + notificationID);
 
             Intent intent = new Intent(getActivity(), AlertReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
@@ -217,7 +217,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
             int notificationID;
             notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
-            showToast("notification ID " + notificationID);
+         //   showToast("notification ID " + notificationID);
 
             Intent intent = new Intent(getActivity(), AlertReceiver.class);
             intent.putExtra("index", notificationID);
@@ -266,7 +266,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
         //delete alarm
         int notificationID;
         notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
-        showToast("notification ID " + notificationID);
+     //   showToast("notification ID " + notificationID);
 
         Intent intent = new Intent(getActivity(), AlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
@@ -373,7 +373,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
                 notificationID = Integer.parseInt(alarmHour+alarmMinute);
 
 
-                showToast("notification ID " + notificationID);
+        //        showToast("notification ID " + notificationID);
                 //showToast("index " + rowIndex + " hour " + hour + " minute " + minute);
                 //showToast(" Is everyday " + alarmIsEveryday + " status " + alarmStatus);
 
@@ -432,7 +432,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
 
                 //cancel previous alarm which is edited
                 notificationID = Integer.parseInt(currentHour+currentMinute);
-                showToast("previous notification ID " + notificationID);
+          //      showToast("previous notification ID " + notificationID);
 
                 PendingIntent pendingIntent2 = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
                 alarmManager.cancel(pendingIntent2);
