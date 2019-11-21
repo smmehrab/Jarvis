@@ -42,9 +42,9 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -430,7 +430,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -534,7 +534,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }

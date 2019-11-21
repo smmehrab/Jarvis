@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.jarvis.R;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -47,7 +47,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     void changeActivity(){
-        Intent intent = new Intent(SplashScreenActivity.this, WelcomeActivity.class);
+        Intent intent = new Intent(SplashScreenActivity.this, SignInActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         finish();

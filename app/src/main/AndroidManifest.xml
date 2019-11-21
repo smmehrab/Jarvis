@@ -37,8 +37,6 @@
         <activity android:name=".Journal.JournalActivity" />
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
-        <activity android:name=".UserHandling.ResetPassActivity" />
-        <activity android:name=".UserHandling.SignUpActivity" />
         <activity android:name=".UserHandling.SignInActivity" />
         <activity android:name=".WelcomeScreen.WelcomeActivity" />
         <activity android:name=".SplashScreen.SplashScreenActivity">

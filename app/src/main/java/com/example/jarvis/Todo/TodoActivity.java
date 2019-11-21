@@ -53,14 +53,13 @@ import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
-import com.example.jarvis.Reminder.AlertReceiver;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
@@ -840,7 +839,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -1169,7 +1168,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }
