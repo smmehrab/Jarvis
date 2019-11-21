@@ -193,7 +193,6 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
                             retrieveDataFromFirebase();
                             addUserToLocalDatabase(acct, deviceId);
-
                             enterApp();
                         } else {
                             Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed! Try Again!", Snackbar.LENGTH_SHORT).show();
@@ -214,6 +213,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         updateInstance.retriveTodoFromFirebase(getApplicationContext());
         updateInstance.retriveWalletFromFirebase(getApplicationContext());
+        updateInstance.retriveAlarmFromFirebase(getApplicationContext());
     }
 
     public void addUserToLocalDatabase(GoogleSignInAccount acct, String deviceId){

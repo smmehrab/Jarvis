@@ -49,6 +49,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
@@ -1152,11 +1153,15 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
 
+        add.deleteAlarmFromFirebase();
+
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
 
     public void signOut() {
-    //    sync();
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

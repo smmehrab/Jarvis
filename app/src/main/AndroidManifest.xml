@@ -30,7 +30,7 @@
         <activity android:name=".Todo.UpdateTaskActivity" />
         <activity android:name=".Wallet.AddRecordActivity" />
         <activity android:name=".Todo.AddTaskActivity" />
-        <activity android:name=".About.AboutActivity" />
+        <activity android:name=".About.AboutActivity"/>
         <activity android:name=".Settings.SettingsActivity" />
         <activity android:name=".Reminder.ReminderActivity" />
         <activity android:name=".Wallet.WalletActivity" />
@@ -38,11 +38,9 @@
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
         <activity android:name=".UserHandling.SignInActivity" />
-        <activity android:name=".WelcomeScreen.WelcomeActivity" />
         <activity android:name=".SplashScreen.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

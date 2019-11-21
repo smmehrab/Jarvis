@@ -417,7 +417,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         //mEditor.focusEditor();
         mEditor.setPadding(10, 10, 10, 10);
         toolbarTitle.setText(journal.getTitle());
-        mEditor.loadCSS("file:///android_assets/style.css");
+        mEditor.loadCSS("file:///android_asset/style.css");
         mEditor.setPlaceholder("Insert text here...");
         for(int i = 0; i < toogleArray.length; ++i){
             toogleArray[i] = false;

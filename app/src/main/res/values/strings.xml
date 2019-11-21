@@ -51,7 +51,6 @@
     <string name="time_txt">Time</string>
     <string name="profile_details_txt">Profile Details</string>
     <string name="settings_options_txt">Settings Options</string>
-    <string name="about_details_txt">About Details</string>
     <string name="settings_details_txt">Settings Details</string>
     <string name="reset_details_txt">Reset Details</string>
     <string name="set_new_password_txt">Set New Password</string>
@@ -82,6 +81,8 @@
     <string name="heading5">h5</string>
     <string name="heading6">h6</string>
     <string name="ringing_txt">Ringing...</string>
+
+    <string name="about_details_txt">hfdskfh</string>
 
 
 </resources>
