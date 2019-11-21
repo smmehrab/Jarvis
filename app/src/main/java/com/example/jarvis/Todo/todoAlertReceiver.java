@@ -1,5 +1,6 @@
 package com.example.jarvis.Todo;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.jarvis.R;
+import com.example.jarvis.Reminder.CancelAlarm;
 
 import java.math.BigInteger;
 
@@ -28,7 +30,12 @@ public class todoAlertReceiver extends BroadcastReceiver {
 
         todoNotificationId = (intent.getIntExtra("todoNotification", 0));
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Jarvis")
+        Intent gotoTodo = new Intent(context, TodoActivity.class);
+        gotoTodo.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, gotoTodo, PendingIntent.FLAG_ONE_SHOT);
+
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "todoNotificationChannelId")
                 .setSmallIcon(R.drawable.icon_activity_reminder)
                 .setContentTitle("Jarvis")
                 .setContentText("You have a pending task!!!")
@@ -42,9 +49,10 @@ public class todoAlertReceiver extends BroadcastReceiver {
                 //.setOnlyAlertOnce(true);
         //.setDefaults(NotificationCompat.DEFAULT_ALL);
 
-            NotificationManagerCompat.from(context).notify(todoNotificationId, builder.build());
-            mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_NOTIFICATION_URI);
-            mediaPlayer.start();
+        builder.setContentIntent(pendingIntent);
+        NotificationManagerCompat.from(context).notify(todoNotificationId, builder.build());
+        mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_NOTIFICATION_URI);
+        mediaPlayer.start();
 
     }
 

@@ -898,7 +898,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void signOut() {
-        sync();
+    //    sync();
         initializeGoogleVariable();
         mAuth.signOut();
 

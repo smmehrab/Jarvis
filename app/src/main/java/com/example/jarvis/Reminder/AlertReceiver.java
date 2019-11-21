@@ -1,6 +1,7 @@
 package com.example.jarvis.Reminder;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,13 +20,17 @@ import com.example.jarvis.R;
 
 public class AlertReceiver extends BroadcastReceiver {
 
-    MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer;
     private int notificationID;
     @Override
     public void onReceive(Context context, Intent intent) {
 //        NotificationHelper notificationHelper = new NotificationHelper(context);
 //        NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
 //        notificationHelper.getManager().notify(1, nb.build());
+
+        Intent cancelAlarm = new Intent(context, CancelAlarm.class);
+        cancelAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, cancelAlarm, PendingIntent.FLAG_ONE_SHOT);
 
         long[] pattern = {500,500,500,500,500,500,500,500,500};
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -35,10 +40,11 @@ public class AlertReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Jarvis")
                 .setSmallIcon(R.drawable.icon_activity_reminder)
-                .setContentTitle("Alarm")
-                .setContentText("Alarm is ringing")
+                .setContentTitle("Alarm is ringing")
+                .setContentText("Click here to cancel")
                 //.setColor(Color.rgb(100, (float) 64.8, 0))
-                .setColor(Color.BLUE);
+                .setColor(Color.BLUE)
+                .setAutoCancel(true);
                 //.setLights(Color.BLUE, 500, 500)
                 //.setVibrate(pattern)
                 //.setStyle(new NotificationCompat.InboxStyle())
@@ -47,8 +53,12 @@ public class AlertReceiver extends BroadcastReceiver {
                 //.setOnlyAlertOnce(true);
                 //.setDefaults(NotificationCompat.DEFAULT_ALL);
 
+        //builder.addAction(R.drawable.icon_activity_reminder, "cancel");
+        builder.setContentIntent(pendingIntent);
+
         NotificationManagerCompat.from(context).notify(notificationID, builder.build());
         mediaPlayer = MediaPlayer.create(context, Settings.System.DEFAULT_ALARM_ALERT_URI);
         mediaPlayer.start();
+
     }
 }

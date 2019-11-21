@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".Reminder.CancelAlarm">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="543dp"
+        android:src="@drawable/icon_activity_reminder" />
+
+    <Button
+        android:id="@+id/cancel_alarm_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:background="@drawable/shape_rounded_rectangle"
+        android:text="Cancel"
+        android:textSize="30sp"
+        android:elevation="4dp"
+        android:textColor="@color/colorWhite"
+        />
+
+</LinearLayout>
