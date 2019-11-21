@@ -11,12 +11,13 @@ public class Task {
     private Integer isCompleted;
     private Integer isDeleted;
     private Integer isIgnored;
-    private String updateTimestamp;
+    private Integer syncState;
 
     public Task(){
 
     }
-    public Task(String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState, Integer isCompleted, Integer isDeleted, Integer isIgnored, String updateTimestamp) {
+
+    public Task(String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState, Integer isCompleted, Integer isDeleted, Integer isIgnored, Integer syncState) {
         this.title = title;
         this.description = description;
         this.year = year;
@@ -28,9 +29,8 @@ public class Task {
         this.isCompleted = isCompleted;
         this.isDeleted = isDeleted;
         this.isIgnored = isIgnored;
-        this.updateTimestamp = updateTimestamp;
+        this.syncState = syncState;
     }
-
 
     public Task(String title, String description, String year, String month, String day, String hour, String minute, Integer reminderState) {
         this.title = title;
@@ -44,11 +44,7 @@ public class Task {
         this.isCompleted = 0;
         this.isDeleted = 0;
         this.isIgnored = 0;
-
-        Long tsLong = System.currentTimeMillis()/1000;
-        String ts = tsLong.toString();
-
-        this.updateTimestamp = ts;
+        this.syncState = 0;
     }
 
     public String getTitle() {
@@ -139,11 +135,11 @@ public class Task {
         this.isIgnored = isIgnored;
     }
 
-    public String getUpdateTimestamp() {
-        return updateTimestamp;
+    public Integer getSyncState() {
+        return syncState;
     }
 
-    public void setUpdateTimestamp(String updateTimestamp) {
-        this.updateTimestamp = updateTimestamp;
+    public void setSyncState(Integer syncState) {
+        this.syncState = syncState;
     }
 }

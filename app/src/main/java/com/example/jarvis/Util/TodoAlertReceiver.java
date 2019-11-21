@@ -1,4 +1,4 @@
-package com.example.jarvis.Todo;
+package com.example.jarvis.Util;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -15,10 +15,11 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.jarvis.R;
 import com.example.jarvis.Reminder.CancelAlarm;
+import com.example.jarvis.Todo.TodoActivity;
 
 import java.math.BigInteger;
 
-public class todoAlertReceiver extends BroadcastReceiver {
+public class TodoAlertReceiver extends BroadcastReceiver {
 
     MediaPlayer mediaPlayer;
     private int todoNotificationId;

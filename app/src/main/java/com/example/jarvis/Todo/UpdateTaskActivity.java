@@ -27,6 +27,7 @@ import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Util.DatePickerFragment;
 import com.example.jarvis.Util.TimePickerFragment;
+import com.example.jarvis.Util.TodoAlertReceiver;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -254,27 +255,21 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
                 minute = oldMinute;
             }
 
-            // Getting Current Timestamp
-            Long tsLong = System.currentTimeMillis()/1000;
-            String ts = tsLong.toString();
-            updateTimestamp = ts;
-            oldUpdateTimestamp = updateTimestamp;
-
             if(!(title.equals(oldTitle) && year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay))){
                 // Primary Key Field Violated
                 oldIsIgnored = 1;
 
                 // Ignore Existing Task
-                Task task = new Task(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldReminderState, oldIsCompleted, oldIsDeleted, oldIsIgnored, oldUpdateTimestamp);
+                Task task = new Task(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldHour, oldMinute, oldReminderState, oldIsCompleted, oldIsDeleted, oldIsIgnored, 1);
                 sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
 
                 // Add New Task
-                task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
+                task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, 0);
                 sqLiteDatabaseHelper.insertTodo(task);
             } else {
                 // Primary Key Field Not Violated
                 // Update Existing Task
-                Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, updateTimestamp);
+                Task task = new Task(title, description, year, month, day, hour, minute, reminderState, isCompleted, isDeleted, isIgnored, 0);
                 sqLiteDatabaseHelper.updateTodo(task, oldYear, oldMonth, oldDay, oldTitle);
             }
 
@@ -293,7 +288,7 @@ public class UpdateTaskActivity extends AppCompatActivity implements View.OnClic
             todoNotificationID = (Integer.parseInt(year)+Integer.parseInt(month)+Integer.parseInt(day)+Integer.parseInt(hour)+Integer.parseInt(minute));
             showToast("updated noti id: "+todoNotificationID.toString());
             if(reminderState == 1 && isCompleted == 0) {
-                Intent intent = new Intent(this, todoAlertReceiver.class);
+                Intent intent = new Intent(this, TodoAlertReceiver.class);
                 intent.putExtra("todoNotification", todoNotificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
                 alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);

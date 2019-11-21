@@ -15,12 +15,13 @@ public class Record {
     private Integer isDeleted;
     private Integer isIgnored;
 
-    private String updateTimestamp;
+    private Integer syncState;
 
     public Record(){
 
     }
-    public Record(String title, String description, String year, String month, String day, Integer type, String amount, Integer isDeleted, Integer isIgnored, String updateTimestamp) {
+
+    public Record(String title, String description, String year, String month, String day, Integer type, String amount, Integer isDeleted, Integer isIgnored, Integer syncState) {
         this.title = title;
         this.description = description;
         this.year = year;
@@ -30,7 +31,7 @@ public class Record {
         this.amount = amount;
         this.isDeleted = isDeleted;
         this.isIgnored = isIgnored;
-        this.updateTimestamp = updateTimestamp;
+        this.syncState = syncState;
     }
 
     public String getTitle() {
@@ -105,12 +106,12 @@ public class Record {
         this.isIgnored = isIgnored;
     }
 
-    public String getUpdateTimestamp() {
-        return updateTimestamp;
+    public Integer getSyncState() {
+        return syncState;
     }
 
-    public void setUpdateTimestamp(String updateTimestamp) {
-        this.updateTimestamp = updateTimestamp;
+    public void setSyncState(Integer syncState) {
+        this.syncState = syncState;
     }
 
     public Record(String title, String description, String year, String month, String day, Integer type, String amount) {
@@ -123,10 +124,6 @@ public class Record {
         this.amount = amount;
         this.isDeleted = 0;
         this.isIgnored = 0;
-
-        Long tsLong = System.currentTimeMillis()/1000;
-        String ts = tsLong.toString();
-
-        this.updateTimestamp = ts;
+        this.syncState = 0;
     }
 }
