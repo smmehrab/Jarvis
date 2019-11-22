@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="10dp"
-        android:text="Finance Status"
+        android:text="Financial Status"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"
         android:textSize="16sp" />
