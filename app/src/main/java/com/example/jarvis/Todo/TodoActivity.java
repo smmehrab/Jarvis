@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -379,6 +380,10 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         taskAdapter = new TaskAdapter(TodoActivity.this, tasks);
         todoRecyclerView.setAdapter(taskAdapter);
         taskAdapter.notifyDataSetChanged();
+
+        /*****set data in alarmManager was set here****/
+            /////////////////////////////////////////////////////////
+
     }
 
     void handleDeleteAction(int position){
@@ -390,7 +395,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         //delete TodoNotification
         Integer todoNotificationID;
         todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
-        showToast("temporary deleted id: "+todoNotificationID.toString());
+    //    showToast("temporary deleted id: "+todoNotificationID.toString());
 
         Intent intent = new Intent(this, TodoAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
@@ -438,7 +443,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
             Integer todoNotificationID;
             todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
-            showToast("Task complete id: "+todoNotificationID.toString());
+        //    showToast("Task complete id: "+todoNotificationID.toString());
 
             Intent intent = new Intent(this, TodoAlertReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
@@ -461,7 +466,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             c.set(Calendar.SECOND, 0);
             Integer unmarkTodoNotificationID;
             unmarkTodoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+ Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
-            showToast("mark notification id: "+unmarkTodoNotificationID.toString());
+        //    showToast("mark notification id: "+unmarkTodoNotificationID.toString());
 
             if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
                 Intent intent = new Intent(this, TodoAlertReceiver.class);

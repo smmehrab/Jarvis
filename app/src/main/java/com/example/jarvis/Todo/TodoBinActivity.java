@@ -217,7 +217,7 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         //delete TodoNotification
         Integer todoNotificationID;
         todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
-        showToast("permanently deleted id: "+todoNotificationID.toString());
+     //   showToast("permanently deleted id: "+todoNotificationID.toString());
 
         Intent intent = new Intent(this, TodoAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
@@ -244,13 +244,16 @@ public class TodoBinActivity extends AppCompatActivity implements View.OnClickLi
         c.set(Calendar.SECOND, 0);
         Integer restoreTodoNotificationID;
         restoreTodoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+ Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
-        showToast("restored noti id: "+restoreTodoNotificationID.toString());
+     //   showToast("restored noti id: "+restoreTodoNotificationID.toString());
 
-        if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
-            Intent intent = new Intent(this, TodoAlertReceiver.class);
-            intent.putExtra("todoNotification", restoreTodoNotificationID);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, restoreTodoNotificationID, intent, 0);
-            alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+        long currentTime = System.currentTimeMillis();
+        if(currentTime < c.getTimeInMillis()) {
+            if (tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
+                Intent intent = new Intent(this, TodoAlertReceiver.class);
+                intent.putExtra("todoNotification", restoreTodoNotificationID);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, restoreTodoNotificationID, intent, 0);
+                alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
+            }
         }
 
 

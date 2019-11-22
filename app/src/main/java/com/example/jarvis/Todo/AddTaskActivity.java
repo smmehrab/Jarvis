@@ -196,7 +196,7 @@ public class AddTaskActivity extends AppCompatActivity implements View.OnClickLi
 
                 Integer todoNotificationID;
                 todoNotificationID = (Integer.parseInt(year) + Integer.parseInt(month) + Integer.parseInt(day) + Integer.parseInt(hour) + Integer.parseInt(minute));
-                showToast(todoNotificationID.toString());
+             //   showToast(todoNotificationID.toString());
 
                 if (reminderState == 1) {
                     Intent intent = new Intent(this, TodoAlertReceiver.class);
