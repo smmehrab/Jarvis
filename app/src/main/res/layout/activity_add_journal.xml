@@ -79,26 +79,6 @@
                         android:src="@drawable/icon_italic"
                         />
 
-                    <Button
-                        android:id="@+id/action_subscript"
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/colorWhite"
-                        android:textColor="@color/colorAccent"
-                        android:text="@string/subscript"
-                        android:textAllCaps="false"
-                        />
-
-                    <Button
-                        android:id="@+id/action_superscript"
-                        android:layout_width="60dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/colorWhite"
-                        android:textColor="@color/colorAccent"
-                        android:text="@string/superscript"
-                        android:textAllCaps="false"
-                        />
-
                     <ImageButton
                         android:id="@+id/action_strikethrough"
                         android:layout_width="60dp"
