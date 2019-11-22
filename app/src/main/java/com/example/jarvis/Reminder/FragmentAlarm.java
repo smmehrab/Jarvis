@@ -4,11 +4,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
+import com.example.jarvis.Util.AlarmAlertReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -204,7 +203,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
             notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
          //   showToast("notification ID " + notificationID);
 
-            Intent intent = new Intent(getActivity(), AlertReceiver.class);
+            Intent intent = new Intent(getActivity(), AlarmAlertReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
@@ -219,7 +218,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
             notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
          //   showToast("notification ID " + notificationID);
 
-            Intent intent = new Intent(getActivity(), AlertReceiver.class);
+            Intent intent = new Intent(getActivity(), AlarmAlertReceiver.class);
             intent.putExtra("index", notificationID);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
 
@@ -268,7 +267,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
         notificationID = Integer.parseInt(alarms.get(position).getHour()+alarms.get(position).getMinute());
      //   showToast("notification ID " + notificationID);
 
-        Intent intent = new Intent(getActivity(), AlertReceiver.class);
+        Intent intent = new Intent(getActivity(), AlarmAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
@@ -377,7 +376,7 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
                 //showToast("index " + rowIndex + " hour " + hour + " minute " + minute);
                 //showToast(" Is everyday " + alarmIsEveryday + " status " + alarmStatus);
 
-                Intent intent = new Intent(getActivity(), AlertReceiver.class);
+                Intent intent = new Intent(getActivity(), AlarmAlertReceiver.class);
                 intent.putExtra("index", notificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
 
@@ -409,9 +408,9 @@ public class FragmentAlarm extends Fragment implements OnClickListener, View.OnT
                 //update alarmManager with new time
                 int notificationID;
                 notificationID = Integer.parseInt(alarmHour+alarmMinute);
-                showToast("notification ID " + notificationID);
+             //   showToast("notification ID " + notificationID);
 
-                Intent intent = new Intent(getActivity(), AlertReceiver.class);
+                Intent intent = new Intent(getActivity(), AlarmAlertReceiver.class);
                 intent.putExtra("index", notificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), notificationID, intent, 0);
 

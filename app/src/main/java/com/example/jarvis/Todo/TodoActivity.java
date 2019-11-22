@@ -50,18 +50,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
-import com.example.jarvis.Reminder.AlertReceiver;
 import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
+import com.example.jarvis.Util.TodoAlertReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
@@ -396,7 +397,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
     //    showToast("temporary deleted id: "+todoNotificationID.toString());
 
-        Intent intent = new Intent(this, todoAlertReceiver.class);
+        Intent intent = new Intent(this, TodoAlertReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
         alarmManager.cancel(pendingIntent);
         pendingIntent.cancel();
@@ -428,7 +429,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("todo_isCompleted", task.getIsCompleted().toString());
         intent.putExtra("todo_isDeleted", task.getIsDeleted().toString());
         intent.putExtra("todo_isIgnored", task.getIsIgnored().toString());
-        intent.putExtra("todo_updateTimestamp", task.getUpdateTimestamp());
+        intent.putExtra("todo_syncState", task.getSyncState());
 
         startActivity(intent);
     }
@@ -444,7 +445,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             todoNotificationID = (Integer.parseInt(tasks.get(position).getYear())+Integer.parseInt(tasks.get(position).getMonth())+Integer.parseInt(tasks.get(position).getDay())+Integer.parseInt(tasks.get(position).getHour())+Integer.parseInt(tasks.get(position).getMinute()));
         //    showToast("Task complete id: "+todoNotificationID.toString());
 
-            Intent intent = new Intent(this, todoAlertReceiver.class);
+            Intent intent = new Intent(this, TodoAlertReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
@@ -468,7 +469,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         //    showToast("mark notification id: "+unmarkTodoNotificationID.toString());
 
             if(tasks.get(position).getReminderState() == 1 && tasks.get(position).getIsCompleted() == 0) {
-                Intent intent = new Intent(this, todoAlertReceiver.class);
+                Intent intent = new Intent(this, TodoAlertReceiver.class);
                 intent.putExtra("todoNotification", unmarkTodoNotificationID);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(this, unmarkTodoNotificationID, intent, 0);
                 alarmManager.setExact(AlarmManager.RTC, c.getTimeInMillis(), pendingIntent);
@@ -845,7 +846,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -1157,11 +1158,15 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
 
+        add.deleteAlarmFromFirebase();
+
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
 
     public void signOut() {
-    //    sync();
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
@@ -1174,7 +1179,7 @@ public class TodoActivity extends AppCompatActivity implements View.OnClickListe
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }

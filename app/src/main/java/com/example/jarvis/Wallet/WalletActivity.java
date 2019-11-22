@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
@@ -48,9 +49,9 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
@@ -381,7 +382,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         intent.putExtra("wallet_isDeleted", record.getIsDeleted().toString());
         intent.putExtra("wallet_isIgnored", record.getIsIgnored().toString());
 
-        intent.putExtra("wallet_updateTimestamp", record.getUpdateTimestamp());
+        intent.putExtra("wallet_syncState", record.getSyncState());
 
         startActivity(intent);
     }
@@ -739,7 +740,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -894,11 +895,15 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
 
+        add.deleteAlarmFromFirebase();
+
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
 
     public void signOut() {
-    //    sync();
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
@@ -911,7 +916,7 @@ public class WalletActivity extends AppCompatActivity implements View.OnClickLis
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }

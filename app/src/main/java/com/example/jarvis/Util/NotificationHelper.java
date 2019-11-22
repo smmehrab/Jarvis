@@ -1,6 +1,6 @@
 /***Apatoto kono kaj nai ei class er but kaj e lagte pare***/
 
-package com.example.jarvis.Reminder;
+package com.example.jarvis.Util;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -15,8 +15,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.example.jarvis.R;
-
-import java.lang.annotation.Target;
 
 public class NotificationHelper extends ContextWrapper {
 

@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">Jarvis</string>
-    <string name="welcome_message">Jarvis Says, Welcome!</string>
+
+    <string name="welcome_quote">
+        \n\"Old Beliefs Doesn\'t Lead You to New Cheese\"\n
+    </string>
+
+    <string name="welcome_message">
+        \nMake your life more organized &amp; productive via using following features of this application:\n\n
+
+        Todo | Journal | Wallet | Reminder
+
+        \n\nThis application provides exclusive voice command feature too, in case you like it more speech oriented.\n
+    </string>
 
     <string name="sign_in_btn_txt">Sign In</string>
     <string name="sign_up_btn_txt">Sign Up</string>
@@ -40,7 +51,6 @@
     <string name="time_txt">Time</string>
     <string name="profile_details_txt">Profile Details</string>
     <string name="settings_options_txt">Settings Options</string>
-    <string name="about_details_txt">About Details</string>
     <string name="settings_details_txt">Settings Details</string>
     <string name="reset_details_txt">Reset Details</string>
     <string name="set_new_password_txt">Set New Password</string>
@@ -70,6 +80,9 @@
     <string name="heading4">h4</string>
     <string name="heading5">h5</string>
     <string name="heading6">h6</string>
+    <string name="ringing_txt">Ringing...</string>
+
+    <string name="about_details_txt">hfdskfh</string>
 
 
 </resources>

@@ -267,25 +267,19 @@ public class UpdateRecordActivity extends AppCompatActivity implements AdapterVi
             description = descriptionEditText.getText().toString();
             amount = amountEditText.getText().toString();
 
-            // Getting Current Timestamp
-            Long tsLong = System.currentTimeMillis()/1000;
-            String ts = tsLong.toString();
-            updateTimestamp = ts;
-            oldUpdateTimestamp = updateTimestamp;
-
             if(!(year.equals(oldYear) && month.equals(oldMonth) && day.equals(oldDay) && title.equals(oldTitle) && type.equals(oldType))){
                 // Primary Key Field Violated
                 oldIsIgnored = 1;
 
                 // Ignore Existing Record
-                Record record = new Record(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldType, oldAmount, oldIsDeleted, oldIsIgnored, oldUpdateTimestamp);
+                Record record = new Record(oldTitle, oldDescription, oldYear, oldMonth, oldDay, oldType, oldAmount, oldIsDeleted, oldIsIgnored, 1);
                 sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
 
                 // Add New Record
-                record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp);
+                record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, 0);
                 sqLiteDatabaseHelper.insertRecord(record);
             } else {
-                Record record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, updateTimestamp);
+                Record record = new Record(title, description, year, month, day, type, amount, isDeleted, isIgnored, 0);
                 sqLiteDatabaseHelper.updateRecord(record, oldYear, oldMonth, oldDay, oldTitle, oldType);
             }
 

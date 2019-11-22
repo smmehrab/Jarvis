@@ -11,11 +11,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,9 +25,8 @@ import com.example.jarvis.Firebase.FirebaseDataRetrieve;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
-import com.example.jarvis.Todo.todoAlertReceiver;
+import com.example.jarvis.Util.TodoAlertReceiver;
 import com.example.jarvis.Wallet.Record;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -51,39 +50,39 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     /** Network Variables */
     private BroadcastReceiver networkReceiver = null;
 
-    //  Variables for Remote Database
+    /** Firebase Variables */
     private static final int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
     GoogleSignInOptions googleSignInOptions;
 
-    // Buttons
-    private Button signInBtn;
+    /** Button */
     private Button signInWithGoogleBtn;
-    private Button forgotPassBtn;
 
-    // EditTexts
-    private EditText emailEditTxt;
-    private EditText passEditTxt;
 
-    // Variable for Local Database
+    /** SQLite Variable */
     SQLiteDatabaseHelper sqLiteDatabaseHelper;
 
+    /** Others */
+    private boolean doubleBackToExitPressedOnce = false;
     private AlarmManager alarmManager;
 
-    // User user;
-    // private int isSignedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        initializeGoogleVariable();
+        initializeSQLiteVariable();
         setUI();
+    }
 
-        handleLocalDatabase();
-        handleRemoteDatabase();
+    @Override
+    protected void onStart() {
+        mAuth.addAuthStateListener(mAuthListener);
+        super.onStart();
     }
 
     void setUI(){
@@ -93,170 +92,19 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     void findXmlElements(){
-        signInBtn = (Button) findViewById(R.id.sign_in_btn);
         signInWithGoogleBtn = (Button) findViewById(R.id.sign_in_with_google_btn);
-        forgotPassBtn = (Button) findViewById(R.id.forgot_pass_btn);
-
-        emailEditTxt = (EditText) findViewById(R.id.sign_in_email_edit_txt);
-        passEditTxt = (EditText) findViewById(R.id.sign_in_pass_edit_txt);
-
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
 
     void setListeners(){
-        signInBtn.setOnClickListener(this);
         signInWithGoogleBtn.setOnClickListener(this);
-        forgotPassBtn.setOnClickListener(this);
     }
 
-    void handleLocalDatabase(){
+    void initializeSQLiteVariable(){
         sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
-
-        /**here should call the alarmManager**/
+        /**may be here should call the alarmManager**/
         setAlarm();
-    }
-
-    void handleRemoteDatabase(){
-        initializeGoogleVariable();
-    }
-
-    private void initializeGoogleVariable() {
-        mAuth = FirebaseAuth.getInstance();
-
-        // Configuring Google Sign In
-        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-    }
-
-//    void handleSignIn() {
-//        String email = emailEditTxt.getText().toString();
-//        String password = passEditTxt.getText().toString();
-//        //change a little
-//        Boolean result;
-//        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
-//            result = sqLiteDatabaseHelper.findUser(email, password);
-//
-//            if (result) {
-//                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-//                intent.putExtra("currentUser", email);
-//                startActivity(intent);
-//            } else {
-//                Toast.makeText(getApplicationContext(), "Invalid Email Or Password. Try Again!", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//        else
-//            Toast.makeText(getApplicationContext(), "Text Field can't be empty!!!", Toast.LENGTH_SHORT).show();
-//
-//    }
-
-    void handleSignInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-        //startActivityForResult();
-    }
-
-    void handleForgotPass(){
-        Intent intent = new Intent(SignInActivity.this, ResetPassActivity.class);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onClick(View view) {
-        if(view == signInWithGoogleBtn){
-            if(!isConnectedToInternet())
-                Snackbar.make(findViewById(R.id.sign_in_activity), "Can't Sign In Without Internet Access!", Snackbar.LENGTH_SHORT).show();
-            else
-                handleSignInWithGoogle();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(SignInActivity.this, WelcomeActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-               // Log.w(TAG, "Google sign in failed", e);
-                // ...
-            }
-        }
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-
-                            String deviceId = findDeviceId();
-
-                            retrieveDataFromFirebase();
-                            addUserToLocalDatabase(acct, deviceId);
-
-                            enterApp(acct, deviceId);
-                        } else {
-                            Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    public void retrieveDataFromFirebase(){
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        /**  CHECK & UPDATE DEVICE ID ON FIREBASE */
-
-        // Call Firebase Sync
-        FirebaseDataRetrieve updateInstance = new FirebaseDataRetrieve(FirebaseFirestore.getInstance(),mAuth.getUid());
-
-        ArrayList<com.example.jarvis.Todo.Task> tasks = new ArrayList<>();
-        ArrayList<Record> records = new ArrayList<>();
-
-        updateInstance.retriveTodoFromFirebase(getApplicationContext());
-        updateInstance.retriveWalletFromFirebase(getApplicationContext());
-    }
-
-    public void addUserToLocalDatabase(GoogleSignInAccount acct, String deviceId){
-        // Inserting that User to TABLE_USER (Local Database)
-        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
-        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
-
-        // Getting Current Timestamp
-        Long tsLong = System.currentTimeMillis()/1000;
-        String ts = tsLong.toString();
-
-        // Creating New User
-        User currentUser = new User( mAuth.getUid(), acct.getEmail(), acct.getDisplayName(), Objects.requireNonNull(acct.getPhotoUrl()).toString(), deviceId, ts);
-
-        // Inserting to the Local Database
-        sqLiteDatabaseHelper.insertUser(currentUser);
     }
 
     public void setAlarm(){
@@ -294,13 +142,13 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                         c.set(Calendar.SECOND, 0);
 
                         todoNotificationID = (Integer.parseInt(mYear)+Integer.parseInt(mMonth)+Integer.parseInt(mDay)+Integer.parseInt(mHour)+Integer.parseInt(mMinute));
-                        showToast(todoNotificationID.toString());
+                //        showToast(todoNotificationID.toString());
 
                         long reminderTime = c.getTimeInMillis();
                         long currentTime= System.currentTimeMillis();
 
                         if(reminderTime > currentTime){
-                            Intent intent = new Intent(this, todoAlertReceiver.class);
+                            Intent intent = new Intent(this, TodoAlertReceiver.class);
                             intent.putExtra("todoNotification", todoNotificationID);
                             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, todoNotificationID, intent, 0);
                             alarmManager.setExact(AlarmManager.RTC, reminderTime, pendingIntent);
@@ -313,19 +161,143 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    public void enterApp(GoogleSignInAccount acct, String deviceId){
-        // Changing Activity
+    private void initializeGoogleVariable() {
+        mAuth = FirebaseAuth.getInstance();
+        checkIfAlreadySignIn();
+
+        // Configuring Google Sign In
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+
+    }
+
+    private void checkIfAlreadySignIn() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser() != null){
+                    enterApp();
+                }
+            }
+        };
+    }
+
+    void handleSignInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == signInWithGoogleBtn) {
+            if (!isConnectedToInternet())
+                Snackbar.make(findViewById(R.id.sign_in_activity), "Can't Sign In Without Internet Access!", Snackbar.LENGTH_SHORT).show();
+            else {
+                handleSignInWithGoogle();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.finish();
+            moveTaskToBack(true);
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+
+        showToast("Press Once Again to EXIT");
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In Successful | Authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            String deviceId = findDeviceId();
+
+                            retrieveDataFromFirebase();
+                            addUserToLocalDatabase(acct, deviceId);
+                            enterApp();
+                        } else {
+                            Snackbar.make(findViewById(R.id.sign_in_activity), "Authentication Failed! Try Again!", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    public void retrieveDataFromFirebase(){
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        /**  CHECK & UPDATE DEVICE ID ON FIREBASE */
+        // Call Firebase Sync
+        FirebaseDataRetrieve updateInstance = new FirebaseDataRetrieve(FirebaseFirestore.getInstance(),mAuth.getUid());
+
+        ArrayList<com.example.jarvis.Todo.Task> tasks = new ArrayList<>();
+        ArrayList<Record> records = new ArrayList<>();
+
+        updateInstance.retriveTodoFromFirebase(getApplicationContext());
+        updateInstance.retriveWalletFromFirebase(getApplicationContext());
+        updateInstance.retriveAlarmFromFirebase(getApplicationContext());
+    }
+
+    public void addUserToLocalDatabase(GoogleSignInAccount acct, String deviceId){
+        // Inserting that User to TABLE_USER (Local Database)
+        SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(getApplicationContext());
+        SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getWritableDatabase();
+
+        // Getting Current Timestamp
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+
+        // Creating New User
+        User currentUser = new User( mAuth.getUid(), acct.getEmail(), acct.getDisplayName(), Objects.requireNonNull(acct.getPhotoUrl()).toString(), deviceId, ts);
+
+        // Inserting to the Local Database
+        sqLiteDatabaseHelper.insertUser(currentUser);
+    }
+
+    public void enterApp(){
         Intent intent = new Intent(SignInActivity.this, HomeActivity.class);
-
-        // Passing New User Info to the HomeActivity
-        intent.putExtra("uid", mAuth.getUid());
-        intent.putExtra("email", acct.getEmail());
-        intent.putExtra("name", acct.getDisplayName());
-        intent.putExtra("photo", Objects.requireNonNull(acct.getPhotoUrl()).toString());
-        intent.putExtra("deviceId", deviceId);
-
         startActivity(intent);
-        finish();
     }
 
     public String findDeviceId(){
@@ -353,5 +325,4 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
     }
-
 }

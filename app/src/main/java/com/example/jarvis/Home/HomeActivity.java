@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -37,6 +36,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Journal.JournalActivity;
 import com.example.jarvis.R;
@@ -44,9 +44,9 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -107,9 +107,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Intent recognizerIntent;
     private String LOG_TAG = "HomeActivity";
     private ToggleButton voiceCommandToggleButton;
-
-    private TextToSpeech mTTS;
-
     private boolean isVcOn;
 
     @Override
@@ -117,24 +114,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        setWelcomeMessage();
+        activateUser();
         setUI();
         setVoiceCommandFeature();
         isVoiceCommandOn();
     }
 
-    public void setWelcomeMessage(){
-        if(getIntent().getExtras() != null) {
-//            deviceId = getIntent().getExtras().getString("deviceId");
-//            currentUid = getIntent().getExtras().getString("uid");
-//            currentUser = getIntent().getExtras().getString("email");
-//            currentUserName = getIntent().getExtras().getString("name");
-//            currentUserPhoto = getIntent().getExtras().getString("photo");
-        }
-
+    public void activateUser(){
         SQLiteDatabaseHelper sqLiteDatabaseHelper = new SQLiteDatabaseHelper(this);
         SQLiteDatabase sqLiteDatabase = sqLiteDatabaseHelper.getReadableDatabase();
-
         activeUser = sqLiteDatabaseHelper.getUser();
     }
 
@@ -146,24 +134,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void findXmlElements(){
+        // Parent Layout
         drawerLayout = (DrawerLayout) findViewById(R.id.home_drawer_layout);
 
+        // Toolbar
         toolbar = (Toolbar) findViewById(R.id.home_toolbar);
-
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
         activityDrawerBtn = (Button) findViewById(R.id.activity_drawer_btn);
 
+        // Navigation Drawer
         userNavigationView = (NavigationView) findViewById(R.id.user_navigation_view);
         activityNavigationView = (NavigationView) findViewById(R.id.home_navigation_view);
 
         profilePictureImageView = (ImageView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_picture);
         profileEmailTextView = (TextView) userNavigationView.getHeaderView(0).findViewById(R.id.user_profile_email);
 
+        // Home Options
         todoActivityBtn = (Button) findViewById(R.id.todo_activity_btn);
         journalActivityBtn = (Button) findViewById(R.id.journal_activity_btn);
         walletActivityBtn = (Button) findViewById(R.id.wallet_activity_btn);
         reminderActivityBtn = (Button) findViewById(R.id.reminder_activity_btn);
 
+        // Voice Command
         progressBar = (ProgressBar) findViewById(R.id.home_progress_bar);
         voiceCommandToggleButton = (ToggleButton) findViewById(R.id.home_voice_command_toggle_btn);
     }
@@ -189,7 +181,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         reminderActivityBtn.setOnClickListener(this);
 
         voiceCommandToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -260,8 +251,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
-    /** ON CLICK HANDLING */
 
+    /** ON CLICK HANDLING */
     @Override
     public void onClick(View view) {
         if(view == userDrawerBtn){
@@ -392,7 +383,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /** FIREBASE AUTHENTICATION HANDLING */
-
     private void initializeGoogleVariable() {
         mAuth = FirebaseAuth.getInstance();
 
@@ -406,7 +396,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /** VOICE COMMAND HANDLING */
-
     public void setVoiceCommandFeature(){
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         Log.i(LOG_TAG, "isRecognitionAvailable: " + SpeechRecognizer.isRecognitionAvailable(this));
@@ -416,24 +405,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en");
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-
-//        mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-//            @Override
-//            public void onInit(int status) {
-//                if (status == TextToSpeech.SUCCESS) {
-//                    int result = mTTS.setLanguage(Locale.ENGLISH);
-//
-//                    if (result == TextToSpeech.LANG_MISSING_DATA
-//                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-//                        Log.e("TTS", "Language not supported");
-//                    } else {
-//
-//                    }
-//                } else {
-//                    Log.e("TTS", "Initialization failed");
-//                }
-//            }
-//        });
     }
 
     public void isVoiceCommandOn(){
@@ -551,12 +522,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
-        }
-
-        else if(matches.get(0).equals("open activity options")){
+        } else if(matches.get(0).equals("open activity options")){
             activityDrawerBtn.callOnClick();
             restartVoiceCommand();
         } else if(matches.get(0).equals("close activity options")){
@@ -568,37 +537,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else if(matches.get(0).equals("close user options")){
             userDrawerBtn.callOnClick();
             restartVoiceCommand();
-        }
-
-
-        else if(matches.get(0).equals("add a new task")){
-
-        } else if(matches.get(0).equals("update a task")){
-
-        } else if(matches.get(0).equals("delete a task")){
-
-        } else if(matches.get(0).equals("mark a task as completed")){
-
-        }
-
-//        else if(matches.get(0).equals("scroll up")){
-//            disableVoiceCommand();
-//            scroll(-1);
-//        } else if(matches.get(0).equals("scroll down")){
-//            disableVoiceCommand();
-//            scroll(1);
-//        }
-
-        else if(matches.get(0).equals("turn off voice command")){
+        } else if(matches.get(0).equals("turn off voice command")){
             disableVoiceCommand();
-        }
-
-//        else if(matches.get(0).equals("read")){
-////            read();
-//        } else if(matches.get(0).equals("stop reading")){
-//
-//        }
-        else {
+        } else {
             showToast("Didn't Recognize \"" + matches.get(0) + "\"! Try Again!");
             restartVoiceCommand();
         }
@@ -681,7 +622,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /** Get Active User */
-
     public static com.example.jarvis.UserHandling.User getActiveUser() {
         return activeUser;
     }
@@ -696,6 +636,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), uid);
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
+        add.deleteAlarmFromFirebase();
+
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
 
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
@@ -714,7 +658,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }

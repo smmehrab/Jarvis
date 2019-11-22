@@ -26,145 +26,60 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="vertical"
-            android:weightSum="7">
+            android:layout_weight="0.5"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:weightSum="7">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:background="@drawable/shape_left_rounded_rectangle"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/email_txt"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/sign_in_email_edit_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:background="@drawable/shape_right_rounded_outlined_rectangle"
-                    android:inputType="text"
-                    android:padding="10dp"
-                    android:textSize="11sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:weightSum="7">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:background="@drawable/shape_left_rounded_rectangle"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/pass_txt"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/sign_in_pass_edit_txt"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:background="@drawable/shape_right_rounded_outlined_rectangle"
-                    android:inputType="textPassword"
-                    android:padding="10dp"
-                    android:textSize="11sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_height="match_parent"
+                android:text="@string/app_name"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="normal"
+                android:textSize="24sp"
+                android:gravity="center"/>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:gravity="center_horizontal"
+            android:layout_weight="4"
+            android:gravity="center"
             android:orientation="vertical"
-            android:weightSum="11">
+            android:weightSum="5">
 
-            <Button
-                android:id="@+id/sign_in_btn"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:background="@drawable/shape_rounded_rectangle"
-                android:text="@string/sign_in_btn_txt"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                android:elevation="4dp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.75" />
-
-            <Button
-                android:id="@+id/sign_in_with_google_btn"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:background="@drawable/shape_rounded_outlined_rectangle"
-                android:drawableLeft="@drawable/google_icon"
-                android:padding="5dp"
-                android:elevation="4dp"
-                android:text="@string/sign_in_with_google_btn_txt"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome_quote"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp" />
+                android:textStyle="normal"
+                android:textSize="12sp"
+                android:gravity="center"/>
 
-            <Button
-                android:id="@+id/forgot_pass_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:background="@color/colorWhite"
-                android:clickable="true"
-                android:focusable="true"
-                android:shadowColor="@color/colorWhite"
-                android:stateListAnimator="@null"
-                android:text="@string/forgot_pass_btn_txt"
-                android:textAlignment="center"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome_message"
                 android:textColor="@color/colorPrimary"
-                android:textSize="11sp" />
+                android:textStyle="normal"
+                android:textSize="12sp"
+                android:gravity="center"/>
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/sign_in_with_google_btn"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/btn_background"
+            android:drawableLeft="@drawable/google_icon"
+            android:padding="5dp"
+            android:elevation="4dp"
+            android:text="@string/sign_in_with_google_btn_txt"
+            android:textColor="@drawable/btn_text_color"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

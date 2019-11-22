@@ -44,6 +44,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jarvis.About.AboutActivity;
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.R;
@@ -51,10 +52,10 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Util.RecyclerTouchListener;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -664,7 +665,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -818,12 +819,15 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
         FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), uid);
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
+        add.deleteAlarmFromFirebase();
 
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
 
     public void signOut() {
-    //    sync();
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
@@ -836,7 +840,7 @@ public class JournalActivity extends AppCompatActivity implements View.OnClickLi
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }

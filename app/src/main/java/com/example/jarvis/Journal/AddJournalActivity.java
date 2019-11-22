@@ -151,35 +151,6 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-        findViewById(R.id.action_subscript).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                mEditor.setSubscript();
-                if(!toogleArray[2]) {
-                    findViewById(R.id.action_subscript).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
-                    toogleArray[2] = true;
-                }
-
-                else{
-                    toogleArray[2] = false;
-                    findViewById(R.id.action_subscript).setBackground(getResources().getDrawable(R.color.colorWhite));
-                }
-            }
-        });
-
-        findViewById(R.id.action_superscript).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                mEditor.setSuperscript();
-                if(!toogleArray[3]) {
-                    findViewById(R.id.action_superscript).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
-                    toogleArray[3] = true;
-                }
-
-                else{
-                    toogleArray[3] = false;
-                    findViewById(R.id.action_superscript).setBackground(getResources().getDrawable(R.color.colorWhite));
-                }
-            }
-        });
 
         findViewById(R.id.action_strikethrough).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -214,7 +185,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
 
-                mEditor.setHeading(1);
+                mEditor.setHeading(3);
                 if(!toogleArray[6]) {
 
                     findViewById(R.id.action_heading1).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
@@ -230,7 +201,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
 
         findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                mEditor.setHeading(2);
+                mEditor.setHeading(4);
                 if(!toogleArray[7]) {
                     findViewById(R.id.action_heading2).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
                     toogleArray[7] = true;
@@ -245,7 +216,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
 
         findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                mEditor.setHeading(3);
+                mEditor.setHeading(5);
                 if(!toogleArray[8]) {
                     findViewById(R.id.action_heading3).setBackground(getResources().getDrawable(R.drawable.icon_color_ash_op));
                     toogleArray[8] = true;
@@ -417,7 +388,7 @@ public class AddJournalActivity extends AppCompatActivity implements View.OnClic
         //mEditor.focusEditor();
         mEditor.setPadding(10, 10, 10, 10);
         toolbarTitle.setText(journal.getTitle());
-        mEditor.loadCSS("file:///android_assets/style.css");
+        mEditor.loadCSS("file:///android_asset/style.css");
         mEditor.setPlaceholder("Insert text here...");
         for(int i = 0; i < toogleArray.length; ++i){
             toogleArray[i] = false;

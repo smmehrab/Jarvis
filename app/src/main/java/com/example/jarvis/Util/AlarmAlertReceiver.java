@@ -1,6 +1,5 @@
-package com.example.jarvis.Reminder;
+package com.example.jarvis.Util;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,15 +9,14 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.provider.Settings;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.jarvis.R;
+import com.example.jarvis.Reminder.CancelAlarm;
 
-public class AlertReceiver extends BroadcastReceiver {
+public class AlarmAlertReceiver extends BroadcastReceiver {
 
     public static MediaPlayer mediaPlayer;
     private int notificationID;

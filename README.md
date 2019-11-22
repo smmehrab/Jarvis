@@ -36,15 +36,3 @@ As a part of life, many of us love to keep track of their daily activities and m
 
 ##### 4. Reminder:
 - Add different types of events and set alarm for that event.
-
-##### 5. Alarm: 
-- Disable or enable snooze option for an alarm.
-- Add puzzle to stop an alarm. 
-
-##### 6. Focus (Stopwatch):
-- If you open another app while running the stopwatch, the stopwatch will be killed. But you will also be able to use the normal stopwatch feature. 
-- You will be provided with points based on your focused hours.
-
-##### 7. Interest Based Bookmarker:
-- Add different interests.
-- Add bookmarks to those interests, like adding files to a folder.

@@ -1,18 +1,19 @@
 package com.example.jarvis.Reminder;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.jarvis.R;
+import com.example.jarvis.Util.AlarmAlertReceiver;
 
 public class CancelAlarm extends AppCompatActivity {
 
     private Button cancelAlarm;
-    private AlertReceiver alertReceiver;
+    private AlarmAlertReceiver alertReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

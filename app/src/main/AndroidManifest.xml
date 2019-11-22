@@ -30,31 +30,27 @@
         <activity android:name=".Todo.UpdateTaskActivity" />
         <activity android:name=".Wallet.AddRecordActivity" />
         <activity android:name=".Todo.AddTaskActivity" />
-        <activity android:name=".About.AboutActivity" />
+        <activity android:name=".About.AboutActivity"/>
         <activity android:name=".Settings.SettingsActivity" />
         <activity android:name=".Reminder.ReminderActivity" />
         <activity android:name=".Wallet.WalletActivity" />
         <activity android:name=".Journal.JournalActivity" />
         <activity android:name=".Todo.TodoActivity" />
         <activity android:name=".Home.HomeActivity" />
-        <activity android:name=".UserHandling.ResetPassActivity" />
-        <activity android:name=".UserHandling.SignUpActivity" />
         <activity android:name=".UserHandling.SignInActivity" />
-        <activity android:name=".WelcomeScreen.WelcomeActivity" />
         <activity android:name=".SplashScreen.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <receiver
-            android:name=".Reminder.AlertReceiver"
+            android:name=".Util.AlarmAlertReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name=".Todo.todoAlertReceiver"
+            android:name=".Util.TodoAlertReceiver"
             android:enabled="true"
             android:exported="true" />
     </application>

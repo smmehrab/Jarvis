@@ -14,10 +14,12 @@ import android.os.CountDownTimer;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -34,6 +36,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.jarvis.Firebase.FirebaseDataAdd;
 import com.example.jarvis.Firebase.FirebaseDataUpdate;
 import com.example.jarvis.Home.HomeActivity;
 import com.example.jarvis.Journal.JournalActivity;
@@ -42,9 +45,9 @@ import com.example.jarvis.Reminder.ReminderActivity;
 import com.example.jarvis.SQLite.SQLiteDatabaseHelper;
 import com.example.jarvis.Settings.SettingsActivity;
 import com.example.jarvis.Todo.TodoActivity;
+import com.example.jarvis.UserHandling.SignInActivity;
 import com.example.jarvis.Util.NetworkReceiver;
 import com.example.jarvis.Wallet.WalletActivity;
-import com.example.jarvis.WelcomeScreen.WelcomeActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -62,9 +65,9 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
 
     /** Network Variables */
     private BroadcastReceiver networkReceiver = null;
-
     /** Firebase Variables */
     private static final int RC_SIGN_IN = 1;
+    private WebView webView;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -113,6 +116,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void findXmlElements(){
+        webView = (WebView) findViewById(R.id.webview);
         drawerLayout = (DrawerLayout) findViewById(R.id.about_drawer_layout);
         toolbar = (Toolbar) findViewById(R.id.about_toolbar);
         userDrawerBtn = (Button) findViewById(R.id.user_drawer_btn);
@@ -168,7 +172,6 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
         mAuth = FirebaseAuth.getInstance();
         networkReceiver = new NetworkReceiver();
         broadcastIntent();
-
         activityDrawerBtn.setBackgroundResource(R.drawable.icon_activity_about);
         activityTitle.setText(R.string.about_txt);
 
@@ -179,6 +182,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
         userNavigationView.getMenu().findItem(R.id.user_about_option).setChecked(true);
 
         progressBar.setVisibility(View.INVISIBLE);
+        webView.loadUrl("file:///android_asset/view.html");
     }
 
     public void showToast(String message){
@@ -430,7 +434,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
             intent.putExtra("voice_command", "true");
             startActivity(intent);
         } else if(matches.get(0).equals("please sign out")){
-            Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+            Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
             startActivity(intent);
             finish();
         }
@@ -516,12 +520,15 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
         FirebaseDataUpdate add = new FirebaseDataUpdate(FirebaseFirestore.getInstance(), uid);
         add.queryOnMultipleTodoInput(sqLiteDatabaseHelper.syncTodoItems());
         add.queryOnMultipleWalletInput(sqLiteDatabaseHelper.syncWalletItems());
+        add.deleteAlarmFromFirebase();
 
+        FirebaseDataAdd addAlarm = new FirebaseDataAdd(FirebaseFirestore.getInstance(),uid);
+        addAlarm.addAlarmInFireBase(sqLiteDatabaseHelper.syncAlarmItems());
         sqLiteDatabaseHelper.updateSyncTime(uid);
     }
 
     public void signOut() {
-        //sync();
+        sync();
         initializeGoogleVariable();
         mAuth.signOut();
 
@@ -534,7 +541,7 @@ public class AboutActivity extends AppCompatActivity implements View.OnClickList
 
                         sqLiteDatabaseHelper.refreshDatabase(sqLiteDatabase);
 
-                        Intent intent = new Intent(getApplicationContext(), WelcomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
                         startActivity(intent);
                         finish();
                     }
